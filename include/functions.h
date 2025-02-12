@@ -140,7 +140,6 @@ auto getHelpString()->std::string;
 void printHelp();
 
 /* -------------- Command line inputs -------------- */
-void getEnter();
 auto getKey() -> char;
 auto getLine() -> std::string;
 auto getConfirmation() -> bool;

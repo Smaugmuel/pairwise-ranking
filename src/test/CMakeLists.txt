@@ -5,7 +5,7 @@ enable_testing()
 list(APPEND test_helper_files
 	testing.cpp
 	testing.h
-	${PROJECT_SOURCE_DIR}/include/functions.h
+	${PROJECT_SOURCE_DIR}/src/functions.h
 	${PROJECT_SOURCE_DIR}/src/functions.cpp
 )
 
@@ -40,6 +40,6 @@ list(APPEND tests
 
 foreach(test_name ${tests})
 	add_executable(${test_name} ${test_name}.cpp ${test_helper_files})
-	target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+	target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 	add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()

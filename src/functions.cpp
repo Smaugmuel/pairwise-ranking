@@ -556,10 +556,6 @@ void printHelp() {
 }
 
 /* -------------- Command line inputs -------------- */
-void getEnter() {
-	print("Press Enter to continue...", false);
-	std::cin.get();
-}
 auto getKey() -> char {
 	return _getch();
 }

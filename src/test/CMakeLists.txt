@@ -5,8 +5,12 @@ enable_testing()
 list(APPEND test_helper_files
 	testing.cpp
 	testing.h
-	${PROJECT_SOURCE_DIR}/src/functions.h
 	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.h
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/print.h
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.h
 )
 
 list(APPEND tests

@@ -50,30 +50,30 @@ void generateWithReducedVotingIfEnoughItemsToReduce() {
 	}
 }
 void generateWithFullVotingGivesCorrectAmountOfScheduledVotes() {
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(2), false).value()), 1ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(3), false).value()), 3ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(4), false).value()), 6ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(5), false).value()), 10ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(6), false).value()), 15ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(7), false).value()), 21ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(8), false).value()), 28ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(9), false).value()), 36ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(10), false).value()), 45ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(20), false).value()), 190ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(30), false).value()), 435ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(2), false).value().numberOfScheduledVotes(), 1ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(3), false).value().numberOfScheduledVotes(), 3ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(4), false).value().numberOfScheduledVotes(), 6ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(5), false).value().numberOfScheduledVotes(), 10ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(6), false).value().numberOfScheduledVotes(), 15ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(7), false).value().numberOfScheduledVotes(), 21ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(8), false).value().numberOfScheduledVotes(), 28ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(9), false).value().numberOfScheduledVotes(), 36ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(10), false).value().numberOfScheduledVotes(), 45ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(20), false).value().numberOfScheduledVotes(), 190ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(30), false).value().numberOfScheduledVotes(), 435ui32);
 }
 void generateWithReducedVotingGivesCorrectAmountOfScheduledVotes() {
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(2), true).value()), 1ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(3), true).value()), 3ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(4), true).value()), 6ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(5), true).value()), 10ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(6), true).value()), 9ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(7), true).value()), 14ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(8), true).value()), 12ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(9), true).value()), 18ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(10), true).value()), 15ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(20), true).value()), 30ui32);
-	ASSERT_EQ(numberOfScheduledVotes(VotingRound::create(getNItems(30), true).value()), 45ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(2), true).value().numberOfScheduledVotes(), 1ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(3), true).value().numberOfScheduledVotes(), 3ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(4), true).value().numberOfScheduledVotes(), 6ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(5), true).value().numberOfScheduledVotes(), 10ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(6), true).value().numberOfScheduledVotes(), 9ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(7), true).value().numberOfScheduledVotes(), 14ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(8), true).value().numberOfScheduledVotes(), 12ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(9), true).value().numberOfScheduledVotes(), 18ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(10), true).value().numberOfScheduledVotes(), 15ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(20), true).value().numberOfScheduledVotes(), 30ui32);
+	ASSERT_EQ(VotingRound::create(getNItems(30), true).value().numberOfScheduledVotes(), 45ui32);
 }
 void generateWithFullVotingGivesCorrectScheduledVotes() {
 	auto const generate_and_get_index_pairs = [](uint32_t number_of_items) -> IndexPairs {

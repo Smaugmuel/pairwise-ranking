@@ -18,112 +18,6 @@ auto operator==(Vote const& a, Vote const& b) -> bool {
 	return a.index_pair == b.index_pair && a.winner == b.winner;
 }
 
-/* -------------- Voting round verification -------------- */
-auto hasDuplicateItems(Items const& items) -> bool {
-	std::unordered_set<Item> item_set{};
-	for (auto const& item : items) {
-		item_set.insert(item);
-	}
-	return item_set.size() != items.size();
-}
-auto hasInvalidScheduledVotes(IndexPairs const& index_pairs, uint32_t number_of_items) -> bool {
-	for (auto const& [left, right] : index_pairs) {
-		if (left >= number_of_items || right >= number_of_items || left == right) {
-			printError("Invalid scheduled votes. Left: " + std::to_string(left) +
-				", right: " + std::to_string(right) + ", number of items: " + std::to_string(number_of_items));
-			return true;
-		}
-	}
-	return false;
-}
-auto hasDuplicateScheduledVotes(IndexPairs const& index_pairs) -> bool {
-	std::unordered_set<IndexPair, IndexPairHash> index_pair_set{};
-	for (auto const& index_pair : index_pairs) {
-		index_pair_set.insert(sortIndexPair(index_pair));
-	}
-	return index_pair_set.size() != index_pairs.size();
-}
-auto expectedIndexPairs(Items const& items, bool reduced_voting) -> uint32_t {
-	if (items.size() < 2) {
-		return 0;
-	}
-	size_t number_of_pairs = sumOfFirstIntegers(items.size() - 1);
-	if (reduced_voting && items.size() >= kMinimumItemsForPruning) {
-		number_of_pairs -= items.size() * pruningAmount(items.size());
-	}
-	return static_cast<uint32_t>(number_of_pairs);
-}
-auto hasVotesWithInvalidIndices(Votes const& votes, uint32_t number_of_items) -> bool {
-	for (auto const& vote : votes) {
-		if (vote.index_pair.first >= vote.index_pair.second ||
-			vote.index_pair.second >= number_of_items) {
-			return true;
-		}
-	}
-	return false;
-}
-auto hasVotesWithInvalidVoteOption(Votes const& votes) -> bool {
-	for (auto const& vote : votes) {
-		if (vote.winner != Option::A && vote.winner != Option::B) {
-			return true;
-		}
-	}
-	return false;
-}
-auto hasDuplicateVotes(Votes const& votes) -> bool {
-	std::unordered_set<IndexPair, IndexPairHash> index_pair_set{};
-	for (auto const& vote : votes) {
-		index_pair_set.insert(vote.index_pair);
-	}
-	return index_pair_set.size() != votes.size();
-}
-auto verifyVotingRound(VotingRound const& voting_round) -> bool {
-	// Verify state of items, seed, index pairs, and votes
-
-	if (voting_round.items.size() < 2) {
-		printError("At least two items are required");
-		return false;
-	}
-	if (hasDuplicateItems(voting_round.items)) {
-		printError("Duplicate items found");
-		return false;
-	}
-	if (hasInvalidScheduledVotes(voting_round.index_pairs, voting_round.items.size())) {
-		printError("Scheduled votes are invalid");
-		return false;
-	}
-	if (hasDuplicateScheduledVotes(voting_round.index_pairs)) {
-		printError("Scheduled votes have duplicates");
-		return false;
-	}
-	if (voting_round.seed == 0) {
-		printError("Seed is 0");
-		return false;
-	}
-	uint32_t const expected_pairs = expectedIndexPairs(voting_round.items, voting_round.reduced_voting);
-	if (numberOfScheduledVotes(voting_round) != expected_pairs) {
-		printError("Generated pairs: " + std::to_string(voting_round.index_pairs.size()) + ". Expected: " + std::to_string(expected_pairs));
-		return false;
-	}
-	if (hasVotesWithInvalidIndices(voting_round.votes, voting_round.items.size())) {
-		printError("Invalid indices in votes");
-		return false;
-	}
-	if (hasVotesWithInvalidVoteOption(voting_round.votes)) {
-		printError("Invalid option voted for");
-		return false;
-	}
-	if (hasDuplicateVotes(voting_round.votes)) {
-		printError("Votes are duplicated");
-		return false;
-	}
-	if (voting_round.votes.size() > numberOfScheduledVotes(voting_round)) {
-		printError("Number of votes exceed maximum amount");
-		return false;
-	}
-	return true;
-}
-
 /* -------------- Voting round score calculation -------------- */
 void incrementWinner(Scores& scores, Item const& item) {
 	auto it = std::find_if(scores.begin(), scores.end(), [&](Score const& score) {
@@ -733,7 +627,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 	Items items = parseItems(lines);
 	voting_round = VotingRound::create(items, reduce_voting);
 	shuffleVotingOrder(voting_round.value());
-	if (!verifyVotingRound(voting_round.value())) {
+	if (!voting_round.value().verify()) {
 		printError("Could not generate poll");
 		voting_round.reset();
 		return;
@@ -741,7 +635,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 }
 void loadRound(std::optional<VotingRound>& voting_round, std::vector<std::string> const& lines) {
 	std::optional<VotingRound> temp = VotingRound::create(lines);
-	if (!temp.has_value() || !verifyVotingRound(temp.value())) {
+	if (!temp.has_value() || !temp.value().verify()) {
 		printError("Could not load poll");
 		return;
 	}

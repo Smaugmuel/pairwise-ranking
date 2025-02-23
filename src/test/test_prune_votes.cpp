@@ -43,7 +43,7 @@ void pruningDuringVotingRoundCreationWithTooFewItems() {
 	for (size_t number_of_items = 2; number_of_items < kMinimumItemsForPruning; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), true).value();
 		auto const expected_amount = static_cast<uint32_t>(sumOfFirstIntegers(number_of_items - 1));
-		ASSERT_EQ(numberOfScheduledVotes(voting_round), expected_amount);
+		ASSERT_EQ(voting_round.numberOfScheduledVotes(), expected_amount);
 	}
 }
 void pruningAfterVotingRoundCreationWithTooFewItems() {
@@ -51,7 +51,7 @@ void pruningAfterVotingRoundCreationWithTooFewItems() {
 		auto voting_round = VotingRound::create(getNItems(number_of_items), false).value();
 		pruneVotes(voting_round);
 		auto const expected_amount = static_cast<uint32_t>(sumOfFirstIntegers(number_of_items - 1));
-		ASSERT_EQ(numberOfScheduledVotes(voting_round), expected_amount);
+		ASSERT_EQ(voting_round.numberOfScheduledVotes(), expected_amount);
 	}
 }
 void pruningDuringVotingRoundCreationRemovesAdjacentPairs() {
@@ -72,7 +72,7 @@ void pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems() {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), true).value();
 		auto const number_of_pruned_votes = number_of_items * pruningAmount(number_of_items);
 		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
-		ASSERT_EQ(numberOfScheduledVotes(voting_round), static_cast<uint32_t>(number_of_votes_after_pruning));
+		ASSERT_EQ(voting_round.numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));
 	}
 }
 void pruningAmountAfterVotingRoundCreationDependsOnNumberOfItems() {
@@ -81,7 +81,7 @@ void pruningAmountAfterVotingRoundCreationDependsOnNumberOfItems() {
 		pruneVotes(voting_round);
 		auto const number_of_pruned_votes = number_of_items * pruningAmount(number_of_items);
 		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
-		ASSERT_EQ(numberOfScheduledVotes(voting_round), static_cast<uint32_t>(number_of_votes_after_pruning));
+		ASSERT_EQ(voting_round.numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));
 	}
 }
 void pruningWhenVotesAlreadyExist() {
@@ -89,14 +89,14 @@ void pruningWhenVotesAlreadyExist() {
 	vote(voting_round, Option::A);
 	pruneVotes(voting_round.value());
 	ASSERT_FALSE(voting_round.value().reduced_voting);
-	ASSERT_EQ(numberOfScheduledVotes(voting_round.value()), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items.size() - 1)));
+	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items.size() - 1)));
 }
 void pruningWhenAlreadyPruned() {
 	auto voting_round = VotingRound::create(getNItems(15), true);
-	auto const number_of_votes_total_before = numberOfScheduledVotes(voting_round.value());
+	auto const number_of_votes_total_before = voting_round.value().numberOfScheduledVotes();
 	pruneVotes(voting_round.value());
 	ASSERT_TRUE(voting_round.value().reduced_voting);
-	ASSERT_EQ(numberOfScheduledVotes(voting_round.value()), number_of_votes_total_before);
+	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), number_of_votes_total_before);
 }
 void parseVotingRoundWithPruning() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
@@ -104,7 +104,7 @@ void parseVotingRoundWithPruning() {
 		ASSERT_TRUE(voting_round.value().reduced_voting);
 		auto const number_of_pruned_votes = number_of_items * pruningAmount(number_of_items);
 		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
-		ASSERT_EQ(numberOfScheduledVotes(voting_round.value()), static_cast<uint32_t>(number_of_votes_after_pruning));
+		ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));
 	}
 }
 void pruningRemovesCorrectScheduledVotes() {

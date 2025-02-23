@@ -17,6 +17,7 @@
 
 #include "constants.h"
 #include "functions.h"
+#include "helpers.h"
 #include "print.h"
 
 void programLoop() {

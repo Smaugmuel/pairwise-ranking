@@ -160,8 +160,63 @@ auto parseVote(std::string const& str) -> Vote {
 		std::make_pair(option_a.value(), option_b.value()),
 		static_cast<Option>(winner.value()) };
 }
+void incrementWinner(Scores& scores, Item const& item) {
+	auto it = std::find_if(scores.begin(), scores.end(), [&](Score const& score) {
+		return score.item == item;
+		});
+	if (it == scores.end()) {
+		Score score{};
+		score.item = item;
+		score.wins = 1;
+		scores.emplace_back(score);
+	}
+	else {
+		it->wins++;
+	}
+}
+void incrementLoser(Scores& scores, Item const& item) {
+	auto it = std::find_if(scores.begin(), scores.end(), [&](Score const& score) {
+		return score.item == item;
+		});
+	if (it == scores.end()) {
+		Score score{};
+		score.item = item;
+		score.losses = 1;
+		scores.emplace_back(score);
+	}
+	else {
+		it->losses++;
+	}
+}
+auto findMaxLength(Items const& items) -> size_t {
+	if (items.empty()) {
+		return 0;
+	}
+	return std::max_element(items.begin(), items.end(),
+		[](Item const& a, Item const& b) {
+			return a.size() < b.size();
+		}
+	)->size();
+}
+auto counterString(size_t counter, size_t total) -> std::string {
+	size_t const total_length = numberOfDigits(total);
+	size_t const counter_length = numberOfDigits(counter);
+
+	return
+		"(" + std::string(total_length - counter_length, ' ') + std::to_string(counter) +
+		"/" + std::to_string(total) + ")";
+}
 
 } // namespace
+
+
+/* -------------- Global operators -------------- */
+auto operator==(Score const& a, Score const& b) -> bool {
+	return a.item == b.item && a.wins == b.wins && a.losses == b.losses;
+}
+auto operator==(Vote const& a, Vote const& b) -> bool {
+	return a.index_pair == b.index_pair && a.winner == b.winner;
+}
 
 auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optional<VotingRound> {
 	if (items.size() < 2) {
@@ -300,6 +355,30 @@ auto VotingRound::shuffle() -> bool {
 	std::shuffle(items.begin(), items.end(), random_engine);
 	return true;
 }
+auto VotingRound::vote(Option option) -> bool {
+	if (!hasRemainingVotes()) {
+		return false;
+	}
+	votes.emplace_back(index_pairs[votes.size()], option);
+	is_saved = false;
+	return true;
+}
+auto VotingRound::undoVote() -> bool {
+	// Need to check since pop_back() decrements vector size even when it's 0, causing a size_t underflow
+	if (votes.empty()) {
+		return false;
+	}
+	votes.pop_back();
+	is_saved = false;
+	return true;
+}
+auto VotingRound::save(std::string const& file_name) -> bool {
+	if (!saveFile(file_name, convertToText())) {
+		return false;
+	}
+	is_saved = true;
+	return true;
+}
 auto VotingRound::verify() const -> bool {
 	// Verify state of items, seed, index pairs, and votes
 
@@ -346,6 +425,75 @@ auto VotingRound::verify() const -> bool {
 	}
 	return true;
 }
+auto VotingRound::currentVotingLine() const -> std::optional<std::string> {
+	if (!hasRemainingVotes()) {
+		printError("Voting finished. No active votes to print");
+		return std::nullopt;
+	}
+	size_t    const  counter = votes.size();
+	IndexPair const& indices = index_pairs[counter];
+
+	size_t const max_length = findMaxLength(items);
+	size_t const length_a = items[indices.first].size();
+	size_t const length_b = items[indices.second].size();
+
+	size_t const padding_length_a = max_length - length_a;
+	size_t const padding_length_b = max_length - length_b;
+	return counterString(counter + 1, index_pairs.size()) + " "
+		"H: help. "
+		"A: \'" + items[indices.first] + "\'." + std::string(padding_length_a, ' ') + " "
+		"B: \'" + items[indices.second] + "\'." + std::string(padding_length_b, ' ') + " Your choice: ";
+}
+auto VotingRound::hasRemainingVotes() const -> bool {
+	return votes.size() < index_pairs.size();
+}
 auto VotingRound::numberOfScheduledVotes() const -> uint32_t {
 	return static_cast<uint32_t>(index_pairs.size());
+}
+auto VotingRound::calculateScores() const -> Scores {
+	Scores scores{};
+	for (Vote const& vote : votes) {
+		if (vote.winner == Option::A) {
+			incrementWinner(scores, items[vote.index_pair.first]);
+			incrementLoser(scores, items[vote.index_pair.second]);
+		}
+		else {
+			incrementWinner(scores, items[vote.index_pair.second]);
+			incrementLoser(scores, items[vote.index_pair.first]);
+		}
+	}
+	return scores;
+}
+auto VotingRound::convertToText() const -> std::vector<std::string> {
+	std::vector<std::string> lines{};
+
+	// Save original item order, to make seeded item shuffling deterministic
+	if (original_items_order.empty() ||
+		items.empty()) {
+		printError("Failed to generate voting file data: No items");
+		return lines;
+	}
+
+	// Items
+	for (Item const& item : original_items_order) {
+		lines.emplace_back(item);
+	}
+	lines.emplace_back("");
+
+	// Seed
+	lines.emplace_back(std::to_string(seed));
+
+	// Voting format
+	if (reduced_voting) {
+		lines.emplace_back("reduced");
+	}
+	else {
+		lines.emplace_back("full");
+	}
+
+	// Save votes
+	for (Vote const& vote : votes) {
+		lines.emplace_back(std::to_string(vote.index_pair.first) + " " + std::to_string(vote.index_pair.second) + " " + std::to_string(to_underlying(vote.winner)));
+	}
+	return lines;
 }

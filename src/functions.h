@@ -2,37 +2,6 @@
 
 #include "voting_round.h"
 
-struct Score {
-	Item item{};
-	uint32_t wins = 0;
-	uint32_t losses = 0;
-};
-auto operator==(Score const& a, Score const& b) -> bool;
-
-struct ScoreMaxLengths {
-	size_t max_length_str{ 0 };
-	size_t max_length_wins{ 0 };
-	size_t max_length_losses{ 0 };
-};
-
-using Scores = std::vector<Score>;
-
-/* -------------- Voting round score calculation -------------- */
-void incrementWinner(Scores& scores, Item const& item);
-void incrementLoser(Scores& scores, Item const& item);
-auto calculateScores(VotingRound const& voting_round) -> Scores;
-
-/* -------------- Voting round miscellaneous -------------- */
-auto hasRemainingVotes(VotingRound const& voting_round) -> bool;
-auto convertVotingRoundToText(VotingRound const& voting_round) -> std::vector<std::string>;
-
-/* -------------- Printing votable options -------------- */
-auto currentOptionItems(VotingRound const& voting_round) -> std::pair<std::string, std::string>;
-auto findMaxLength(Items const& items) -> size_t;
-auto numberOfDigits(size_t n) -> size_t;
-auto counterString(size_t counter, size_t total) -> std::string;
-auto currentVotingLine(VotingRound const& voting_round) -> std::optional<std::string>;
-
 /* -------------- Printing active screen -------------- */
 auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool const show_intro_screen)->std::string;
 void printActiveMenu(std::optional<VotingRound> const& voting_round, bool const show_intro_screen);
@@ -60,10 +29,6 @@ auto parseScores(std::vector<std::string> const& lines) -> Scores;
 
 /* -------------- Object-to-string conversion -------------- */
 auto generateScoreFileData(Scores const& scores) -> std::vector<std::string>;
-
-/* -------------- File system management -------------- */
-auto saveFile(std::string const& file_name, std::vector<std::string> const& lines) -> bool;
-auto loadFile(std::string const& file_name) -> std::vector<std::string>;
 
 /* -------------- Verifications -------------- */
 auto verifyFilesExist(std::vector<std::string> const& file_names) -> bool;

@@ -17,12 +17,6 @@ struct ScoreMaxLengths {
 
 using Scores = std::vector<Score>;
 
-/* -------------- General helpers -------------- */
-template<typename T>
-constexpr auto to_underlying(T t) -> std::underlying_type_t<T> {
-	return static_cast<std::underlying_type_t<T>>(t);
-}
-
 /* -------------- Voting round score calculation -------------- */
 void incrementWinner(Scores& scores, Item const& item);
 void incrementLoser(Scores& scores, Item const& item);

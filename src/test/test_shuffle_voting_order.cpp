@@ -4,7 +4,7 @@
 int main() {
 	auto voting_round = VotingRound::create({ "1", "2", "3", "4", "5", "6", "7", "8" }, false);
 	voting_round.value().seed = 123456;
-	shuffleVotingOrder(voting_round.value());
+	voting_round.value().shuffle();
 
 	ASSERT_EQ(voting_round.value().index_pairs, IndexPairs{
 		IndexPair{0, 6},

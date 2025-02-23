@@ -1,4 +1,5 @@
 #include "functions.h"
+#include "helpers.h"
 #include "testing.h"
 
 namespace
@@ -33,7 +34,7 @@ void votingRoundWithReducedVoting() {
 }
 void votingRoundWithOneVote() {
 	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
-	shuffleVotingOrder(voting_round.value());
+	voting_round.value().shuffle();
 	vote(voting_round, Option::A);
 
 	auto const vote_string =

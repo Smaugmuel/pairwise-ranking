@@ -7,6 +7,8 @@ list(APPEND test_helper_files
 	testing.h
 	${PROJECT_SOURCE_DIR}/src/functions.cpp
 	${PROJECT_SOURCE_DIR}/src/functions.h
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.h
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/print.h
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp

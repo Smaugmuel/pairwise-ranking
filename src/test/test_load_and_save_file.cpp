@@ -4,6 +4,7 @@
 #include "functions.h"
 #include "helpers.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {

@@ -1,5 +1,5 @@
-#include "functions.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {
@@ -46,15 +46,15 @@ void itemLengthIsEqualToHeaderLength() {
 }
 void votingIsCompleted() {
 	auto voting_round = VotingRound::create({ "item1", "item2" }, false);
-	vote(voting_round, Option::A);
+	voting_round.value().vote(Option::A);
 	ASSERT_FALSE(voting_round.value().currentVotingLine().has_value());
 }
 void incompleteVotingIncreasesCounterAndChangesItem() {
 	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
-	vote(voting_round, Option::A);
+	voting_round.value().vote(Option::A);
 	ASSERT_EQ(voting_round.value().currentVotingLine().value(),
 		std::string{ "(2/3) H: help. A: \'item1\'. B: \'item3\'. Your choice: " });
-	vote(voting_round, Option::A);
+	voting_round.value().vote(Option::A);
 	ASSERT_EQ(voting_round.value().currentVotingLine().value(),
 		std::string{ "(3/3) H: help. A: \'item2\'. B: \'item3\'. Your choice: " });
 }

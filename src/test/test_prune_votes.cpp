@@ -1,7 +1,7 @@
 #include "constants.h"
-#include "functions.h"
 #include "helpers.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {
@@ -87,7 +87,7 @@ void pruningAmountAfterVotingRoundCreationDependsOnNumberOfItems() {
 }
 void pruningWhenVotesAlreadyExist() {
 	auto voting_round = VotingRound::create(getNItems(15), false);
-	vote(voting_round, Option::A);
+	voting_round.value().vote(Option::A);
 	voting_round.value().prune();
 	ASSERT_FALSE(voting_round.value().reduced_voting);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items.size() - 1)));

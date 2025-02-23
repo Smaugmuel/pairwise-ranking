@@ -2,50 +2,180 @@ cmake_minimum_required(VERSION 3.15)
 
 enable_testing()
 
-list(APPEND test_helper_files
+set(test_name test_calculate_scores)
+add_executable(${test_name}
+	${test_name}.cpp
 	testing.cpp
-	testing.h
-	${PROJECT_SOURCE_DIR}/src/functions.cpp
-	${PROJECT_SOURCE_DIR}/src/functions.h
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/helpers.h
 	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/print.h
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.h
-)
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
 
-list(APPEND tests
-	test_load_and_save_file
-	
-	# Tests for generation and convertion of voting round
-	test_generate_new_voting_round
-	test_parse_voting_round
-	test_generate_voting_round_file_data
-	test_verify_voting_round
-	
-	# Tests for modification of votes
-	test_shuffle_voting_order
-	test_prune_votes
-	
-	# Tests for calculation and presentation of score
-	test_calculate_scores
-	test_combine_scores
-	test_create_score_table
-	test_generate_score_file_data
-	test_parse_scores
-	
-	test_current_voting_line
-	test_get_active_menu_string
+set(test_name test_combine_scores)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
 
-	test_undo
-	test_vote
+set(test_name test_create_score_table)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
 
-	test_item_order_randomized
-)
+set(test_name test_current_voting_line)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
 
-foreach(test_name ${tests})
-	add_executable(${test_name} ${test_name}.cpp ${test_helper_files})
-	target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
-	add_test(NAME ${test_name} COMMAND ${test_name})
-endforeach()
+set(test_name test_generate_new_voting_round)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_generate_score_file_data)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_generate_voting_round_file_data)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_get_active_menu_string)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_item_order_randomized)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_load_and_save_file)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_parse_scores)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_parse_voting_round)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_prune_votes)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_shuffle_voting_order)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_undo)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_verify_voting_round)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_vote)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})

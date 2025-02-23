@@ -1,5 +1,5 @@
-#include "functions.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {
@@ -102,7 +102,7 @@ void scoresAreCalculatedWithCorrectItems() {
 
 	// Vote A on each option
 	for (uint32_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
-		vote(voting_round, Option::A);
+		voting_round.value().vote(Option::A);
 	}
 	auto const scores = voting_round.value().calculateScores();
 
@@ -118,7 +118,7 @@ void scoresAreCalculatedWithCorrectItems() {
 	}
 }
 
-}
+} // namespace
 
 int main() {
 	itemOrderIsShuffledWhenShufflingNewVotingRound();

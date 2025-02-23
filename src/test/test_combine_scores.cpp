@@ -3,6 +3,7 @@
 
 namespace
 {
+
 void combiningNoScoreSet() {
 	ASSERT_EQ(combineScores({}).size(), 0ui64);
 }
@@ -45,7 +46,7 @@ void combiningTwoScoreSetsWithDifferentItems() {
 	ASSERT_EQ(combined_scores[1], score2);
 }
 
-}
+} // namespace
 
 int main() {
 	combiningNoScoreSet();

@@ -1,12 +1,14 @@
-#include "functions.h"
-#include "helpers.h"
+//#include "functions.h"
+//#include "helpers.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {
 auto findScoreForItem(Scores const& scores, std::string const& item) -> Score {
 	return *std::find_if(scores.begin(), scores.end(), [&item](Score const& score) {
-		return score.item == item; });
+		return score.item == item;
+	});
 }
 auto currentOptionItems(VotingRound const& voting_round) -> std::pair<std::string, std::string> {
 	auto const index_pair = voting_round.index_pairs[voting_round.votes.size()];
@@ -18,7 +20,7 @@ void zeroVotes() {
 }
 void oneVoteForA() {
 	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2"}, false) };
-	vote(voting_round, Option::A);
+	voting_round.value().vote(Option::A);
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
 	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 1, 0 });
@@ -26,7 +28,7 @@ void oneVoteForA() {
 }
 void oneVoteForB() {
 	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2"}, false) };
-	vote(voting_round, Option::B);
+	voting_round.value().vote(Option::B);
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
 	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 0, 1 });
@@ -35,7 +37,7 @@ void oneVoteForB() {
 void allVotesForA() {
 	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
-		vote(voting_round, Option::A);
+		voting_round.value().vote(Option::A);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -49,7 +51,7 @@ void allVotesForA() {
 void allVotesForB() {
 	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
-		vote(voting_round, Option::B);
+		voting_round.value().vote(Option::B);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -66,14 +68,14 @@ void votingForItem2AndOptionAIfNotPresent() {
 		auto const current_items = currentOptionItems(voting_round.value());
 
 		if (current_items.first == "item2") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
 		if (current_items.second == "item2") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
-		vote(voting_round, Option::A);
+		voting_round.value().vote(Option::A);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -91,14 +93,14 @@ void votingForItem3AndOptionAIfNotPresent() {
 		auto const current_items = currentOptionItems(voting_round.value());
 
 		if (current_items.first == "item3") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
 		if (current_items.second == "item3") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
-		vote(voting_round, Option::A);
+		voting_round.value().vote(Option::A);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -116,14 +118,14 @@ void votingForItem2AndOptionBIfNotPresent() {
 		auto const current_items = currentOptionItems(voting_round.value());
 
 		if (current_items.first == "item2") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
 		if (current_items.second == "item2") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
-		vote(voting_round, Option::B);
+		voting_round.value().vote(Option::B);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -141,14 +143,14 @@ void votingForItem3AndOptionBIfNotPresent() {
 		auto const current_items = currentOptionItems(voting_round.value());
 
 		if (current_items.first == "item3") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
 		if (current_items.second == "item3") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
-		vote(voting_round, Option::B);
+		voting_round.value().vote(Option::B);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -166,14 +168,14 @@ void votingForItem2AndAgainstItem3AndOptionAIfNeither() {
 		auto const current_items = currentOptionItems(voting_round.value());
 		
 		if (current_items.first == "item2" || current_items.second == "item3") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
 		if (current_items.second == "item2" || current_items.first == "item3") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
-		vote(voting_round, Option::A);
+		voting_round.value().vote(Option::A);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -191,14 +193,14 @@ void votingForItem2AndAgainstItem3AndOptionBIfNeither() {
 		auto const current_items = currentOptionItems(voting_round.value());
 
 		if (current_items.first == "item2" || current_items.second == "item3") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
 		if (current_items.second == "item2" || current_items.first == "item3") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
-		vote(voting_round, Option::B);
+		voting_round.value().vote(Option::B);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -216,14 +218,14 @@ void votingForItem3AndAgainstItem2AndOptionAIfNeither() {
 		auto const current_items = currentOptionItems(voting_round.value());
 
 		if (current_items.first == "item2" || current_items.second == "item3") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
 		if (current_items.second == "item2" || current_items.first == "item3") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
-		vote(voting_round, Option::A);
+		voting_round.value().vote(Option::A);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -241,14 +243,14 @@ void votingForItem3AndAgainstItem2AndOptionBIfNeither() {
 		auto const current_items = currentOptionItems(voting_round.value());
 
 		if (current_items.first == "item2" || current_items.second == "item3") {
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			continue;
 		}
 		if (current_items.second == "item2" || current_items.first == "item3") {
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			continue;
 		}
-		vote(voting_round, Option::B);
+		voting_round.value().vote(Option::B);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -263,7 +265,7 @@ void votingForItem3AndAgainstItem2AndOptionBIfNeither() {
 void votingForOptionAButNotFullRound() {
 	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < 4; ++i) {
-		vote(voting_round, Option::A);
+		voting_round.value().vote(Option::A);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -280,7 +282,7 @@ void votingForOptionAButNotFullRound() {
 void votingForOptionBButNotFullRound() {
 	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < 4; ++i) {
-		vote(voting_round, Option::B);
+		voting_round.value().vote(Option::B);
 	}
 	auto const scores = voting_round.value().calculateScores();
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());

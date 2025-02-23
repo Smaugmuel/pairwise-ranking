@@ -21,29 +21,10 @@ auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::
 auto fixSwedish(std::string const& str) -> std::string;
 
 /* -------------- String-to-object parsing -------------- */
-auto readNextWord(std::stringstream& stream) -> std::string;
-auto parseNextNumber(std::stringstream& stream) -> std::optional<uint32_t>;
-auto parseScore(std::string const& str) -> Score;
 auto parseItems(std::vector<std::string> const& lines) -> Items;
-auto parseScores(std::vector<std::string> const& lines) -> Scores;
-
-/* -------------- Object-to-string conversion -------------- */
-auto generateScoreFileData(Scores const& scores) -> std::vector<std::string>;
 
 /* -------------- Verifications -------------- */
 auto verifyFilesExist(std::vector<std::string> const& file_names) -> bool;
-
-/* -------------- Print scores -------------- */
-auto sortScores(Scores const& scores)->Scores;
-auto findMaxLengthItem(Scores const& scores)->size_t;
-auto findMaxLengthWins(Scores const& scores)->size_t;
-auto findMaxLengthLosses(Scores const& scores)->size_t;
-auto createScoreTable(Scores const& scores)->std::string;
-
-/* -------------- Combine scores -------------- */
-void addScore(Scores& scores, Score const& new_score);
-auto addScores(Scores const& a, Scores const& b) -> Scores;
-auto combineScores(std::vector<Scores> const& score_sets) -> Scores;
 
 /* -------------- Menu alternatives -------------- */
 auto vote(std::optional<VotingRound>& voting_round, Option option)->std::string;

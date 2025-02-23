@@ -1,5 +1,5 @@
-#include "functions.h"
 #include "testing.h"
+#include "score_helpers.h"
 
 int main() {
 	ASSERT_EQ(generateScoreFileData({}), std::vector<std::string>{});

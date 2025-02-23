@@ -9,6 +9,10 @@ add_executable(${PROJECT_NAME}
 	helpers.h
 	print.cpp
 	print.h
+	score.cpp
+	score.h
+	score_helpers.cpp
+	score_helpers.h
 	voting_round.cpp
 	voting_round.h
 )

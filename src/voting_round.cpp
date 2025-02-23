@@ -211,9 +211,6 @@ auto counterString(size_t counter, size_t total) -> std::string {
 
 
 /* -------------- Global operators -------------- */
-auto operator==(Score const& a, Score const& b) -> bool {
-	return a.item == b.item && a.wins == b.wins && a.losses == b.losses;
-}
 auto operator==(Vote const& a, Vote const& b) -> bool {
 	return a.index_pair == b.index_pair && a.winner == b.winner;
 }

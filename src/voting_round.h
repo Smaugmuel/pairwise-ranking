@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "score.h"
+
 /* -------------- Items -------------- */
 using Item = std::string;
 using Items = std::vector<Item>;
@@ -33,15 +35,6 @@ struct Vote {
 };
 auto operator==(Vote const& a, Vote const& b) -> bool;
 using Votes = std::vector<Vote>;
-
-/* -------------- Score -------------- */
-struct Score {
-	Item item{};
-	uint32_t wins = 0;
-	uint32_t losses = 0;
-};
-auto operator==(Score const& a, Score const& b) -> bool;
-using Scores = std::vector<Score>;
 
 /* -------------- Voting round -------------- */
 

@@ -42,6 +42,9 @@ public:
 	static auto create(Items const& items, bool reduce_voting) -> std::optional<VotingRound>;
 	static auto create(std::vector<std::string> const& lines) -> std::optional<VotingRound>;
 
+	auto numberOfScheduledVotes() const -> uint32_t;
+	auto verify() const -> bool;
+
 	Items original_items_order{};
 	Items items{};
 	Seed seed{ 0 };
@@ -51,13 +54,8 @@ public:
 	bool reduced_voting{ false };
 };
 
-/* -------------- Voting round generation -------------- */
-auto generateSeed() -> Seed;
-auto generateIndexPairs(uint32_t const number_of_items) -> IndexPairs;
+/* -------------- Voting round interface functions -------------- */
 void shuffleVotingOrder(VotingRound& voting_round);
-
-/* -------------- Voting round verification -------------- */
-auto numberOfScheduledVotes(VotingRound const& voting_round) -> uint32_t;
 auto sumOfFirstIntegers(size_t n) -> size_t;
 
 /* -------------- Vote pruning -------------- */

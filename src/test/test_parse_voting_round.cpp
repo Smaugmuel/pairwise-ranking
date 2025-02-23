@@ -326,7 +326,7 @@ void fourItemsAndReducedVotingAndFourVotes() {
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
 	ASSERT_FALSE(voting_round.value().reduced_voting);
-	ASSERT_EQ(numberOfScheduledVotes(voting_round.value()), 6ui32);
+	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{
 		Vote{std::make_pair(1, 3), Option::A},
 		Vote{std::make_pair(0, 1), Option::B},
@@ -360,7 +360,7 @@ void sevenItemsAndReducedVotingAndFourVotes() {
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four", "i5", "sixth", "se7en" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
 	ASSERT_TRUE(voting_round.value().reduced_voting);
-	ASSERT_EQ(numberOfScheduledVotes(voting_round.value()), 14ui32);
+	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 14ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{
 		Vote{std::make_pair(1, 3), Option::A},
 		Vote{std::make_pair(0, 1), Option::B},
@@ -385,7 +385,7 @@ void fourItemsAndFullVotingAndOneVote() {
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
 	ASSERT_FALSE(voting_round.value().reduced_voting);
-	ASSERT_EQ(numberOfScheduledVotes(voting_round.value()), 6ui32);
+	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{ Vote{std::make_pair(1, 3), Option::A} });
 }
 void fourItemsAndFullVotingAndZeroVotes() {
@@ -405,7 +405,7 @@ void fourItemsAndFullVotingAndZeroVotes() {
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
 	ASSERT_FALSE(voting_round.value().reduced_voting);
-	ASSERT_EQ(numberOfScheduledVotes(voting_round.value()), 6ui32);
+	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_TRUE(voting_round.value().votes.empty());
 }
 

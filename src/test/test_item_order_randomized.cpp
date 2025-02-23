@@ -101,7 +101,7 @@ void scoresAreCalculatedWithCorrectItems() {
 	shuffleVotingOrder(voting_round.value());
 
 	// Vote A on each option
-	for (uint32_t i = 0; i < numberOfScheduledVotes(voting_round.value()); i++) {
+	for (uint32_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
 		vote(voting_round, Option::A);
 	}
 	auto const scores = calculateScores(voting_round.value());

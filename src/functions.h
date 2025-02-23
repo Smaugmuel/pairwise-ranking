@@ -23,16 +23,6 @@ constexpr auto to_underlying(T t) -> std::underlying_type_t<T> {
 	return static_cast<std::underlying_type_t<T>>(t);
 }
 
-/* -------------- Voting round verification -------------- */
-auto hasDuplicateItems(Items const& items) -> bool;
-auto hasInvalidScheduledVotes(IndexPairs const& index_pairs, uint32_t number_of_items) -> bool;
-auto hasDuplicateScheduledVotes(IndexPairs const& index_pairs) -> bool;
-auto expectedIndexPairs(Items const& items, bool reduced_voting) -> uint32_t;
-auto hasVotesWithInvalidIndices(Votes const& votes, uint32_t number_of_items) -> bool;
-auto hasVotesWithInvalidVoteOption(Votes const& votes) -> bool;
-auto hasDuplicateVotes(Votes const& votes) -> bool;
-auto verifyVotingRound(VotingRound const& voting_round) -> bool;
-
 /* -------------- Voting round score calculation -------------- */
 void incrementWinner(Scores& scores, Item const& item);
 void incrementLoser(Scores& scores, Item const& item);

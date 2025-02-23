@@ -11,146 +11,6 @@
 #include "helpers.h"
 #include "print.h"
 
-/* -------------- Type definitions -------------- */
-auto operator==(Score const& a, Score const& b) -> bool {
-	return a.item == b.item && a.wins == b.wins && a.losses == b.losses;
-}
-auto operator==(Vote const& a, Vote const& b) -> bool {
-	return a.index_pair == b.index_pair && a.winner == b.winner;
-}
-
-/* -------------- Voting round score calculation -------------- */
-void incrementWinner(Scores& scores, Item const& item) {
-	auto it = std::find_if(scores.begin(), scores.end(), [&](Score const& score) {
-		return score.item == item;
-		});
-	if (it == scores.end()) {
-		Score score{};
-		score.item = item;
-		score.wins = 1;
-		scores.emplace_back(score);
-	}
-	else {
-		it->wins++;
-	}
-}
-void incrementLoser(Scores& scores, Item const& item) {
-	auto it = std::find_if(scores.begin(), scores.end(), [&](Score const& score) {
-		return score.item == item;
-		});
-	if (it == scores.end()) {
-		Score score{};
-		score.item = item;
-		score.losses = 1;
-		scores.emplace_back(score);
-	}
-	else {
-		it->losses++;
-	}
-}
-auto calculateScores(VotingRound const& voting_round) -> Scores {
-	Scores scores{};
-	for (Vote const& vote : voting_round.votes) {
-		if (vote.winner == Option::A) {
-			incrementWinner(scores, voting_round.items[vote.index_pair.first]);
-			incrementLoser(scores, voting_round.items[vote.index_pair.second]);
-		}
-		else {
-			incrementWinner(scores, voting_round.items[vote.index_pair.second]);
-			incrementLoser(scores, voting_round.items[vote.index_pair.first]);
-		}
-	}
-	return scores;
-}
-
-/* -------------- Voting round miscellaneous -------------- */
-auto hasRemainingVotes(VotingRound const& voting_round) -> bool {
-	return voting_round.votes.size() < voting_round.index_pairs.size();
-}
-auto convertVotingRoundToText(VotingRound const& voting_round) -> std::vector<std::string> {
-	std::vector<std::string> lines{};
-
-	// Save original item order, to make seeded item shuffling deterministic
-	if (voting_round.original_items_order.empty() ||
-		voting_round.items.empty()) {
-		printError("Failed to generate voting file data: No items");
-		return lines;
-	}
-
-	// Items
-	for (Item const& item : voting_round.original_items_order) {
-		lines.emplace_back(item);
-	}
-	lines.emplace_back("");
-
-	// Seed
-	lines.emplace_back(std::to_string(voting_round.seed));
-
-	// Voting format
-	if (voting_round.reduced_voting) {
-		lines.emplace_back("reduced");
-	}
-	else {
-		lines.emplace_back("full");
-	}
-
-	// Save votes
-	for (Vote const& vote : voting_round.votes) {
-		lines.emplace_back(std::to_string(vote.index_pair.first) + " " + std::to_string(vote.index_pair.second) + " " + std::to_string(to_underlying(vote.winner)));
-	}
-	return lines;
-}
-
-/* -------------- Printing votable options -------------- */
-auto currentOptionItems(VotingRound const& voting_round) -> std::pair<std::string, std::string> {
-	auto const index_pair = voting_round.index_pairs[voting_round.votes.size()];
-	return { voting_round.items[index_pair.first], voting_round.items[index_pair.second] };
-}
-auto findMaxLength(Items const& items) -> size_t {
-	if (items.empty()) {
-		return 0;
-	}
-	return std::max_element(items.begin(), items.end(),
-		[](Item const& a, Item const& b) {
-			return a.size() < b.size();
-		}
-	)->size();
-}
-auto numberOfDigits(size_t n) -> size_t {
-	if (n == 0) {
-		return 1;
-	}
-	return static_cast<size_t>(std::log10(n)) + 1;
-}
-auto counterString(size_t counter, size_t total) -> std::string {
-	size_t const total_length = numberOfDigits(total);
-	size_t const counter_length = numberOfDigits(counter);
-
-	return
-		"(" + std::string(total_length - counter_length, ' ') + std::to_string(counter) +
-		"/" + std::to_string(total) + ")";
-}
-auto currentVotingLine(VotingRound const& voting_round) -> std::optional<std::string> {
-	if (!hasRemainingVotes(voting_round)) {
-		printError("Voting finished. No active votes to print");
-		return std::nullopt;
-	}
-	Items     const& items = voting_round.items;
-	size_t    const  counter = voting_round.votes.size();
-	IndexPair const& indices = voting_round.index_pairs[counter];
-
-	size_t const max_length = findMaxLength(items);
-	size_t const length_a = items[indices.first].size();
-	size_t const length_b = items[indices.second].size();
-
-	size_t const padding_length_a = max_length - length_a;
-	size_t const padding_length_b = max_length - length_b;
-	return counterString(counter + 1, voting_round.index_pairs.size()) + " "
-		"H: help. "
-		"A: \'" + items[indices.first] + "\'." + std::string(padding_length_a, ' ') + " "
-		"B: \'" + items[indices.second] + "\'." + std::string(padding_length_b, ' ') + " Your choice: ";
-}
-
 /* -------------- Printing active screen -------------- */
 auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool const show_intro_screen) -> std::string {
 	std::string menu{};
@@ -163,12 +23,12 @@ auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool co
 		return menu;
 	}
 
-	if (!hasRemainingVotes(voting_round.value())) {
+	if (!voting_round.value().hasRemainingVotes()) {
 		menu += "Poll finished. H: help. Q: quit. Your choice: ";
 		return menu;
 	}
 
-	auto const current_voting_line = currentVotingLine(voting_round.value());
+	auto const current_voting_line = voting_round.value().currentVotingLine();
 	if (current_voting_line.has_value()) {
 		menu += current_voting_line.value();
 	}
@@ -353,39 +213,6 @@ auto generateScoreFileData(Scores const& scores) -> std::vector<std::string> {
 		lines.emplace_back(std::to_string(score.wins) + " " + std::to_string(score.losses) + " " + score.item);
 	}
 	return lines;
-}
-
-/* -------------- File system management -------------- */
-auto loadFile(std::string const& file_name) -> std::vector<std::string> {
-	std::ifstream file(file_name);
-	if (!file.is_open()) {
-		printError("Could not open file \'" + file_name + "\' in " + std::filesystem::current_path().string());
-		return {};
-	}
-
-	std::vector<std::string> lines{};
-	std::string line;
-	while (std::getline(file, line)) {
-		lines.emplace_back(line);
-	}
-	file.close();
-	return lines;
-}
-auto saveFile(std::string const& file_name, std::vector<std::string> const& lines) -> bool {
-	if (lines.empty()) {
-		printError("No lines to save");
-		return false;
-	}
-	std::ofstream file(file_name);
-	if (!file.is_open()) {
-		printError("Could not create file " + file_name);
-		return false;
-	}
-	for (auto const& line : lines) {
-		file << line << '\n';
-	}
-	file.close();
-	return true;
 }
 
 /* -------------- Verifications -------------- */
@@ -573,45 +400,37 @@ auto vote(std::optional<VotingRound>& voting_round, Option option) -> std::strin
 	if (!voting_round.has_value()) {
 		return "No poll to vote in";
 	}
-	if (!hasRemainingVotes(voting_round.value())) {
+	if (!voting_round.value().vote(option)) {
 		return "No ongoing poll with pending votes";
 	}
-	voting_round.value().votes.emplace_back(voting_round.value().index_pairs[voting_round.value().votes.size()], option);
-	voting_round.value().is_saved = false;
 	return {};
 }
 auto undo(std::optional<VotingRound>& voting_round) -> std::string {
 	if (!voting_round.has_value()) {
 		return "No poll to undo from";
 	}
-	// Need to check since pop_back() decrements vector size even when it's 0, causing an underflow
-	if (!voting_round.value().votes.empty()) {
-		voting_round.value().votes.pop_back();
-		voting_round.value().is_saved = false;
-	}
+	voting_round.value().undoVote();
 	return {};
 }
 auto save(std::optional<VotingRound>& voting_round, std::string const votes_file_name, std::string const results_file_name) -> std::pair<bool, std::string> {
 	if (!voting_round.has_value()) {
 		return { false, "No poll to save" };
 	}
-	if (!saveFile(votes_file_name, convertVotingRoundToText(voting_round.value()))) {
+	if (!voting_round.value().save(votes_file_name)) {
 		return { false, "Could not save votes to " + votes_file_name + "." };
 	}
 
 	std::string result{ "Votes saved to " + votes_file_name + "." };
-	if (hasRemainingVotes(voting_round.value())) {
-		voting_round.value().is_saved = true;
+	if (voting_round.value().hasRemainingVotes()) {
 		return { true, result };
 	}
 
-	if (!saveFile(results_file_name, generateScoreFileData(sortScores(calculateScores(voting_round.value()))))) {
+	if (!saveFile(results_file_name, generateScoreFileData(sortScores(voting_round.value().calculateScores())))) {
 		result += " Could not save results to " + results_file_name + ".";
 	}
 	else {
 		result += " Results saved to " + results_file_name + ".";
 	}
-	voting_round.value().is_saved = true;
 	return { true, result };
 }
 void newRound(std::optional<VotingRound>& voting_round) {
@@ -647,7 +466,7 @@ void printScores(std::optional<VotingRound> const& voting_round) {
 		printError("No poll to print");
 		return;
 	}
-	print(createScoreTable(calculateScores(voting_round.value())), false);
+	print(createScoreTable(voting_round.value().calculateScores()), false);
 }
 void combine() {
 	// Input names of two or more files to combine

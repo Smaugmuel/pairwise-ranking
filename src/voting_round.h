@@ -22,7 +22,6 @@ struct IndexPairHash {
 using IndexPairs = std::vector<IndexPair>;
 
 /* -------------- Votes -------------- */
-
 enum class Option : uint32_t {
 	A,
 	B
@@ -35,6 +34,15 @@ struct Vote {
 auto operator==(Vote const& a, Vote const& b) -> bool;
 using Votes = std::vector<Vote>;
 
+/* -------------- Score -------------- */
+struct Score {
+	Item item{};
+	uint32_t wins = 0;
+	uint32_t losses = 0;
+};
+auto operator==(Score const& a, Score const& b) -> bool;
+using Scores = std::vector<Score>;
+
 /* -------------- Voting round -------------- */
 
 class VotingRound final {
@@ -44,8 +52,15 @@ public:
 
 	auto prune() -> bool;
 	auto shuffle() -> bool;
-	auto numberOfScheduledVotes() const -> uint32_t;
+	auto vote(Option option) -> bool;
+	auto undoVote() -> bool;
+	auto save(std::string const& file_name) -> bool;
 	auto verify() const -> bool;
+	auto currentVotingLine() const -> std::optional<std::string>;
+	auto hasRemainingVotes() const -> bool;
+	auto numberOfScheduledVotes() const -> uint32_t;
+	auto calculateScores() const -> Scores;
+	auto convertToText() const -> std::vector<std::string>;
 
 	Items original_items_order{};
 	Items items{};

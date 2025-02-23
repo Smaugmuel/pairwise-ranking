@@ -89,7 +89,7 @@ void convertingVotingRoundToTextUsesOriginalItemOrder() {
 	auto voting_round = VotingRound::create(items, false);
 	voting_round.value().seed = 12345;
 	voting_round.value().shuffle();
-	auto const text = convertVotingRoundToText(voting_round.value());
+	auto const text = voting_round.value().convertToText();
 	for (size_t i = 0; i < items.size(); i++) {
 		ASSERT_EQ(text[i], items[i]);
 	}
@@ -104,7 +104,7 @@ void scoresAreCalculatedWithCorrectItems() {
 	for (uint32_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
 		vote(voting_round, Option::A);
 	}
-	auto const scores = calculateScores(voting_round.value());
+	auto const scores = voting_round.value().calculateScores();
 
 	// Because of the order in which matchups are generated, voting for A each time
 	// will mean the first item gets N-1 wins, where N is the number of items.

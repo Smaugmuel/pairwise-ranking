@@ -6,11 +6,11 @@ namespace
 {
 
 void emptyVotingRound() {
-	ASSERT_EQ(convertVotingRoundToText(VotingRound{}), std::vector<std::string>{});
+	ASSERT_EQ(VotingRound{}.convertToText(), std::vector<std::string>{});
 }
 void votingRoundWithFullVoting() {
 	auto const voting_round = VotingRound::create({ "item1", "item2" }, false);
-	ASSERT_EQ(convertVotingRoundToText(voting_round.value()), std::vector<std::string>{
+	ASSERT_EQ(voting_round.value().convertToText(), std::vector<std::string>{
 		"item1",
 		"item2",
 		"",
@@ -20,7 +20,7 @@ void votingRoundWithFullVoting() {
 }
 void votingRoundWithReducedVoting() {
 	auto const voting_round = VotingRound::create({ "i1", "i2", "i3", "i4", "i5", "i6" }, true);
-	ASSERT_EQ(convertVotingRoundToText(voting_round.value()), std::vector<std::string>{
+	ASSERT_EQ(voting_round.value().convertToText(), std::vector<std::string>{
 		"i1",
 		"i2",
 		"i3",
@@ -41,7 +41,7 @@ void votingRoundWithOneVote() {
 		std::to_string(voting_round.value().votes[0].index_pair.first) + " " +
 		std::to_string(voting_round.value().votes[0].index_pair.second) + " " +
 		std::to_string(to_underlying(voting_round.value().votes[0].winner));
-	ASSERT_EQ(convertVotingRoundToText(voting_round.value()), std::vector<std::string>{
+	ASSERT_EQ(voting_round.value().convertToText(), std::vector<std::string>{
 		"item1",
 		"item2",
 		"item3",

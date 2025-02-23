@@ -12,7 +12,7 @@ void votingRoundNotCreated() {
 	ASSERT_FALSE(voting_round.has_value());
 }
 void firstAndFinalVotes() {
-	auto voting_round = generateNewVotingRound({ "item1", "item2" ,"item3" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2" ,"item3" }, false);
 	ASSERT_TRUE(voting_round.value().votes.empty());
 	
 	vote(voting_round, Option::A);
@@ -28,7 +28,7 @@ void firstAndFinalVotes() {
 	ASSERT_EQ(voting_round.value().votes[2], Vote{ { 1, 2 }, Option::A });
 }
 void votingAfterCompleted() {
-	auto voting_round = generateNewVotingRound({ "item1", "item2" ,"item3" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2" ,"item3" }, false);
 
 	vote(voting_round, Option::B);
 	vote(voting_round, Option::B);

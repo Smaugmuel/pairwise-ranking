@@ -2,7 +2,7 @@
 #include "testing.h"
 
 int main() {
-	auto voting_round = generateNewVotingRound({ "1", "2", "3", "4", "5", "6", "7", "8" }, false);
+	auto voting_round = VotingRound::create({ "1", "2", "3", "4", "5", "6", "7", "8" }, false);
 	voting_round.value().seed = 123456;
 	shuffleVotingOrder(voting_round.value());
 

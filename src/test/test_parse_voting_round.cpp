@@ -11,25 +11,25 @@ auto operator+(std::vector<std::string> const& vec, std::string && str) -> std::
 }
 
 void noLinesToParse() {
-	ASSERT_FALSE(parseVotingRoundFromText({}).has_value());
+	ASSERT_FALSE(VotingRound::create({}).has_value());
 }
 
 // Items tests
 void noItemsBeforeEmptyLine() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"",
 		"1",
 		"full" }).has_value());
 }
 void fewerThanTwoItems() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"",
 		"1",
 		"full" }).has_value());
 }
 void itemAppearsMultipleTimes() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item1",
 		"",
@@ -37,7 +37,7 @@ void itemAppearsMultipleTimes() {
 		"full" }).has_value());
 }
 void anItemIsEmpty() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"",
 		"item2",
@@ -46,7 +46,7 @@ void anItemIsEmpty() {
 		"full" }).has_value());
 }
 void noEmptyLineBetweenItemsAndSeed() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"1",
@@ -55,30 +55,30 @@ void noEmptyLineBetweenItemsAndSeed() {
 
 // Seed tests
 void seedIsMissing() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"full" }).has_value());
 }
 void seedIsEmpty() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"full" }).has_value());
 }
 void seedIsNotAPositiveInteger() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"a",
 		"full" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"-1",
 		"full" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"!",
@@ -87,7 +87,7 @@ void seedIsNotAPositiveInteger() {
 
 // Reduced voting setting tests
 void fullVoting() {
-	std::optional<VotingRound> const voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> const voting_round = VotingRound::create({
 		"item1",
 		"item2",
 		"",
@@ -97,7 +97,7 @@ void fullVoting() {
 	ASSERT_FALSE(voting_round.value().reduced_voting);
 }
 void reducedVotingWithTooFewItems() {
-	std::optional<VotingRound> const voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> const voting_round = VotingRound::create({
 		"item1",
 		"item2",
 		"",
@@ -107,7 +107,7 @@ void reducedVotingWithTooFewItems() {
 	ASSERT_FALSE(voting_round.value().reduced_voting);
 }
 void reducedVotingWithEnoughItems() {
-	std::optional<VotingRound> const voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> const voting_round = VotingRound::create({
 		"item1",
 		"item2",
 		"item3",
@@ -121,14 +121,14 @@ void reducedVotingWithEnoughItems() {
 	ASSERT_TRUE(voting_round.value().reduced_voting);
 }
 void reducedVotingSettingIsMissing() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1" }).has_value());
 }
 void reducedVotingSettingIsEmpty() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
@@ -136,43 +136,43 @@ void reducedVotingSettingIsEmpty() {
 		"" }).has_value());
 }
 void reducedVotingSettingIsInvalid() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		" " }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		"a" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		"1" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		"reduce" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		"reduced " }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		"fill" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
@@ -182,7 +182,7 @@ void reducedVotingSettingIsInvalid() {
 
 // Votes tests
 void noVotes() {
-	std::optional<VotingRound> const voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> const voting_round = VotingRound::create({
 		"item1",
 		"item2",
 		"",
@@ -198,40 +198,40 @@ void voteDoesNotHaveThreeIntegers() {
 		"",
 		"1",
 		"full" };
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + " ").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "a").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "a b").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "a 1").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0 b").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0 1").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "a b c").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "a b 0").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "a 1 c").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "a 1 0").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0 b c").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0 b 0").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0 1 c").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0 1 0 d").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "0 1 0 1").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + " ").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "a").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "a b").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "a 1").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0 b").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0 1").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "a b c").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "a b 0").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "a 1 c").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "a 1 0").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0 b c").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0 b 0").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0 1 c").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0 1 0 d").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "0 1 0 1").has_value());
 }
 void voteOptionIndicesAreGreaterThanNumberOfItems() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		"full",
 		"0 2 0" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
 		"1",
 		"full",
 		"2 0 0" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"item3",
@@ -239,7 +239,7 @@ void voteOptionIndicesAreGreaterThanNumberOfItems() {
 		"1",
 		"full",
 		"0 3 0" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"item3",
@@ -249,7 +249,7 @@ void voteOptionIndicesAreGreaterThanNumberOfItems() {
 		"3 0 0" }).has_value());
 }
 void moreVotesThanPossible() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"",
@@ -257,7 +257,7 @@ void moreVotesThanPossible() {
 		"full",
 		"0 1 0",
 		"1 0 0" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"item2",
@@ -270,7 +270,7 @@ void moreVotesThanPossible() {
 		"1 0 0" }).has_value());
 }
 void sameMatchupMultipleTimes() {
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"item3",
@@ -279,7 +279,7 @@ void sameMatchupMultipleTimes() {
 		"full",
 		"0 1 0",
 		"0 1 0" }).has_value());
-	ASSERT_FALSE(parseVotingRoundFromText({
+	ASSERT_FALSE(VotingRound::create({
 		"item1",
 		"item2",
 		"item3",
@@ -296,9 +296,9 @@ void chosenVoteIsNotZeroOrOne() {
 		"",
 		"1",
 		"full" };
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "1 2 2").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "1 2 -0").has_value());
-	ASSERT_FALSE(parseVotingRoundFromText(base_lines + "1 2 -1").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "1 2 2").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "1 2 -0").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + "1 2 -1").has_value());
 }
 
 // Combined tests
@@ -306,7 +306,7 @@ auto hasItem(Items const& items, Item const& item) -> bool {
 	return std::find(items.begin(), items.end(), item) != items.end();
 }
 void fourItemsAndReducedVotingAndFourVotes() {
-	std::optional<VotingRound> const voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> const voting_round = VotingRound::create({
 		"item1",
 		"item 2",
 		"itemthree",
@@ -334,7 +334,7 @@ void fourItemsAndReducedVotingAndFourVotes() {
 		Vote{std::make_pair(0, 2), Option::B} });
 }
 void sevenItemsAndReducedVotingAndFourVotes() {
-	std::optional<VotingRound> const voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> const voting_round = VotingRound::create({
 		"item1",
 		"item 2",
 		"itemthree",
@@ -368,7 +368,7 @@ void sevenItemsAndReducedVotingAndFourVotes() {
 		Vote{std::make_pair(0, 2), Option::B} });
 }
 void fourItemsAndFullVotingAndOneVote() {
-	std::optional<VotingRound> const voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> const voting_round = VotingRound::create({
 		"item1",
 		"item 2",
 		"itemthree",
@@ -389,7 +389,7 @@ void fourItemsAndFullVotingAndOneVote() {
 	ASSERT_EQ(voting_round.value().votes, Votes{ Vote{std::make_pair(1, 3), Option::A} });
 }
 void fourItemsAndFullVotingAndZeroVotes() {
-	std::optional<VotingRound> voting_round = parseVotingRoundFromText({
+	std::optional<VotingRound> voting_round = VotingRound::create({
 		"item1",
 		"item 2",
 		"itemthree",

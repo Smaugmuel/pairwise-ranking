@@ -13,12 +13,12 @@ void noVotingRoundCreated() {
 			  std::string{ "Press H for help: " });
 }
 void votingRoundStarted() {
-	auto const voting_round = generateNewVotingRound({ "item1", "item2" }, false);
+	auto const voting_round = VotingRound::create({ "item1", "item2" }, false);
 	ASSERT_EQ(getActiveMenuString(voting_round, false),
 			  std::string{ "(1/1) H: help. A: \'item1\'. B: \'item2\'. Your choice: " });
 }
 void votingRoundCompleted() {
-	auto voting_round = generateNewVotingRound({ "item1", "item2" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2" }, false);
 	vote(voting_round, Option::A);
 	ASSERT_EQ(getActiveMenuString(voting_round, false),
 			  std::string{ "Poll finished. H: help. Q: quit. Your choice: " });

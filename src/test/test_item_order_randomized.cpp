@@ -29,7 +29,7 @@ auto findScore(Scores const& scores, Item const& item) -> Score {
 
 void itemOrderIsShuffledWhenShufflingNewVotingRound() {
 	auto const items = getNItems(10);
-	auto voting_round = generateNewVotingRound(items, false);
+	auto voting_round = VotingRound::create(items, false);
 	voting_round.value().seed = 12345;
 	shuffleVotingOrder(voting_round.value());
 	Items const expected_item_order{
@@ -48,7 +48,7 @@ void itemOrderIsShuffledWhenShufflingNewVotingRound() {
 }
 void originalItemOrderIsRetainedWhenShufflingNewVotingRound() {
 	auto const items = getNItems(10);
-	auto voting_round = generateNewVotingRound(items, false);
+	auto voting_round = VotingRound::create(items, false);
 	shuffleVotingOrder(voting_round.value());
 	ASSERT_EQ(voting_round.value().original_items_order, items);
 }
@@ -59,7 +59,7 @@ void itemOrderIsShuffledWhenShufflingParsedVotingRound() {
 		"12345",
 		"full"
 	};
-	auto const voting_round = parseVotingRoundFromText(voting_round_text);
+	auto const voting_round = VotingRound::create(voting_round_text);
 	Items const expected_item_order{
 		"item7",
 		"item6",
@@ -81,12 +81,12 @@ void originalItemOrderIsRetainedWhenShufflingParsedVotingRound() {
 		"12345",
 		"full"
 	};
-	auto const voting_round = parseVotingRoundFromText(voting_round_text);
+	auto const voting_round = VotingRound::create(voting_round_text);
 	ASSERT_EQ(voting_round.value().original_items_order, items);
 }
 void convertingVotingRoundToTextUsesOriginalItemOrder() {
 	auto const items = getNItems(10);
-	auto voting_round = generateNewVotingRound(items, false);
+	auto voting_round = VotingRound::create(items, false);
 	voting_round.value().seed = 12345;
 	shuffleVotingOrder(voting_round.value());
 	auto const text = convertVotingRoundToText(voting_round.value());
@@ -96,7 +96,7 @@ void convertingVotingRoundToTextUsesOriginalItemOrder() {
 }
 void scoresAreCalculatedWithCorrectItems() {
 	auto const items = getNItems(10);
-	auto voting_round = generateNewVotingRound(items, false);
+	auto voting_round = VotingRound::create(items, false);
 	voting_round.value().seed = 12345;
 	shuffleVotingOrder(voting_round.value());
 

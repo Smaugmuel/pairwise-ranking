@@ -37,7 +37,11 @@ using Votes = std::vector<Vote>;
 
 /* -------------- Voting round -------------- */
 
-struct VotingRound final {
+class VotingRound final {
+public:
+	static auto create(Items const& items, bool reduce_voting) -> std::optional<VotingRound>;
+	static auto create(std::vector<std::string> const& lines) -> std::optional<VotingRound>;
+
 	Items original_items_order{};
 	Items items{};
 	Seed seed{ 0 };
@@ -51,8 +55,6 @@ struct VotingRound final {
 auto generateSeed() -> Seed;
 auto generateIndexPairs(uint32_t const number_of_items) -> IndexPairs;
 void shuffleVotingOrder(VotingRound& voting_round);
-auto generateNewVotingRound(Items const& items, bool reduce_voting) -> std::optional<VotingRound>;
-auto parseVotingRoundFromText(std::vector<std::string> const& lines) -> std::optional<VotingRound>;
 
 /* -------------- Voting round verification -------------- */
 auto numberOfScheduledVotes(VotingRound const& voting_round) -> uint32_t;

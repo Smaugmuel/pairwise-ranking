@@ -34,31 +34,9 @@ auto hasDuplicateMatchups(Votes const& votes) -> bool {
 } // namespace
 
 
-/* -------------- Voting round generation -------------- */
-auto generateSeed() -> Seed {
-	return static_cast<Seed>(std::chrono::system_clock::now().time_since_epoch().count());
-}
-auto generateIndexPairs(uint32_t const number_of_items) -> IndexPairs {
-	if (number_of_items < 2) {
-		printError("Number of items (" + std::to_string(number_of_items) + ") is less than two");
-		return {};
-	}
+/* -------------- Voting round -------------- */
 
-	IndexPairs index_pairs;
-	for (uint32_t item_a = 0; item_a < number_of_items; item_a++) {
-		for (uint32_t item_b = item_a + 1; item_b < number_of_items; item_b++) {
-			index_pairs.emplace_back(item_a, item_b);
-		}
-	}
-
-	return index_pairs;
-}
-void shuffleVotingOrder(VotingRound& voting_round) {
-	std::default_random_engine random_engine(voting_round.seed);
-	std::shuffle(voting_round.index_pairs.begin(), voting_round.index_pairs.end(), random_engine);
-	std::shuffle(voting_round.items.begin(), voting_round.items.end(), random_engine);
-}
-auto generateNewVotingRound(Items const& items, bool reduce_voting) -> std::optional<VotingRound> {
+auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optional<VotingRound> {
 	if (items.size() < 2) {
 		printError("Can't generate voting round: Fewer than two items");
 		return std::nullopt;
@@ -84,7 +62,7 @@ auto generateNewVotingRound(Items const& items, bool reduce_voting) -> std::opti
 
 	return voting_round;
 }
-auto parseVotingRoundFromText(std::vector<std::string> const& lines) -> std::optional<VotingRound> {
+auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional<VotingRound> {
 	VotingRound voting_round{};
 	size_t line_index = 0;
 
@@ -174,6 +152,31 @@ auto parseVotingRoundFromText(std::vector<std::string> const& lines) -> std::opt
 
 	voting_round.is_saved = true;
 	return voting_round;
+}
+
+/* -------------- Voting round generation -------------- */
+auto generateSeed() -> Seed {
+	return static_cast<Seed>(std::chrono::system_clock::now().time_since_epoch().count());
+}
+auto generateIndexPairs(uint32_t const number_of_items) -> IndexPairs {
+	if (number_of_items < 2) {
+		printError("Number of items (" + std::to_string(number_of_items) + ") is less than two");
+		return {};
+	}
+
+	IndexPairs index_pairs;
+	for (uint32_t item_a = 0; item_a < number_of_items; item_a++) {
+		for (uint32_t item_b = item_a + 1; item_b < number_of_items; item_b++) {
+			index_pairs.emplace_back(item_a, item_b);
+		}
+	}
+
+	return index_pairs;
+}
+void shuffleVotingOrder(VotingRound& voting_round) {
+	std::default_random_engine random_engine(voting_round.seed);
+	std::shuffle(voting_round.index_pairs.begin(), voting_round.index_pairs.end(), random_engine);
+	std::shuffle(voting_round.items.begin(), voting_round.items.end(), random_engine);
 }
 
 /* -------------- Voting round verification -------------- */

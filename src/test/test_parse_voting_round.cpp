@@ -1,5 +1,5 @@
-#include "functions.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {

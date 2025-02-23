@@ -1,5 +1,5 @@
-#include "functions.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {
@@ -94,7 +94,7 @@ void votingRoundWithValidVotes() {
 	for (auto prune_votes : { true, false }) {
 		for (size_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 			auto voting_round = VotingRound::create(getNItems(number_of_items), prune_votes);
-			vote(voting_round, Option::A);
+			voting_round.value().vote(Option::A);
 			ASSERT_TRUE(voting_round.value().verify());
 		}
 	}
@@ -104,7 +104,7 @@ void votingRoundWithCompletedVoting() {
 		for (size_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 			auto voting_round = VotingRound::create(getNItems(number_of_items), prune_votes);
 			for (size_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
-				vote(voting_round, static_cast<Option>(i % 2));
+				voting_round.value().vote(static_cast<Option>(i % 2));
 			}
 			ASSERT_TRUE(voting_round.value().verify());
 		}
@@ -115,7 +115,7 @@ void votingRoundWithTooManyVotes() {
 		for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 			auto voting_round = VotingRound::create(getNItems(number_of_items), prune_votes);
 			for (size_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
-				vote(voting_round, static_cast<Option>(i % 2));
+				voting_round.value().vote(static_cast<Option>(i % 2));
 			}
 			voting_round.value().votes.emplace_back(IndexPair{ 0, number_of_items }, Option::A);
 			ASSERT_FALSE(voting_round.value().verify());
@@ -144,7 +144,7 @@ void votingRoundWithDuplicateVotes() {
 	for (auto prune_votes : { true, false }) {
 		for (size_t number_of_items = 3; number_of_items < 25; number_of_items++) {
 			auto voting_round = VotingRound::create(getNItems(number_of_items), prune_votes);
-			vote(voting_round, Option::B);
+			voting_round.value().vote(Option::B);
 			voting_round.value().votes.emplace_back(voting_round.value().votes[0].index_pair, Option::A);
 			ASSERT_FALSE(voting_round.value().verify());
 		}

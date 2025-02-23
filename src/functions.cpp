@@ -8,6 +8,7 @@
 #include <sstream>			// stringstream
 
 #include "constants.h"
+#include "helpers.h"
 #include "print.h"
 
 /* -------------- Type definitions -------------- */
@@ -626,7 +627,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 
 	Items items = parseItems(lines);
 	voting_round = VotingRound::create(items, reduce_voting);
-	shuffleVotingOrder(voting_round.value());
+	voting_round.value().shuffle();
 	if (!voting_round.value().verify()) {
 		printError("Could not generate poll");
 		voting_round.reset();

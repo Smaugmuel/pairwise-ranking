@@ -1,5 +1,6 @@
 #include "constants.h"
 #include "functions.h"
+#include "helpers.h"
 #include "testing.h"
 
 namespace
@@ -49,7 +50,7 @@ void pruningDuringVotingRoundCreationWithTooFewItems() {
 void pruningAfterVotingRoundCreationWithTooFewItems() {
 	for (size_t number_of_items = 2; number_of_items < kMinimumItemsForPruning; number_of_items++) {
 		auto voting_round = VotingRound::create(getNItems(number_of_items), false).value();
-		pruneVotes(voting_round);
+		voting_round.prune();
 		auto const expected_amount = static_cast<uint32_t>(sumOfFirstIntegers(number_of_items - 1));
 		ASSERT_EQ(voting_round.numberOfScheduledVotes(), expected_amount);
 	}
@@ -63,7 +64,7 @@ void pruningDuringVotingRoundCreationRemovesAdjacentPairs() {
 void pruningAfterVotingRoundCreationRemovesAdjacentPairs() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
 		auto voting_round = VotingRound::create(getNItems(number_of_items), false).value();
-		pruneVotes(voting_round);
+		voting_round.prune();
 		ASSERT_FALSE(hasAnyAdjacentPair(voting_round));
 	}
 }
@@ -78,7 +79,7 @@ void pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems() {
 void pruningAmountAfterVotingRoundCreationDependsOnNumberOfItems() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
 		auto voting_round = VotingRound::create(getNItems(number_of_items), false).value();
-		pruneVotes(voting_round);
+		voting_round.prune();
 		auto const number_of_pruned_votes = number_of_items * pruningAmount(number_of_items);
 		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
 		ASSERT_EQ(voting_round.numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));
@@ -87,14 +88,14 @@ void pruningAmountAfterVotingRoundCreationDependsOnNumberOfItems() {
 void pruningWhenVotesAlreadyExist() {
 	auto voting_round = VotingRound::create(getNItems(15), false);
 	vote(voting_round, Option::A);
-	pruneVotes(voting_round.value());
+	voting_round.value().prune();
 	ASSERT_FALSE(voting_round.value().reduced_voting);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items.size() - 1)));
 }
 void pruningWhenAlreadyPruned() {
 	auto voting_round = VotingRound::create(getNItems(15), true);
 	auto const number_of_votes_total_before = voting_round.value().numberOfScheduledVotes();
-	pruneVotes(voting_round.value());
+	voting_round.value().prune();
 	ASSERT_TRUE(voting_round.value().reduced_voting);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), number_of_votes_total_before);
 }

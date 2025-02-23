@@ -4,6 +4,8 @@ add_executable(${PROJECT_NAME}
 	constants.h
 	functions.cpp
 	functions.h
+	helpers.cpp
+	helpers.h
 	pairwise_ranking.cpp
 	print.cpp
 	print.h

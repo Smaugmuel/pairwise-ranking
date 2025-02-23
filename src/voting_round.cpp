@@ -6,11 +6,18 @@
 #include <unordered_set>
 
 #include "constants.h"
+#include "helpers.h"
 #include "print.h"
 
 namespace
 {
 
+auto sortIndexPair(IndexPair const& index_pair) -> IndexPair {
+	if (index_pair.first < index_pair.second) {
+		return index_pair;
+	}
+	return std::make_pair(index_pair.second, index_pair.first);
+}
 auto itemsAreUnique(Items const& items) -> bool {
 	return items.size() == std::unordered_set<Item>{ items.begin(), items.end() }.size();
 }
@@ -106,11 +113,55 @@ auto hasDuplicateVotes(Votes const& votes) -> bool {
 	}
 	return index_pair_set.size() != votes.size();
 }
+auto generateIndexPairWithOffset(uint32_t const i, uint32_t const offset, uint32_t const number_of_items) -> IndexPair {
+	return std::make_pair(i, (i + offset) % number_of_items);
+}
+void removeNSpacedPairs(IndexPairs& index_pairs, uint32_t const offset, uint32_t const number_of_items) {
+	for (uint32_t i = 0; i < number_of_items; i++) {
+		// Since pairs are generated with the first element always being smaller than the second,
+		// the order must be ensured here.
+		auto const pair = sortIndexPair(generateIndexPairWithOffset(i, offset, number_of_items));
+		index_pairs.erase(std::remove(index_pairs.begin(), index_pairs.end(), pair), index_pairs.end());
+	}
+}
+auto pruneVotes(IndexPairs const& index_pairs, uint32_t const number_of_items, uint32_t const pruning_iterations) -> IndexPairs {
+	IndexPairs reduced_pairs = index_pairs;
+	for (uint32_t index_offset = 0; index_offset < pruning_iterations; index_offset++) {
+		removeNSpacedPairs(reduced_pairs, index_offset + 1, number_of_items);
+	}
+	return reduced_pairs;
+}
+auto reduceVotes(IndexPairs const& index_pairs, uint32_t const number_of_items) -> IndexPairs {
+	if (number_of_items < kMinimumItemsForPruning) {
+		printError("Too few items (" + std::to_string(number_of_items) + ") to reduce voting. No reduction performed");
+		return index_pairs;
+	}
+	return pruneVotes(index_pairs, number_of_items, pruningAmount(number_of_items));
+}
+auto parseVote(std::string const& str) -> Vote {
+	std::vector<std::string> words = parseWords(str);
+	if (words.size() != 3) {
+		printError("Invalid vote format. Number of words (" + std::to_string(words.size()) + ") doesn't equal 3");
+		return {};
+	}
+	std::optional<uint32_t> option_a = parseNumber(words[0]);
+	std::optional<uint32_t> option_b = parseNumber(words[1]);
+	std::optional<uint32_t> winner = parseNumber(words[2]);
+	if (!(option_a.has_value() && option_b.has_value() && winner.has_value())) {
+		printError("Unable to parse vote");
+		return {};
+	}
+	if (!(winner.value() == 0 || winner.value() == 1)) {
+		printError("Voted option is invalid");
+		return {};
+	}
+
+	return Vote{
+		std::make_pair(option_a.value(), option_b.value()),
+		static_cast<Option>(winner.value()) };
+}
 
 } // namespace
-
-
-/* -------------- Voting round -------------- */
 
 auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optional<VotingRound> {
 	if (items.size() < 2) {
@@ -133,7 +184,7 @@ auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optiona
 	voting_round.original_items_order = items;
 
 	if (reduce_voting) {
-		pruneVotes(voting_round);
+		voting_round.prune();
 	}
 
 	return voting_round;
@@ -197,10 +248,10 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 
 	voting_round.index_pairs = generateIndexPairs(static_cast<uint32_t>(voting_round.items.size()));
 	if (reduced_voting) {
-		pruneVotes(voting_round);
+		voting_round.prune();
 	}
 
-	shuffleVotingOrder(voting_round);
+	voting_round.shuffle();
 
 	// Load votes
 	for (; line_index < lines.size(); line_index++) {
@@ -229,7 +280,26 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 	voting_round.is_saved = true;
 	return voting_round;
 }
-
+auto VotingRound::prune() -> bool {
+	if (reduced_voting) {
+		printError("Already pruned. Can't prune again");
+		return false;
+	}
+	if (!votes.empty()) {
+		printError("Can't prune when votes exist");
+		return false;
+	}
+	auto const number_of_items = static_cast<uint32_t>(items.size());
+	index_pairs = reduceVotes(index_pairs, number_of_items);
+	reduced_voting = index_pairs.size() < sumOfFirstIntegers(number_of_items - 1);
+	return true;
+}
+auto VotingRound::shuffle() -> bool {
+	std::default_random_engine random_engine(seed);
+	std::shuffle(index_pairs.begin(), index_pairs.end(), random_engine);
+	std::shuffle(items.begin(), items.end(), random_engine);
+	return true;
+}
 auto VotingRound::verify() const -> bool {
 	// Verify state of items, seed, index pairs, and votes
 
@@ -278,123 +348,4 @@ auto VotingRound::verify() const -> bool {
 }
 auto VotingRound::numberOfScheduledVotes() const -> uint32_t {
 	return static_cast<uint32_t>(index_pairs.size());
-}
-
-/* -------------- Voting round generation -------------- */
-void shuffleVotingOrder(VotingRound& voting_round) {
-	std::default_random_engine random_engine(voting_round.seed);
-	std::shuffle(voting_round.index_pairs.begin(), voting_round.index_pairs.end(), random_engine);
-	std::shuffle(voting_round.items.begin(), voting_round.items.end(), random_engine);
-}
-
-/* -------------- Voting round verification -------------- */
-auto sumOfFirstIntegers(size_t n) -> size_t {
-	return (n * (n + 1)) / 2;
-}
-
-/* -------------- Vote pruning -------------- */
-auto sortIndexPair(IndexPair const& index_pair) -> IndexPair {
-	if (index_pair.first < index_pair.second) {
-		return index_pair;
-	}
-	return std::make_pair(index_pair.second, index_pair.first);
-}
-auto generateIndexPairWithOffset(uint32_t const i, uint32_t const offset, uint32_t const number_of_items) -> IndexPair {
-	return std::make_pair(i, (i + offset) % number_of_items);
-}
-void removeNSpacedPairs(IndexPairs& index_pairs, uint32_t const offset, uint32_t const number_of_items) {
-	for (uint32_t i = 0; i < number_of_items; i++) {
-		// Since pairs are generated with the first element always being smaller than the second,
-		// the order must be ensured here.
-		auto const pair = sortIndexPair(generateIndexPairWithOffset(i, offset, number_of_items));
-		index_pairs.erase(std::remove(index_pairs.begin(), index_pairs.end(), pair), index_pairs.end());
-	}
-}
-auto pruneVotes(IndexPairs const& index_pairs, uint32_t const number_of_items, uint32_t const pruning_iterations) -> IndexPairs {
-	IndexPairs reduced_pairs = index_pairs;
-	for (uint32_t index_offset = 0; index_offset < pruning_iterations; index_offset++) {
-		removeNSpacedPairs(reduced_pairs, index_offset + 1, number_of_items);
-	}
-	return reduced_pairs;
-}
-auto pruningAmount(uint32_t const number_of_items) -> uint32_t {
-	if (number_of_items < kMinimumItemsForPruning) {
-		return 0;
-	}
-	return 1 + (number_of_items - kMinimumItemsForPruning) / 2;
-}
-auto reduceVotes(IndexPairs const& index_pairs, uint32_t const number_of_items) -> IndexPairs {
-	if (number_of_items < kMinimumItemsForPruning) {
-		printError("Too few items (" + std::to_string(number_of_items) + ") to reduce voting. No reduction performed");
-		return index_pairs;
-	}
-	return pruneVotes(index_pairs, number_of_items, pruningAmount(number_of_items));
-}
-void pruneVotes(VotingRound& voting_round) {
-	if (voting_round.reduced_voting) {
-		printError("Already pruned. Can't prune again");
-		return;
-	}
-	if (!voting_round.votes.empty()) {
-		printError("Can't prune when votes exist");
-		return;
-	}
-	auto const number_of_items = static_cast<uint32_t>(voting_round.items.size());
-	voting_round.index_pairs = reduceVotes(voting_round.index_pairs, number_of_items);
-	voting_round.reduced_voting = voting_round.index_pairs.size() < sumOfFirstIntegers(number_of_items - 1);
-}
-
-/* -------------- General helpers -------------- */
-auto isNumber(std::string const& str) -> bool {
-	if (str.empty()) {
-		return false;
-	}
-	for (auto c : str) {
-		if (!std::isdigit(c)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-/* -------------- String-to-object parsing -------------- */
-auto parseWords(std::string const& str) -> std::vector<std::string> {
-	std::stringstream stream(str);
-	std::vector<std::string> words{};
-	std::string word{};
-	while (stream >> word) {
-		words.push_back(word);
-	}
-	return words;
-}
-
-auto parseNumber(std::string const& str) -> std::optional<uint32_t> {
-	if (!isNumber(str)) {
-		printError("Unable to parse '" + str + "'. Not a number");
-		return std::nullopt;
-	}
-	return static_cast<uint32_t>(std::stoul(str));
-}
-
-auto parseVote(std::string const& str) -> Vote {
-	std::vector<std::string> words = parseWords(str);
-	if (words.size() != 3) {
-		printError("Invalid vote format. Number of words (" + std::to_string(words.size()) + ") doesn't equal 3");
-		return {};
-	}
-	std::optional<uint32_t> option_a = parseNumber(words[0]);
-	std::optional<uint32_t> option_b = parseNumber(words[1]);
-	std::optional<uint32_t> winner = parseNumber(words[2]);
-	if (!(option_a.has_value() && option_b.has_value() && winner.has_value())) {
-		printError("Unable to parse vote");
-		return {};
-	}
-	if (!(winner.value() == 0 || winner.value() == 1)) {
-		printError("Voted option is invalid");
-		return {};
-	}
-
-	return Vote{
-		std::make_pair(option_a.value(), option_b.value()),
-		static_cast<Option>(winner.value()) };
 }

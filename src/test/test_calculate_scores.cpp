@@ -12,7 +12,7 @@ void zeroVotes() {
 	ASSERT_EQ(calculateScores({}).size(), 0ui64);
 }
 void oneVoteForA() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2"}, false) };
 	vote(voting_round, Option::A);
 	auto const scores = calculateScores(voting_round.value());
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -20,7 +20,7 @@ void oneVoteForA() {
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 0, 1 });
 }
 void oneVoteForB() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2"}, false) };
 	vote(voting_round, Option::B);
 	auto const scores = calculateScores(voting_round.value());
 	ASSERT_EQ(scores.size(), voting_round.value().items.size());
@@ -28,7 +28,7 @@ void oneVoteForB() {
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 1, 0 });
 }
 void allVotesForA() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		vote(voting_round, Option::A);
 	}
@@ -42,7 +42,7 @@ void allVotesForA() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 0, 3 });
 }
 void allVotesForB() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		vote(voting_round, Option::B);
 	}
@@ -56,7 +56,7 @@ void allVotesForB() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 4, 0 });
 }
 void votingForItem2AndOptionAIfNotPresent() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 
@@ -81,7 +81,7 @@ void votingForItem2AndOptionAIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 0, 3 });
 }
 void votingForItem3AndOptionAIfNotPresent() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 
@@ -106,7 +106,7 @@ void votingForItem3AndOptionAIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 0, 3 });
 }
 void votingForItem2AndOptionBIfNotPresent() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 
@@ -131,7 +131,7 @@ void votingForItem2AndOptionBIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForItem3AndOptionBIfNotPresent() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 
@@ -156,7 +156,7 @@ void votingForItem3AndOptionBIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForItem2AndAgainstItem3AndOptionAIfNeither() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 		
@@ -181,7 +181,7 @@ void votingForItem2AndAgainstItem3AndOptionAIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 1, 2 });
 }
 void votingForItem2AndAgainstItem3AndOptionBIfNeither() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 
@@ -206,7 +206,7 @@ void votingForItem2AndAgainstItem3AndOptionBIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForItem3AndAgainstItem2AndOptionAIfNeither() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 
@@ -231,7 +231,7 @@ void votingForItem3AndAgainstItem2AndOptionAIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 1, 2 });
 }
 void votingForItem3AndAgainstItem2AndOptionBIfNeither() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < numberOfScheduledVotes(voting_round.value()); ++i) {
 		auto const current_items = currentOptionItems(voting_round.value());
 
@@ -256,7 +256,7 @@ void votingForItem3AndAgainstItem2AndOptionBIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForOptionAButNotFullRound() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < 4; ++i) {
 		vote(voting_round, Option::A);
 	}
@@ -273,7 +273,7 @@ void votingForOptionAButNotFullRound() {
 	ASSERT_TRUE(findScoreForItem(scores, "item3").wins + findScoreForItem(scores, "item3").losses >= 1);
 }
 void votingForOptionBButNotFullRound() {
-	std::optional<VotingRound> voting_round{ generateNewVotingRound({"item1", "item2", "item3", "item4"}, false) };
+	std::optional<VotingRound> voting_round{ VotingRound::create({"item1", "item2", "item3", "item4"}, false) };
 	for (auto i = 0; i < 4; ++i) {
 		vote(voting_round, Option::B);
 	}

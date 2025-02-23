@@ -94,7 +94,7 @@ void saveWhenSaveFileFails() {
 	std::filesystem::remove(kTestFileName);
 	std::filesystem::remove(kTestFileName2);
 
-	auto voting_round = generateNewVotingRound({ "item1", "item2" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2" }, false);
 	voting_round.value().items.clear();
 	auto const results = save(voting_round, kTestFileName, kTestFileName2);
 	ASSERT_EQ(results.first, false);
@@ -107,7 +107,7 @@ void saveWhenSomeVotesRemain() {
 	std::filesystem::remove(kTestFileName);
 	std::filesystem::remove(kTestFileName2);
 
-	auto voting_round = generateNewVotingRound({ "item1", "item2", "item3" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
 	auto const results = save(voting_round, kTestFileName, kTestFileName2);
 	ASSERT_EQ(results.first, true);
 	ASSERT_EQ(results.second, std::string{ "Votes saved to " } + kTestFileName +  ".");
@@ -121,7 +121,7 @@ void saveWhenNoVotesRemain() {
 	std::filesystem::remove(kTestFileName);
 	std::filesystem::remove(kTestFileName2);
 
-	auto voting_round = generateNewVotingRound({ "item1", "item2", "item3" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
 	vote(voting_round, Option::A);
 	vote(voting_round, Option::A);
 	vote(voting_round, Option::A);

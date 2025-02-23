@@ -731,7 +731,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 	print(reduce_voting ? "y" : "n");
 
 	Items items = parseItems(lines);
-	voting_round = generateNewVotingRound(items, reduce_voting);
+	voting_round = VotingRound::create(items, reduce_voting);
 	shuffleVotingOrder(voting_round.value());
 	if (!verifyVotingRound(voting_round.value())) {
 		printError("Could not generate poll");
@@ -740,7 +740,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 	}
 }
 void loadRound(std::optional<VotingRound>& voting_round, std::vector<std::string> const& lines) {
-	std::optional<VotingRound> temp = parseVotingRoundFromText(lines);
+	std::optional<VotingRound> temp = VotingRound::create(lines);
 	if (!temp.has_value() || !verifyVotingRound(temp.value())) {
 		printError("Could not load poll");
 		return;

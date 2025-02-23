@@ -9,7 +9,7 @@ void undoWhenNoVotingRound() {
 	ASSERT_EQ(undo(voting_round), std::string{ "No poll to undo from" });
 }
 void undoWhenVotesExist() {
-	auto voting_round = generateNewVotingRound({ "item1", "item2", "item3" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
 	vote(voting_round, Option::A);
 	vote(voting_round, Option::B);
 	ASSERT_EQ(undo(voting_round), std::string{});
@@ -17,7 +17,7 @@ void undoWhenVotesExist() {
 	ASSERT_EQ(voting_round.value().votes[0].winner, Option::A);
 }
 void undoWhenNoVotesExist() {
-	auto voting_round = generateNewVotingRound({ "item1", "item2", "item3" }, false);
+	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
 	ASSERT_EQ(undo(voting_round), std::string{});
 }
 

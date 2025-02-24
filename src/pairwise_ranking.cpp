@@ -19,6 +19,7 @@
 #include "functions.h"
 #include "helpers.h"
 #include "print.h"
+#include "score_helpers.h"
 
 void programLoop() {
 	std::optional<VotingRound> voting_round{};
@@ -56,12 +57,21 @@ void programLoop() {
 			loadRound(voting_round, lines);
 		}
 		else if (ch == 's') {
-			auto const results = save(voting_round, kVotesFile, kResultFile);
-			if (results.first) {
-				print(results.second);
+			if (!voting_round.has_value()) {
+				printError("No voting round to save from");
+				continue;
+			}
+			if (!voting_round.value().save(kVotesFile)) {
+				printError("Could not save votes to " + kVotesFile + ".");
 			}
 			else {
-				printError(results.second);
+				print("Votes saved to " + kVotesFile + ".");
+			}
+			if (!saveScores(voting_round.value().calculateScores(), kResultFile)) {
+				printError("Could not save scores to " + kResultFile + ".");
+			}
+			else {
+				print("Scores saved to " + kResultFile + ".");
 			}
 		}
 		else if (ch == 'p') {

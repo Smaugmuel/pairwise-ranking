@@ -250,3 +250,8 @@ auto generateScoreFileData(Scores const& scores) -> std::vector<std::string> {
 	}
 	return lines;
 }
+
+/* -------------- File management -------------- */
+auto saveScores(Scores const& scores, std::string const file_name) -> bool {
+	return saveFile(file_name, generateScoreFileData(sortScores(scores)));
+}

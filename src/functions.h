@@ -29,7 +29,6 @@ auto verifyFilesExist(std::vector<std::string> const& file_names) -> bool;
 /* -------------- Menu alternatives -------------- */
 auto vote(std::optional<VotingRound>& voting_round, Option option)->std::string;
 auto undo(std::optional<VotingRound>& voting_round)->std::string;
-auto save(std::optional<VotingRound>& voting_round, std::string const votes_file_name, std::string const results_file_name)->std::pair<bool, std::string>;
 void newRound(std::optional<VotingRound>& voting_round);
 void loadRound(std::optional<VotingRound>& voting_round, std::vector<std::string> const& lines);
 void printScores(std::optional<VotingRound> const& voting_round);

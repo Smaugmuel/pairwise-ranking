@@ -18,3 +18,6 @@ auto combineScores(std::vector<Scores> const& score_sets) -> Scores;
 auto parseScore(std::string const& str) -> Score;
 auto parseScores(std::vector<std::string> const& lines) -> Scores;
 auto generateScoreFileData(Scores const& scores) -> std::vector<std::string>;
+
+/* -------------- File management -------------- */
+auto saveScores(Scores const& scores, std::string const file_name) -> bool;

@@ -26,7 +26,7 @@ void programLoop() {
 	bool first_iteration = true;
 
 	while (true) {
-		printActiveMenu(voting_round, first_iteration);
+		print(getActiveMenuString(voting_round, first_iteration), false);
 		first_iteration = false;
 
 		char const ch = getKey();
@@ -37,7 +37,7 @@ void programLoop() {
 			}
 		}
 		else if (ch == 'h') {
-			printHelp();
+			print(getHelpString());
 		}
 		else if (ch == 'n') {
 			if (!continueWithoutSaving(voting_round, "create new poll")) {

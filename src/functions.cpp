@@ -12,99 +12,9 @@
 #include "print.h"
 #include "score_helpers.h"
 
-/* -------------- Printing active screen -------------- */
-auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool const show_intro_screen) -> std::string {
-	std::string menu{};
-	if (show_intro_screen) {
-		menu += "Welcome! ";
-	}
+namespace
+{
 
-	if (!voting_round.has_value()) {
-		menu += "Press H for help: ";
-		return menu;
-	}
-
-	if (!voting_round.value().hasRemainingVotes()) {
-		menu += "Poll finished. H: help. Q: quit. Your choice: ";
-		return menu;
-	}
-
-	auto const current_voting_line = voting_round.value().currentVotingLine();
-	if (current_voting_line.has_value()) {
-		menu += current_voting_line.value();
-	}
-	return menu;
-}
-void printActiveMenu(std::optional<VotingRound> const& voting_round, bool const show_intro_screen) {
-	print(getActiveMenuString(voting_round, show_intro_screen), false);
-}
-
-/* -------------- Printing miscellaneous -------------- */
-auto getHelpString() -> std::string {
-	return
-		"Q: quit program. "
-		"N: start new poll. "
-		"L: load started poll. "
-		"S: save votes/scores to file.\n"
-		"A: vote for left option. "
-		"B: vote for right option. "
-		"U: undo last vote.\n"
-		"P: print scores. "
-		"C: combine scores. ";
-}
-void printHelp() {
-	print(getHelpString());
-}
-
-/* -------------- Command line inputs -------------- */
-auto getKey() -> char {
-	return _getch();
-}
-auto getLine() -> std::string {
-	std::string input{};
-	std::getline(std::cin, input);
-	return input;
-}
-auto getConfirmation() -> bool {
-	while (true) {
-		char const ch = getKey();
-		if (ch == 'n') {
-			return false;
-		}
-		else if (ch == 'y') {
-			return true;
-		}
-	}
-	return false;
-}
-auto getMultipleFileNames() -> std::vector<std::string> {
-	print("Specify two or more files, e.g. \"file_1.txt file_2.txt\", without the quotation marks (\"): ", false);
-
-	std::vector<std::string> file_names = parseWords(getLine());
-	if (!verifyFilesExist(file_names)) {
-		printError("One or more files don't exist");
-		return {};
-	}
-	
-	if (file_names.size() < 2) {
-		printError("Two or more files are required to combine scores");
-		return {};
-	}
-	return file_names;
-}
-auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::string const& str) -> bool {
-	bool response = true;
-	if (voting_round.has_value() && !voting_round.value().is_saved) {
-		print("You have unsaved data. Do you still wish to " + str + "? (Y / N) : ", false);
-		if (!getConfirmation()) {
-			response = false;
-		}
-		print("");
-	}
-	return response;
-}
-
-/* -------------- Localization -------------- */
 auto fixSwedish(std::string const& str) -> std::string {
 	std::string new_str = str;
 	for (size_t i = 0; i < new_str.size(); i++) {
@@ -134,7 +44,6 @@ auto fixSwedish(std::string const& str) -> std::string {
 	}
 	return new_str;
 }
-
 auto parseItems(std::vector<std::string> const& lines) -> Items {
 	Items items{};
 	items.reserve(lines.size());
@@ -143,8 +52,11 @@ auto parseItems(std::vector<std::string> const& lines) -> Items {
 	}
 	return items;
 }
-
-/* -------------- Verifications -------------- */
+auto getLine() -> std::string {
+	std::string input{};
+	std::getline(std::cin, input);
+	return input;
+}
 auto verifyFilesExist(std::vector<std::string> const& file_names) -> bool {
 	bool all_files_exist = true;
 	for (auto const& name : file_names) {
@@ -154,6 +66,89 @@ auto verifyFilesExist(std::vector<std::string> const& file_names) -> bool {
 		}
 	}
 	return all_files_exist;
+}
+auto getMultipleFileNames() -> std::vector<std::string> {
+	print("Specify two or more files, e.g. \"file_1.txt file_2.txt\", without the quotation marks (\"): ", false);
+
+	std::vector<std::string> file_names = parseWords(getLine());
+	if (!verifyFilesExist(file_names)) {
+		printError("One or more files don't exist");
+		return {};
+	}
+
+	if (file_names.size() < 2) {
+		printError("Two or more files are required to combine scores");
+		return {};
+	}
+	return file_names;
+}
+
+} // namespace
+
+/* -------------- Menu strings -------------- */
+auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool const show_intro_screen) -> std::string {
+	std::string menu{};
+	if (show_intro_screen) {
+		menu += "Welcome! ";
+	}
+
+	if (!voting_round.has_value()) {
+		menu += "Press H for help: ";
+		return menu;
+	}
+
+	if (!voting_round.value().hasRemainingVotes()) {
+		menu += "Poll finished. H: help. Q: quit. Your choice: ";
+		return menu;
+	}
+
+	auto const current_voting_line = voting_round.value().currentVotingLine();
+	if (current_voting_line.has_value()) {
+		menu += current_voting_line.value();
+	}
+	return menu;
+}
+auto getHelpString() -> std::string {
+	return
+		"(Key to press is in brackets)\n"
+		"Show this [H]elp menu\n"
+		"[Q]uit program\n"
+		"Start a [N]ew poll\n"
+		"[L]oad poll\n"
+		"[S]ave votes and scores\n"
+		"Vote for option [A]\n"
+		"Vote for option [B]\n"
+		"[U]ndo last vote\n"
+		"[P]rint scores\n"
+		"[C]ombine previously saved scores\n";
+}
+
+/* -------------- Command line inputs -------------- */
+auto getKey() -> char {
+	return _getch();
+}
+auto getConfirmation() -> bool {
+	while (true) {
+		char const ch = getKey();
+		if (ch == 'n') {
+			return false;
+		}
+		else if (ch == 'y') {
+			return true;
+		}
+	}
+	return false;
+}
+auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::string const& str) -> bool {
+	bool response = true;
+	if (voting_round.has_value() && !voting_round.value().is_saved) {
+		print("You have unsaved data. Do you still wish to " + str + "? (Y / N) : ", false);
+		if (!getConfirmation()) {
+			response = false;
+		}
+		print("");
+	}
+	return response;
 }
 
 /* -------------- Menu alternatives -------------- */

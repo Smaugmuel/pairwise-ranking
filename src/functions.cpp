@@ -173,27 +173,6 @@ auto undo(std::optional<VotingRound>& voting_round) -> std::string {
 	voting_round.value().undoVote();
 	return {};
 }
-auto save(std::optional<VotingRound>& voting_round, std::string const votes_file_name, std::string const results_file_name) -> std::pair<bool, std::string> {
-	if (!voting_round.has_value()) {
-		return { false, "No poll to save" };
-	}
-	if (!voting_round.value().save(votes_file_name)) {
-		return { false, "Could not save votes to " + votes_file_name + "." };
-	}
-
-	std::string result{ "Votes saved to " + votes_file_name + "." };
-	if (voting_round.value().hasRemainingVotes()) {
-		return { true, result };
-	}
-
-	if (!saveFile(results_file_name, generateScoreFileData(sortScores(voting_round.value().calculateScores())))) {
-		result += " Could not save results to " + results_file_name + ".";
-	}
-	else {
-		result += " Results saved to " + results_file_name + ".";
-	}
-	return { true, result };
-}
 void newRound(std::optional<VotingRound>& voting_round) {
 	std::vector<std::string> const lines = loadFile(kItemsFile);
 	if (lines.size() < 2) {

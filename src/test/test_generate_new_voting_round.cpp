@@ -5,17 +5,6 @@
 namespace
 {
 
-/* -------------- Test helpers -------------- */
-auto getNItems(size_t n) -> Items {
-	Items items;
-	items.reserve(n);
-	for (size_t i = 0; i < n; i++) {
-		items.push_back("item" + std::to_string(i + 1));
-	}
-	return items;
-}
-
-/* -------------- Tests -------------- */
 void generateWithTooFewItems() {
 	ASSERT_FALSE(VotingRound::create(getNItems(0), false).has_value());
 	ASSERT_FALSE(VotingRound::create(getNItems(0), true).has_value());

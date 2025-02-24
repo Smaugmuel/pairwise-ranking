@@ -4,17 +4,6 @@
 namespace
 {
 
-/* -------------- Test helpers -------------- */
-auto getNItems(size_t n) -> Items {
-	Items items;
-	items.reserve(n);
-	for (size_t i = 0; i < n; i++) {
-		items.push_back("item" + std::to_string(i + 1));
-	}
-	return items;
-}
-
-/* -------------- Tests -------------- */
 void newVotingRoundWithFullVoting() {
 	for (size_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 		ASSERT_TRUE(VotingRound::create(getNItems(number_of_items), false).value().verify());

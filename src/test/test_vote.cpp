@@ -17,15 +17,15 @@ void firstAndFinalVotes() {
 	
 	vote(voting_round, Option::A);
 	ASSERT_EQ(voting_round.value().votes.size(), 1ui64);
-	ASSERT_EQ(voting_round.value().votes[0], Vote{ { 0, 1 }, Option::A });
+	ASSERT_EQ(voting_round.value().votes[0], Vote{ 0, 1, Option::A });
 	
 	vote(voting_round, Option::B);
 	ASSERT_EQ(voting_round.value().votes.size(), 2ui64);
-	ASSERT_EQ(voting_round.value().votes[1], Vote{ { 0, 2 }, Option::B });
+	ASSERT_EQ(voting_round.value().votes[1], Vote{ 0, 2, Option::B });
 
 	vote(voting_round, Option::A);
 	ASSERT_EQ(voting_round.value().votes.size(), 3ui64);
-	ASSERT_EQ(voting_round.value().votes[2], Vote{ { 1, 2 }, Option::A });
+	ASSERT_EQ(voting_round.value().votes[2], Vote{ 1, 2, Option::A });
 }
 void votingAfterCompleted() {
 	auto voting_round = VotingRound::create({ "item1", "item2" ,"item3" }, false);
@@ -39,7 +39,7 @@ void votingAfterCompleted() {
 	ASSERT_EQ(voting_round.value().votes.size(), 3ui64);
 }
 
-}
+} // namespace
 
 int main() {
 	votingRoundNotCreated();

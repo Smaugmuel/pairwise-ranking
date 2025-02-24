@@ -328,10 +328,10 @@ void fourItemsAndReducedVotingAndFourVotes() {
 	ASSERT_FALSE(voting_round.value().reduced_voting);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{
-		Vote{std::make_pair(1, 3), Option::A},
-		Vote{std::make_pair(0, 1), Option::B},
-		Vote{std::make_pair(2, 3), Option::A},
-		Vote{std::make_pair(0, 2), Option::B} });
+		Vote{1, 3, Option::A},
+		Vote{0, 1, Option::B},
+		Vote{2, 3, Option::A},
+		Vote{0, 2, Option::B} });
 }
 void sevenItemsAndReducedVotingAndFourVotes() {
 	std::optional<VotingRound> const voting_round = VotingRound::create({
@@ -362,10 +362,10 @@ void sevenItemsAndReducedVotingAndFourVotes() {
 	ASSERT_TRUE(voting_round.value().reduced_voting);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 14ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{
-		Vote{std::make_pair(1, 3), Option::A},
-		Vote{std::make_pair(0, 1), Option::B},
-		Vote{std::make_pair(2, 3), Option::A},
-		Vote{std::make_pair(0, 2), Option::B} });
+		Vote{1, 3, Option::A},
+		Vote{0, 1, Option::B},
+		Vote{2, 3, Option::A},
+		Vote{0, 2, Option::B} });
 }
 void fourItemsAndFullVotingAndOneVote() {
 	std::optional<VotingRound> const voting_round = VotingRound::create({
@@ -386,7 +386,7 @@ void fourItemsAndFullVotingAndOneVote() {
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
 	ASSERT_FALSE(voting_round.value().reduced_voting);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
-	ASSERT_EQ(voting_round.value().votes, Votes{ Vote{std::make_pair(1, 3), Option::A} });
+	ASSERT_EQ(voting_round.value().votes, Votes{ Vote{1, 3, Option::A} });
 }
 void fourItemsAndFullVotingAndZeroVotes() {
 	std::optional<VotingRound> voting_round = VotingRound::create({

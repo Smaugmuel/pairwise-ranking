@@ -38,8 +38,8 @@ void votingRoundWithOneVote() {
 	voting_round.value().vote(Option::A);
 
 	auto const vote_string =
-		std::to_string(voting_round.value().votes[0].index_pair.first) + " " +
-		std::to_string(voting_round.value().votes[0].index_pair.second) + " " +
+		std::to_string(voting_round.value().votes[0].a_idx) + " " +
+		std::to_string(voting_round.value().votes[0].b_idx) + " " +
 		std::to_string(to_underlying(voting_round.value().votes[0].winner));
 	ASSERT_EQ(voting_round.value().convertToText(), std::vector<std::string>{
 		"item1",

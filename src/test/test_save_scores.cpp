@@ -1,7 +1,6 @@
 #include <filesystem>
 #include <fstream>
 
-#include "functions.h"
 #include "score_helpers.h"
 #include "testing.h"
 

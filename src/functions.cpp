@@ -86,7 +86,7 @@ auto getMultipleFileNames() -> std::vector<std::string> {
 } // namespace
 
 /* -------------- Menu strings -------------- */
-auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool const show_intro_screen) -> std::string {
+auto activeMenuString(std::optional<VotingRound> const& voting_round, bool const show_intro_screen) -> std::string {
 	std::string menu{};
 	if (show_intro_screen) {
 		menu += "Welcome! ";
@@ -108,9 +108,8 @@ auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool co
 	}
 	return menu;
 }
-auto getHelpString() -> std::string {
+auto helpString() -> std::string {
 	return
-		"(Key to press is in brackets)\n"
 		"Display this [H]elp menu\n"
 		"[Q]uit program\n"
 		"Start a [N]ew voting round\n"
@@ -121,6 +120,15 @@ auto getHelpString() -> std::string {
 		"[U]ndo last vote\n"
 		"[P]rint scores\n"
 		"[C]ombine previously saved scores\n";
+}
+auto newRoundFormatString(uint32_t const number_of_items) -> std::string {
+	auto const full_voting_size{ sumOfFirstIntegers(number_of_items - 1) };
+	auto const reduced_voting_size{ full_voting_size - number_of_items * pruningAmount(number_of_items) };
+	return
+		"Please specify the desired voting format:\n"
+		"[F]ull voting    - " + std::to_string(full_voting_size) + " votes\n"
+		"[R]educed voting - " + std::to_string(reduced_voting_size) + " votes\n"
+		"[C]ancel\n";
 }
 
 /* -------------- Command line inputs -------------- */
@@ -152,19 +160,48 @@ auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::
 }
 
 /* -------------- Menu alternatives -------------- */
+enum class VotingFormat : uint32_t {
+	Full,
+	Reduced,
+	Cancel
+};
+VotingFormat toVotingFormat(char const ch) {
+	switch (ch) {
+	case 'f':
+		return VotingFormat::Full;
+	case 'r':
+		return VotingFormat::Reduced;
+	case 'c':
+		return VotingFormat::Cancel;
+	}
+	return VotingFormat::Cancel;
+}
 void newRound(std::optional<VotingRound>& voting_round) {
 	std::vector<std::string> const lines = loadFile(kItemsFile);
 	if (lines.size() < 2) {
 		return;
 	}
 
-	auto const full_voting_size = sumOfFirstIntegers(lines.size() - 1);
-	print("Do you want reduced voting (y/n)? Full voting = " + std::to_string(full_voting_size) + " votes. Reduced voting = " + std::to_string(full_voting_size - lines.size() * pruningAmount(lines.size())) + " votes. Your choice: ", false);
-	auto const reduce_voting = getConfirmation();
-	print(reduce_voting ? "y" : "n");
+	// Print voting formats
+	print(newRoundFormatString(static_cast<uint32_t>(lines.size())));
 
+	// Choose voting format
+	char ch{};
+	while (true) {
+		ch = getKey();
+		if (ch == 'f' || ch == 'r' || ch == 'c') {
+			break;
+		}
+	}
+	print(std::string() + ch);
+	VotingFormat const format{ toVotingFormat(ch) };
+	if (format == VotingFormat::Cancel) {
+		return;
+	}
+
+	// Create voting round
 	Items items = parseItems(lines);
-	voting_round = VotingRound::create(items, reduce_voting);
+	voting_round = VotingRound::create(items, format == VotingFormat::Reduced);
 	voting_round.value().shuffle();
 	if (!voting_round.value().verify()) {
 		printError("Could not generate voting round");

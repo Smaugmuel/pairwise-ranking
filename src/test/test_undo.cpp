@@ -6,7 +6,7 @@ namespace
 
 void undoWhenNoVotingRound() {
 	std::optional<VotingRound> voting_round;
-	ASSERT_EQ(undo(voting_round), std::string{ "No poll to undo from" });
+	ASSERT_EQ(undo(voting_round), std::string{ "No voting round to undo from" });
 }
 void undoWhenVotesExist() {
 	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);

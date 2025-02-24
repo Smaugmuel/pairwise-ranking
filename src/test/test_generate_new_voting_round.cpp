@@ -21,21 +21,21 @@ void generateWithFullVoting() {
 	for (size_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), false);
 		ASSERT_TRUE(voting_round.has_value());
-		ASSERT_EQ(voting_round.value().reduced_voting, false);
+		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 	}
 }
 void generateWithReducedVotingIfTooFewItemsToReduce() {
 	for (size_t number_of_items = 2; number_of_items < kMinimumItemsForPruning; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), true);
 		ASSERT_TRUE(voting_round.has_value());
-		ASSERT_FALSE(voting_round.value().reduced_voting);
+		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 	}
 }
 void generateWithReducedVotingIfEnoughItemsToReduce() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 25; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), true);
 		ASSERT_TRUE(voting_round.has_value());
-		ASSERT_TRUE(voting_round.value().reduced_voting);
+		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
 	}
 }
 void generateWithFullVotingGivesCorrectAmountOfScheduledVotes() {

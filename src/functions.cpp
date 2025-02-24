@@ -152,22 +152,6 @@ auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::
 }
 
 /* -------------- Menu alternatives -------------- */
-auto vote(std::optional<VotingRound>& voting_round, Option option) -> std::string {
-	if (!voting_round.has_value()) {
-		return "No voting round to vote in";
-	}
-	if (!voting_round.value().vote(option)) {
-		return "No ongoing voting round with pending votes";
-	}
-	return {};
-}
-auto undo(std::optional<VotingRound>& voting_round) -> std::string {
-	if (!voting_round.has_value()) {
-		return "No voting round to undo from";
-	}
-	voting_round.value().undoVote();
-	return {};
-}
 void newRound(std::optional<VotingRound>& voting_round) {
 	std::vector<std::string> const lines = loadFile(kItemsFile);
 	if (lines.size() < 2) {

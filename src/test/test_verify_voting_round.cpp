@@ -15,7 +15,7 @@ void newVotingRoundWithPrunedVoting() {
 	}
 }
 void votingRoundWithTooFewItems() {
-	auto voting_round = VotingRound::create({ "item1", "item2" }, false).value();
+	auto voting_round = VotingRound::create(getNItems(2), false).value();
 	voting_round.items.pop_back();
 	ASSERT_FALSE(voting_round.verify());
 }

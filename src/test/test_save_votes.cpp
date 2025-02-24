@@ -13,7 +13,7 @@ constexpr auto kTestFileName = "placeholder_file_name.txt";
 void saveWhenSaveFileFails() {
 	std::filesystem::remove(kTestFileName);
 
-	auto voting_round = VotingRound::create({ "item1", "item2" }, false);
+	auto voting_round = VotingRound::create(getNItems(2), false);
 	voting_round.value().items.clear();
 	ASSERT_FALSE(voting_round.value().save(kTestFileName));
 	ASSERT_FALSE(voting_round.value().is_saved);
@@ -22,7 +22,7 @@ void saveWhenSaveFileFails() {
 void saveWhenSomeVotesRemain() {
 	std::filesystem::remove(kTestFileName);
 
-	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
+	auto voting_round = VotingRound::create(getNItems(3), false);
 	ASSERT_TRUE(voting_round.value().save(kTestFileName));
 	ASSERT_TRUE(voting_round.value().is_saved);
 	ASSERT_TRUE(std::filesystem::exists(kTestFileName));
@@ -32,7 +32,7 @@ void saveWhenSomeVotesRemain() {
 void saveWhenNoVotesRemain() {
 	std::filesystem::remove(kTestFileName);
 
-	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
+	auto voting_round = VotingRound::create(getNItems(3), false);
 	voting_round.value().vote(Option::A);
 	voting_round.value().vote(Option::A);
 	voting_round.value().vote(Option::A);

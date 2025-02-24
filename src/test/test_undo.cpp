@@ -1,30 +1,25 @@
-#include "functions.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {
 
-void undoWhenNoVotingRound() {
-	std::optional<VotingRound> voting_round;
-	ASSERT_EQ(undo(voting_round), std::string{ "No voting round to undo from" });
-}
 void undoWhenVotesExist() {
-	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
-	vote(voting_round, Option::A);
-	vote(voting_round, Option::B);
-	ASSERT_EQ(undo(voting_round), std::string{});
+	auto voting_round = VotingRound::create(getNItems(3), false);
+	voting_round.value().vote(Option::A);
+	voting_round.value().vote(Option::B);
+	ASSERT_TRUE(voting_round.value().undoVote());
 	ASSERT_EQ(voting_round.value().votes.size(), 1ui64);
 	ASSERT_EQ(voting_round.value().votes[0].winner, Option::A);
 }
 void undoWhenNoVotesExist() {
-	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
-	ASSERT_EQ(undo(voting_round), std::string{});
+	auto voting_round = VotingRound::create(getNItems(3), false);
+	ASSERT_FALSE(voting_round.value().undoVote());
 }
 
 } // namespace
 
 int main() {
-	undoWhenNoVotingRound();
 	undoWhenVotesExist();
 	undoWhenNoVotesExist();
 	return 0;

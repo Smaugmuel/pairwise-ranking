@@ -78,22 +78,29 @@ void programLoop() {
 			printScores(voting_round);
 		}
 		else if (ch == 'a') {
-			auto const result = vote(voting_round, Option::A);
-			if (!result.empty()) {
-				printError(result);
+			if (!voting_round.has_value()) {
+				printError("No voting round to vote in");
+				continue;
+			}
+			if (!voting_round.value().vote(Option::A)) {
+				printError("No votes pending");
 			}
 		}
 		else if (ch == 'b') {
-			auto const result = vote(voting_round, Option::B);
-			if (!result.empty()) {
-				printError(result);
+			if (!voting_round.has_value()) {
+				printError("No voting round to vote in");
+				continue;
+			}
+			if (!voting_round.value().vote(Option::B)) {
+				printError("No votes pending");
 			}
 		}
 		else if (ch == 'u') {
-			auto const result = undo(voting_round);
-			if (!result.empty()) {
-				printError(result);
+			if (!voting_round.has_value()) {
+				printError("No voting round to undo from");
+				continue;
 			}
+			voting_round.value().undoVote();
 		}
 		else if (ch == 'c') {
 			combine();

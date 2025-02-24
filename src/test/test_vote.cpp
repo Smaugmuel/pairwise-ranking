@@ -1,49 +1,70 @@
-#include "functions.h"
 #include "testing.h"
+#include "voting_round.h"
 
 namespace
 {
 
-void votingRoundNotCreated() {
-	std::optional<VotingRound> voting_round;
-	ASSERT_EQ(vote(voting_round, Option::A), std::string{ "No voting round to vote in" });
-	ASSERT_FALSE(voting_round.has_value());
-	ASSERT_EQ(vote(voting_round, Option::B), std::string{ "No voting round to vote in" });
-	ASSERT_FALSE(voting_round.has_value());
+void firstVoteForA() {
+	auto voting_round = VotingRound::create(getNItems(3), false);
+	ASSERT_TRUE(voting_round.value().getVotes().empty());
+	ASSERT_TRUE(voting_round.value().vote(Option::A));
+	ASSERT_EQ(voting_round.value().getVotes().size(), 1ui64);
+	ASSERT_EQ(voting_round.value().getVotes()[0], Vote{ 0, 1, Option::A });
 }
-void firstAndFinalVotes() {
-	auto voting_round = VotingRound::create({ "item1", "item2" ,"item3" }, false);
-	ASSERT_TRUE(voting_round.value().votes.empty());
-	
-	vote(voting_round, Option::A);
-	ASSERT_EQ(voting_round.value().votes.size(), 1ui64);
-	ASSERT_EQ(voting_round.value().votes[0], Vote{ 0, 1, Option::A });
-	
-	vote(voting_round, Option::B);
-	ASSERT_EQ(voting_round.value().votes.size(), 2ui64);
-	ASSERT_EQ(voting_round.value().votes[1], Vote{ 0, 2, Option::B });
-
-	vote(voting_round, Option::A);
-	ASSERT_EQ(voting_round.value().votes.size(), 3ui64);
-	ASSERT_EQ(voting_round.value().votes[2], Vote{ 1, 2, Option::A });
+void firstVoteForB() {
+	auto voting_round = VotingRound::create(getNItems(3), false);
+	ASSERT_TRUE(voting_round.value().getVotes().empty());
+	ASSERT_TRUE(voting_round.value().vote(Option::B));
+	ASSERT_EQ(voting_round.value().getVotes().size(), 1ui64);
+	ASSERT_EQ(voting_round.value().getVotes()[0], Vote{ 0, 1, Option::B });
 }
-void votingAfterCompleted() {
-	auto voting_round = VotingRound::create({ "item1", "item2" ,"item3" }, false);
+void votingForAForEachScheduledVote() {
+	for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
+		auto voting_round = VotingRound::create(getNItems(number_of_items), false);
+		while (voting_round.value().hasRemainingVotes()) {
+			voting_round.value().vote(Option::A);
+		}
 
-	vote(voting_round, Option::B);
-	vote(voting_round, Option::B);
-	vote(voting_round, Option::B);
+		auto const& votes = voting_round.value().getVotes();
+		ASSERT_EQ(static_cast<uint32_t>(votes.size()), voting_round.value().numberOfScheduledVotes());
+		for (auto const& vote : votes) {
+			ASSERT_EQ(vote.winner, Option::A);
+		}
+	}
+}
+void votingForBForEachScheduledVote() {
+	for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
+		auto voting_round = VotingRound::create(getNItems(number_of_items), false);
+		while (voting_round.value().hasRemainingVotes()) {
+			voting_round.value().vote(Option::B);
+		}
 
-	ASSERT_EQ(vote(voting_round, Option::A), std::string{ "No ongoing voting round with pending votes" });
-	ASSERT_EQ(vote(voting_round, Option::B), std::string{ "No ongoing voting round with pending votes" });
-	ASSERT_EQ(voting_round.value().votes.size(), 3ui64);
+		auto const& votes = voting_round.value().getVotes();
+		ASSERT_EQ(static_cast<uint32_t>(votes.size()), voting_round.value().numberOfScheduledVotes());
+		for (auto const& vote : votes) {
+			ASSERT_EQ(vote.winner, Option::B);
+		}
+	}
+}
+void votingAfterRoundCompleted() {
+	auto voting_round = VotingRound::create(getNItems(3), false);
+
+	voting_round.value().vote(Option::B);
+	voting_round.value().vote(Option::B);
+	voting_round.value().vote(Option::B);
+
+	ASSERT_FALSE(voting_round.value().vote(Option::A));
+	ASSERT_FALSE(voting_round.value().vote(Option::B));
+	ASSERT_EQ(voting_round.value().getVotes().size(), 3ui64);
 }
 
 } // namespace
 
 int main() {
-	votingRoundNotCreated();
-	firstAndFinalVotes();
-	votingAfterCompleted();
+	firstVoteForA();
+	firstVoteForB();
+	votingForAForEachScheduledVote();
+	votingForBForEachScheduledVote();
+	votingAfterRoundCompleted();
 	return 0;
 }

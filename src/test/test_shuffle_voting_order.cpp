@@ -2,7 +2,7 @@
 #include "voting_round.h"
 
 int main() {
-	auto voting_round = VotingRound::create({ "1", "2", "3", "4", "5", "6", "7", "8" }, false);
+	auto voting_round = VotingRound::create(getNItems(8), false);
 	voting_round.value().seed = 123456;
 	voting_round.value().shuffle();
 

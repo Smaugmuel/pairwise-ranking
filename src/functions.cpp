@@ -93,12 +93,12 @@ auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool co
 	}
 
 	if (!voting_round.has_value()) {
-		menu += "Press H for help: ";
+		menu += "Press H if you need help: ";
 		return menu;
 	}
 
 	if (!voting_round.value().hasRemainingVotes()) {
-		menu += "Poll finished. H: help. Q: quit. Your choice: ";
+		menu += "Voting round finished. [H]elp. [Q]uit. Your choice: ";
 		return menu;
 	}
 
@@ -111,10 +111,10 @@ auto getActiveMenuString(std::optional<VotingRound> const& voting_round, bool co
 auto getHelpString() -> std::string {
 	return
 		"(Key to press is in brackets)\n"
-		"Show this [H]elp menu\n"
+		"Display this [H]elp menu\n"
 		"[Q]uit program\n"
-		"Start a [N]ew poll\n"
-		"[L]oad poll\n"
+		"Start a [N]ew voting round\n"
+		"[L]oad started voting round\n"
 		"[S]ave votes and scores\n"
 		"Vote for option [A]\n"
 		"Vote for option [B]\n"
@@ -154,16 +154,16 @@ auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::
 /* -------------- Menu alternatives -------------- */
 auto vote(std::optional<VotingRound>& voting_round, Option option) -> std::string {
 	if (!voting_round.has_value()) {
-		return "No poll to vote in";
+		return "No voting round to vote in";
 	}
 	if (!voting_round.value().vote(option)) {
-		return "No ongoing poll with pending votes";
+		return "No ongoing voting round with pending votes";
 	}
 	return {};
 }
 auto undo(std::optional<VotingRound>& voting_round) -> std::string {
 	if (!voting_round.has_value()) {
-		return "No poll to undo from";
+		return "No voting round to undo from";
 	}
 	voting_round.value().undoVote();
 	return {};
@@ -183,7 +183,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 	voting_round = VotingRound::create(items, reduce_voting);
 	voting_round.value().shuffle();
 	if (!voting_round.value().verify()) {
-		printError("Could not generate poll");
+		printError("Could not generate voting round");
 		voting_round.reset();
 		return;
 	}
@@ -191,14 +191,14 @@ void newRound(std::optional<VotingRound>& voting_round) {
 void loadRound(std::optional<VotingRound>& voting_round, std::vector<std::string> const& lines) {
 	std::optional<VotingRound> temp = VotingRound::create(lines);
 	if (!temp.has_value() || !temp.value().verify()) {
-		printError("Could not load poll");
+		printError("Could not load voting round");
 		return;
 	}
 	voting_round = temp;
 }
 void printScores(std::optional<VotingRound> const& voting_round) {
 	if (!voting_round.has_value()) {
-		printError("No poll to print");
+		printError("No voting round to print");
 		return;
 	}
 	print(createScoreTable(calculateScores(voting_round.value().getItems(), voting_round.value().getVotes())), false);

@@ -40,13 +40,13 @@ void programLoop() {
 			print(getHelpString());
 		}
 		else if (ch == 'n') {
-			if (!continueWithoutSaving(voting_round, "create new poll")) {
+			if (!continueWithoutSaving(voting_round, "create new voting round")) {
 				break;
 			}
 			newRound(voting_round);
 		}
 		else if (ch == 'l') {
-			if (!continueWithoutSaving(voting_round, "load a poll")) {
+			if (!continueWithoutSaving(voting_round, "load a voting round")) {
 				continue;
 			}
 			std::vector<std::string> const lines = loadFile(kVotesFile);

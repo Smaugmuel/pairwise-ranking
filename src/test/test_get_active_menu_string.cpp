@@ -21,7 +21,7 @@ void votingRoundCompleted() {
 	auto voting_round = VotingRound::create({ "item1", "item2" }, false);
 	vote(voting_round, Option::A);
 	ASSERT_EQ(getActiveMenuString(voting_round, false),
-			  std::string{ "Poll finished. H: help. Q: quit. Your choice: " });
+			  std::string{ "Voting round finished. H: help. Q: quit. Your choice: " });
 }
 
 } // namespace

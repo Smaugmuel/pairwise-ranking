@@ -235,7 +235,7 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 
 	// Load seed
 	if (line_index >= lines.size()) {
-		printError("Could not load seed from poll file");
+		printError("Could not load seed from votes file");
 		return std::nullopt;
 	}
 	std::optional<uint32_t> const seed = parseNumber(lines[line_index++]);

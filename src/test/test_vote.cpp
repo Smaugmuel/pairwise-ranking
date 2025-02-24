@@ -6,9 +6,9 @@ namespace
 
 void votingRoundNotCreated() {
 	std::optional<VotingRound> voting_round;
-	ASSERT_EQ(vote(voting_round, Option::A), std::string{ "No poll to vote in" });
+	ASSERT_EQ(vote(voting_round, Option::A), std::string{ "No voting round to vote in" });
 	ASSERT_FALSE(voting_round.has_value());
-	ASSERT_EQ(vote(voting_round, Option::B), std::string{ "No poll to vote in" });
+	ASSERT_EQ(vote(voting_round, Option::B), std::string{ "No voting round to vote in" });
 	ASSERT_FALSE(voting_round.has_value());
 }
 void firstAndFinalVotes() {
@@ -34,8 +34,8 @@ void votingAfterCompleted() {
 	vote(voting_round, Option::B);
 	vote(voting_round, Option::B);
 
-	ASSERT_EQ(vote(voting_round, Option::A), std::string{ "No ongoing poll with pending votes" });
-	ASSERT_EQ(vote(voting_round, Option::B), std::string{ "No ongoing poll with pending votes" });
+	ASSERT_EQ(vote(voting_round, Option::A), std::string{ "No ongoing voting round with pending votes" });
+	ASSERT_EQ(vote(voting_round, Option::B), std::string{ "No ongoing voting round with pending votes" });
 	ASSERT_EQ(voting_round.value().votes.size(), 3ui64);
 }
 

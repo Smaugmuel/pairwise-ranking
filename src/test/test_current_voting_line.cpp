@@ -45,12 +45,12 @@ void itemLengthIsEqualToHeaderLength() {
 			std::string{ "(1/3) H: help. A: \'item1\'. B: \'item2\'. Your choice: " });
 }
 void votingIsCompleted() {
-	auto voting_round = VotingRound::create({ "item1", "item2" }, false);
+	auto voting_round = VotingRound::create(getNItems(2), false);
 	voting_round.value().vote(Option::A);
 	ASSERT_FALSE(voting_round.value().currentVotingLine().has_value());
 }
 void incompleteVotingIncreasesCounterAndChangesItem() {
-	auto voting_round = VotingRound::create({ "item1", "item2", "item3" }, false);
+	auto voting_round = VotingRound::create(getNItems(3), false);
 	voting_round.value().vote(Option::A);
 	ASSERT_EQ(voting_round.value().currentVotingLine().value(),
 		std::string{ "(2/3) H: help. A: \'item1\'. B: \'item3\'. Your choice: " });

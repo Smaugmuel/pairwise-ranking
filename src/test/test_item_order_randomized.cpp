@@ -1,3 +1,5 @@
+#include "score.h"
+#include "score_helpers.h"
 #include "testing.h"
 #include "voting_round.h"
 
@@ -104,7 +106,7 @@ void scoresAreCalculatedWithCorrectItems() {
 	for (uint32_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
 		voting_round.value().vote(Option::A);
 	}
-	auto const scores = voting_round.value().calculateScores();
+	auto const scores = calculateScores(voting_round.value().getItems(), voting_round.value().getVotes());
 
 	// Because of the order in which matchups are generated, voting for A each time
 	// will mean the first item gets N-1 wins, where N is the number of items.

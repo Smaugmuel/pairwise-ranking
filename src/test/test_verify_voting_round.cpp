@@ -117,7 +117,7 @@ void votingRoundWithTooManyVotes() {
 			for (size_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
 				voting_round.value().vote(static_cast<Option>(i % 2));
 			}
-			voting_round.value().votes.emplace_back(IndexPair{ 0, number_of_items }, Option::A);
+			voting_round.value().votes.emplace_back(0, number_of_items, Option::A);
 			ASSERT_FALSE(voting_round.value().verify());
 		}
 	}
@@ -126,7 +126,7 @@ void votingRoundWithInvalidVoteIndices() {
 	for (auto prune_votes : { true, false }) {
 		for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 			auto voting_round = VotingRound::create(getNItems(number_of_items), prune_votes);
-			voting_round.value().votes.emplace_back(IndexPair{ 0, number_of_items }, Option::A);
+			voting_round.value().votes.emplace_back(0, number_of_items, Option::A);
 			ASSERT_FALSE(voting_round.value().verify());
 		}
 	}
@@ -135,7 +135,7 @@ void votingRoundWithInvalidVoteOption() {
 	for (auto prune_votes : { true, false }) {
 		for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 			auto voting_round = VotingRound::create(getNItems(number_of_items), prune_votes);
-			voting_round.value().votes.emplace_back(IndexPair{ 0, number_of_items - 1 }, static_cast<Option>(2));
+			voting_round.value().votes.emplace_back(0, number_of_items - 1, static_cast<Option>(2));
 			ASSERT_FALSE(voting_round.value().verify());
 		}
 	}
@@ -145,7 +145,7 @@ void votingRoundWithDuplicateVotes() {
 		for (size_t number_of_items = 3; number_of_items < 25; number_of_items++) {
 			auto voting_round = VotingRound::create(getNItems(number_of_items), prune_votes);
 			voting_round.value().vote(Option::B);
-			voting_round.value().votes.emplace_back(voting_round.value().votes[0].index_pair, Option::A);
+			voting_round.value().votes.emplace_back(voting_round.value().votes[0].a_idx, voting_round.value().votes[0].b_idx, Option::A);
 			ASSERT_FALSE(voting_round.value().verify());
 		}
 	}

@@ -23,8 +23,7 @@ auto itemsAreUnique(Items const& items) -> bool {
 }
 auto votingIndicesAreSmallerThanNumberOfItems(Votes const& votes, uint32_t const number_of_items) -> bool {
 	for (auto const& vote : votes) {
-		if (vote.index_pair.first >= number_of_items ||
-			vote.index_pair.second >= number_of_items) {
+		if (vote.a_idx >= number_of_items || vote.b_idx >= number_of_items) {
 			return false;
 		}
 	}
@@ -33,7 +32,7 @@ auto votingIndicesAreSmallerThanNumberOfItems(Votes const& votes, uint32_t const
 auto hasDuplicateMatchups(Votes const& votes) -> bool {
 	std::unordered_set<IndexPair, IndexPairHash> index_pair_set{};
 	for (auto const& vote : votes) {
-		index_pair_set.insert(sortIndexPair(vote.index_pair));
+		index_pair_set.insert(sortIndexPair({ vote.a_idx, vote.b_idx }));
 	}
 	return index_pair_set.size() != votes.size();
 }
@@ -91,8 +90,7 @@ auto expectedIndexPairs(Items const& items, bool reduced_voting) -> uint32_t {
 }
 auto hasVotesWithInvalidIndices(Votes const& votes, uint32_t number_of_items) -> bool {
 	for (auto const& vote : votes) {
-		if (vote.index_pair.first >= vote.index_pair.second ||
-			vote.index_pair.second >= number_of_items) {
+		if (vote.a_idx >= vote.b_idx || vote.b_idx >= number_of_items) {
 			return true;
 		}
 	}
@@ -109,7 +107,7 @@ auto hasVotesWithInvalidVoteOption(Votes const& votes) -> bool {
 auto hasDuplicateVotes(Votes const& votes) -> bool {
 	std::unordered_set<IndexPair, IndexPairHash> index_pair_set{};
 	for (auto const& vote : votes) {
-		index_pair_set.insert(vote.index_pair);
+		index_pair_set.insert({ vote.a_idx, vote.b_idx });
 	}
 	return index_pair_set.size() != votes.size();
 }
@@ -157,36 +155,9 @@ auto parseVote(std::string const& str) -> Vote {
 	}
 
 	return Vote{
-		std::make_pair(option_a.value(), option_b.value()),
+		option_a.value(),
+		option_b.value(),
 		static_cast<Option>(winner.value()) };
-}
-void incrementWinner(Scores& scores, Item const& item) {
-	auto it = std::find_if(scores.begin(), scores.end(), [&](Score const& score) {
-		return score.item == item;
-		});
-	if (it == scores.end()) {
-		Score score{};
-		score.item = item;
-		score.wins = 1;
-		scores.emplace_back(score);
-	}
-	else {
-		it->wins++;
-	}
-}
-void incrementLoser(Scores& scores, Item const& item) {
-	auto it = std::find_if(scores.begin(), scores.end(), [&](Score const& score) {
-		return score.item == item;
-		});
-	if (it == scores.end()) {
-		Score score{};
-		score.item = item;
-		score.losses = 1;
-		scores.emplace_back(score);
-	}
-	else {
-		it->losses++;
-	}
 }
 auto findMaxLength(Items const& items) -> size_t {
 	if (items.empty()) {
@@ -209,11 +180,6 @@ auto counterString(size_t counter, size_t total) -> std::string {
 
 } // namespace
 
-
-/* -------------- Global operators -------------- */
-auto operator==(Vote const& a, Vote const& b) -> bool {
-	return a.index_pair == b.index_pair && a.winner == b.winner;
-}
 
 auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optional<VotingRound> {
 	if (items.size() < 2) {
@@ -308,7 +274,7 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 	// Load votes
 	for (; line_index < lines.size(); line_index++) {
 		auto const vote = parseVote(lines[line_index]);
-		if (vote.index_pair == IndexPair{ 0, 0 }) {
+		if (vote.a_idx == 0 && vote.b_idx == 0) {
 			printError("Failed to parse vote");
 			return std::nullopt;
 		}
@@ -356,7 +322,7 @@ auto VotingRound::vote(Option option) -> bool {
 	if (!hasRemainingVotes()) {
 		return false;
 	}
-	votes.emplace_back(index_pairs[votes.size()], option);
+	votes.emplace_back(index_pairs[votes.size()].first, index_pairs[votes.size()].second, option);
 	is_saved = false;
 	return true;
 }
@@ -375,6 +341,12 @@ auto VotingRound::save(std::string const& file_name) -> bool {
 	}
 	is_saved = true;
 	return true;
+}
+auto VotingRound::getItems() const->Items const& {
+	return items;
+}
+auto VotingRound::getVotes() const->Votes const& {
+	return votes;
 }
 auto VotingRound::verify() const -> bool {
 	// Verify state of items, seed, index pairs, and votes
@@ -447,24 +419,10 @@ auto VotingRound::hasRemainingVotes() const -> bool {
 auto VotingRound::numberOfScheduledVotes() const -> uint32_t {
 	return static_cast<uint32_t>(index_pairs.size());
 }
-auto VotingRound::calculateScores() const -> Scores {
-	Scores scores{};
-	for (Vote const& vote : votes) {
-		if (vote.winner == Option::A) {
-			incrementWinner(scores, items[vote.index_pair.first]);
-			incrementLoser(scores, items[vote.index_pair.second]);
-		}
-		else {
-			incrementWinner(scores, items[vote.index_pair.second]);
-			incrementLoser(scores, items[vote.index_pair.first]);
-		}
-	}
-	return scores;
-}
 auto VotingRound::convertToText() const -> std::vector<std::string> {
 	std::vector<std::string> lines{};
 
-	// Save original item order, to make seeded item shuffling deterministic
+	// Original item order, to make seeded item shuffling deterministic
 	if (original_items_order.empty() ||
 		items.empty()) {
 		printError("Failed to generate voting file data: No items");
@@ -488,9 +446,9 @@ auto VotingRound::convertToText() const -> std::vector<std::string> {
 		lines.emplace_back("full");
 	}
 
-	// Save votes
+	// Votes
 	for (Vote const& vote : votes) {
-		lines.emplace_back(std::to_string(vote.index_pair.first) + " " + std::to_string(vote.index_pair.second) + " " + std::to_string(to_underlying(vote.winner)));
+		lines.emplace_back(std::to_string(vote.a_idx) + " " + std::to_string(vote.b_idx) + " " + std::to_string(to_underlying(vote.winner)));
 	}
 	return lines;
 }

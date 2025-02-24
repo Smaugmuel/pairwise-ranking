@@ -206,7 +206,7 @@ void printScores(std::optional<VotingRound> const& voting_round) {
 		printError("No poll to print");
 		return;
 	}
-	print(createScoreTable(voting_round.value().calculateScores()), false);
+	print(createScoreTable(calculateScores(voting_round.value().getItems(), voting_round.value().getVotes())), false);
 }
 void combine() {
 	// Input names of two or more files to combine

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "score.h"
+#include "vote.h"
 
 /* -------------- Items -------------- */
 using Item = std::string;
@@ -23,19 +23,6 @@ struct IndexPairHash {
 };
 using IndexPairs = std::vector<IndexPair>;
 
-/* -------------- Votes -------------- */
-enum class Option : uint32_t {
-	A,
-	B
-};
-
-struct Vote {
-	IndexPair index_pair{};
-	Option winner{};
-};
-auto operator==(Vote const& a, Vote const& b) -> bool;
-using Votes = std::vector<Vote>;
-
 /* -------------- Voting round -------------- */
 
 class VotingRound final {
@@ -48,11 +35,12 @@ public:
 	auto vote(Option option) -> bool;
 	auto undoVote() -> bool;
 	auto save(std::string const& file_name) -> bool;
+	auto getItems() const -> Items const&;
+	auto getVotes() const -> Votes const&;
 	auto verify() const -> bool;
 	auto currentVotingLine() const -> std::optional<std::string>;
 	auto hasRemainingVotes() const -> bool;
 	auto numberOfScheduledVotes() const -> uint32_t;
-	auto calculateScores() const -> Scores;
 	auto convertToText() const -> std::vector<std::string>;
 
 	Items original_items_order{};

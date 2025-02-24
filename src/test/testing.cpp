@@ -26,3 +26,12 @@ void ASSERT_TRUE(bool a, std::source_location const location) {
 void ASSERT_FALSE(bool a, std::source_location const location) {
 	assert_true(location, !a);
 }
+
+auto getNItems(size_t n) -> std::vector<std::string> {
+	std::vector<std::string> items;
+	items.reserve(n);
+	for (size_t i = 0; i < n; i++) {
+		items.push_back("item" + std::to_string(i + 1));
+	}
+	return items;
+}

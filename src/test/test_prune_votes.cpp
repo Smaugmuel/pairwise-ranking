@@ -7,14 +7,6 @@ namespace
 {
 
 /* -------------- Test helpers -------------- */
-auto getNItems(size_t n) -> Items {
-	Items items;
-	items.reserve(n);
-	for (size_t i = 0; i < n; i++) {
-		items.push_back("item" + std::to_string(i + 1));
-	}
-	return items;
-}
 auto hasAnyAdjacentPair(VotingRound const& voting_round) -> bool {
 	auto number_of_items = voting_round.index_pairs.size();
 	auto is_adjacent = [number_of_items](IndexPair const& index_pair) -> bool {

@@ -7,15 +7,6 @@ namespace
 {
 
 /* -------------- Test helpers -------------- */
-auto getNItems(size_t n) -> Items {
-	Items items;
-	items.reserve(n);
-	for (size_t i = 0; i < n; i++) {
-		items.push_back("item" + std::to_string(i + 1));
-	}
-	return items;
-}
-
 template<typename T>
 auto operator+(std::vector<T> const& a, std::vector<T> const& b) -> decltype(auto) {
 	std::vector<T> vec = a;

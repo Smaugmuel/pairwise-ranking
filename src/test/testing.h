@@ -5,6 +5,7 @@
 #include <source_location>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 void assertion_failure(std::source_location const& location, std::string const& error);
 void assert_true(std::source_location const& location, bool val);
@@ -66,7 +67,7 @@ void ASSERT_NE(T const& a, T const& b, std::source_location const location = std
 void ASSERT_TRUE(bool a, std::source_location const location = std::source_location::current());
 void ASSERT_FALSE(bool a, std::source_location const location = std::source_location::current());
 
-
+#if false
 class BaseTest {
 public:
 	virtual void test() const = 0;
@@ -96,3 +97,6 @@ void run_tests() {
 
 	std::apply([](auto&&... args) { (args.test(), ...); }, tests);
 }
+#endif
+
+auto getNItems(size_t n) -> std::vector<std::string>;

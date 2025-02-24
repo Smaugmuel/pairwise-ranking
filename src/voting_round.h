@@ -23,10 +23,17 @@ struct IndexPairHash {
 };
 using IndexPairs = std::vector<IndexPair>;
 
-/* -------------- Voting round -------------- */
+/* -------------- Format -------------- */
+enum class VotingFormat : uint32_t {
+	Invalid,
+	Full,
+	Reduced,
+};
 
+/* -------------- Voting round -------------- */
 class VotingRound final {
 public:
+
 	static auto create(Items const& items, bool reduce_voting) -> std::optional<VotingRound>;
 	static auto create(std::vector<std::string> const& lines) -> std::optional<VotingRound>;
 
@@ -46,8 +53,12 @@ public:
 	Items original_items_order{};
 	Items items{};
 	Seed seed{ 0 };
+
+	// index_pairs is used for score-based voting. ranked_items is used for rank-based voting.
 	IndexPairs index_pairs{};
+	Items ranked_items;
+
 	Votes votes{};
 	bool is_saved{ false };
-	bool reduced_voting{ false };
+	VotingFormat voting_format{ VotingFormat::Invalid };
 };

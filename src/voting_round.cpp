@@ -195,7 +195,7 @@ auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optiona
 	VotingRound voting_round{};
 	voting_round.items = items;
 	voting_round.seed = generateSeed();
-	voting_round.reduced_voting = false;
+	voting_round.voting_format = VotingFormat::Full;
 	voting_round.index_pairs = generateIndexPairs(static_cast<uint32_t>(voting_round.items.size()));
 
 	// Retain item order, to make seeded item shuffling deterministic
@@ -268,6 +268,9 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 	if (reduced_voting) {
 		voting_round.prune();
 	}
+	else {
+		voting_round.voting_format = VotingFormat::Full;
+	}
 
 	voting_round.shuffle();
 
@@ -299,7 +302,7 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 	return voting_round;
 }
 auto VotingRound::prune() -> bool {
-	if (reduced_voting) {
+	if (voting_format == VotingFormat::Reduced) {
 		printError("Already pruned. Can't prune again");
 		return false;
 	}
@@ -309,7 +312,7 @@ auto VotingRound::prune() -> bool {
 	}
 	auto const number_of_items = static_cast<uint32_t>(items.size());
 	index_pairs = reduceVotes(index_pairs, number_of_items);
-	reduced_voting = index_pairs.size() < sumOfFirstIntegers(number_of_items - 1);
+	voting_format = (index_pairs.size() < sumOfFirstIntegers(number_of_items - 1) ? VotingFormat::Reduced : VotingFormat::Full);
 	return true;
 }
 auto VotingRound::shuffle() -> bool {
@@ -371,7 +374,7 @@ auto VotingRound::verify() const -> bool {
 		printError("Seed is 0");
 		return false;
 	}
-	uint32_t const expected_pairs = expectedIndexPairs(items, reduced_voting);
+	uint32_t const expected_pairs = expectedIndexPairs(items, voting_format == VotingFormat::Reduced);
 	if (numberOfScheduledVotes() != expected_pairs) {
 		printError("Generated pairs: " + std::to_string(index_pairs.size()) + ". Expected: " + std::to_string(expected_pairs));
 		return false;
@@ -439,7 +442,7 @@ auto VotingRound::convertToText() const -> std::vector<std::string> {
 	lines.emplace_back(std::to_string(seed));
 
 	// Voting format
-	if (reduced_voting) {
+	if (voting_format == VotingFormat::Reduced) {
 		lines.emplace_back("reduced");
 	}
 	else {

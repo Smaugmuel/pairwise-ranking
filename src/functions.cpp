@@ -125,10 +125,10 @@ auto newRoundFormatString(uint32_t const number_of_items) -> std::string {
 	auto const full_voting_size{ sumOfFirstIntegers(number_of_items - 1) };
 	auto const reduced_voting_size{ full_voting_size - number_of_items * pruningAmount(number_of_items) };
 	return
-		"Please specify the desired voting format:\n"
-		"[F]ull voting    - " + std::to_string(full_voting_size) + " votes\n"
-		"[R]educed voting - " + std::to_string(reduced_voting_size) + " votes\n"
-		"[C]ancel\n";
+		"Please choose voting format:\n"
+		"[F]ull    score-based voting - " + std::to_string(full_voting_size) + " votes\n"
+		"[R]educed score-based voting - " + std::to_string(reduced_voting_size) + " votes\n"
+		"[C]ancel";
 }
 
 /* -------------- Command line inputs -------------- */
@@ -160,11 +160,6 @@ auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::
 }
 
 /* -------------- Menu alternatives -------------- */
-enum class VotingFormat : uint32_t {
-	Full,
-	Reduced,
-	Cancel
-};
 VotingFormat toVotingFormat(char const ch) {
 	switch (ch) {
 	case 'f':
@@ -172,9 +167,9 @@ VotingFormat toVotingFormat(char const ch) {
 	case 'r':
 		return VotingFormat::Reduced;
 	case 'c':
-		return VotingFormat::Cancel;
+		return VotingFormat::Invalid;
 	}
-	return VotingFormat::Cancel;
+	return VotingFormat::Invalid;
 }
 void newRound(std::optional<VotingRound>& voting_round) {
 	std::vector<std::string> const lines = loadFile(kItemsFile);
@@ -195,7 +190,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 	}
 	print(std::string() + ch);
 	VotingFormat const format{ toVotingFormat(ch) };
-	if (format == VotingFormat::Cancel) {
+	if (format == VotingFormat::Invalid) {
 		return;
 	}
 

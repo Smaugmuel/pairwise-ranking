@@ -81,20 +81,20 @@ void pruningWhenVotesAlreadyExist() {
 	auto voting_round = VotingRound::create(getNItems(15), false);
 	voting_round.value().vote(Option::A);
 	voting_round.value().prune();
-	ASSERT_FALSE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items.size() - 1)));
 }
 void pruningWhenAlreadyPruned() {
 	auto voting_round = VotingRound::create(getNItems(15), true);
 	auto const number_of_votes_total_before = voting_round.value().numberOfScheduledVotes();
 	voting_round.value().prune();
-	ASSERT_TRUE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), number_of_votes_total_before);
 }
 void parseVotingRoundWithPruning() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items) + std::vector<std::string>{ "", "1", "reduced" });
-		ASSERT_TRUE(voting_round.value().reduced_voting);
+		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
 		auto const number_of_pruned_votes = number_of_items * pruningAmount(number_of_items);
 		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
 		ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));

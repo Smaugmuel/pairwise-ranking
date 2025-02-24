@@ -94,7 +94,7 @@ void fullVoting() {
 		"1",
 		"full" });
 	ASSERT_TRUE(voting_round.has_value());
-	ASSERT_FALSE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 }
 void reducedVotingWithTooFewItems() {
 	std::optional<VotingRound> const voting_round = VotingRound::create({
@@ -104,7 +104,7 @@ void reducedVotingWithTooFewItems() {
 		"1",
 		"reduced" });
 	ASSERT_TRUE(voting_round.has_value());
-	ASSERT_FALSE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 }
 void reducedVotingWithEnoughItems() {
 	std::optional<VotingRound> const voting_round = VotingRound::create({
@@ -118,7 +118,7 @@ void reducedVotingWithEnoughItems() {
 		"1",
 		"reduced" });
 	ASSERT_TRUE(voting_round.has_value());
-	ASSERT_TRUE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
 }
 void reducedVotingSettingIsMissing() {
 	ASSERT_FALSE(VotingRound::create({
@@ -325,7 +325,7 @@ void fourItemsAndReducedVotingAndFourVotes() {
 	ASSERT_TRUE(hasItem(voting_round.value().items, "item four"));
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
-	ASSERT_FALSE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{
 		Vote{1, 3, Option::A},
@@ -359,7 +359,7 @@ void sevenItemsAndReducedVotingAndFourVotes() {
 	ASSERT_TRUE(hasItem(voting_round.value().items, "se7en"));
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four", "i5", "sixth", "se7en" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
-	ASSERT_TRUE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 14ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{
 		Vote{1, 3, Option::A},
@@ -384,7 +384,7 @@ void fourItemsAndFullVotingAndOneVote() {
 	ASSERT_TRUE(hasItem(voting_round.value().items, "item four"));
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
-	ASSERT_FALSE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_EQ(voting_round.value().votes, Votes{ Vote{1, 3, Option::A} });
 }
@@ -404,7 +404,7 @@ void fourItemsAndFullVotingAndZeroVotes() {
 	ASSERT_TRUE(hasItem(voting_round.value().items, "item four"));
 	ASSERT_EQ(voting_round.value().original_items_order, Items{ "item1", "item 2", "itemthree", "item four" });
 	ASSERT_EQ(voting_round.value().seed, 12345678ui32);
-	ASSERT_FALSE(voting_round.value().reduced_voting);
+	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_TRUE(voting_round.value().votes.empty());
 }

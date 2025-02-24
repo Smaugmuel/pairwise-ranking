@@ -26,7 +26,7 @@ void programLoop() {
 	bool first_iteration = true;
 
 	while (true) {
-		print(getActiveMenuString(voting_round, first_iteration), false);
+		print(activeMenuString(voting_round, first_iteration), false);
 		first_iteration = false;
 
 		char const ch = getKey();
@@ -37,7 +37,7 @@ void programLoop() {
 			}
 		}
 		else if (ch == 'h') {
-			print(getHelpString());
+			print(helpString());
 		}
 		else if (ch == 'n') {
 			if (!continueWithoutSaving(voting_round, "create new voting round")) {

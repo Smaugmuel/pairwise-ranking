@@ -14,7 +14,7 @@ void votingRoundWithFullVoting() {
 		"item1",
 		"item2",
 		"",
-		std::to_string(voting_round.value().seed),
+		std::to_string(voting_round.value().seed()),
 		"full"
 	});
 }
@@ -28,7 +28,7 @@ void votingRoundWithReducedVoting() {
 		"item5",
 		"item6",
 		"",
-		std::to_string(voting_round.value().seed),
+		std::to_string(voting_round.value().seed()),
 		"reduced"
 	});
 }
@@ -38,15 +38,15 @@ void votingRoundWithOneVote() {
 	voting_round.value().vote(Option::A);
 
 	auto const vote_string =
-		std::to_string(voting_round.value().votes[0].a_idx) + " " +
-		std::to_string(voting_round.value().votes[0].b_idx) + " " +
-		std::to_string(to_underlying(voting_round.value().votes[0].winner));
+		std::to_string(voting_round.value().votes()[0].a_idx) + " " +
+		std::to_string(voting_round.value().votes()[0].b_idx) + " " +
+		std::to_string(to_underlying(voting_round.value().votes()[0].winner));
 	ASSERT_EQ(voting_round.value().convertToText(), std::vector<std::string>{
 		"item1",
 		"item2",
 		"item3",
 		"",
-		std::to_string(voting_round.value().seed),
+		std::to_string(voting_round.value().seed()),
 		"full",
 		vote_string
 	});

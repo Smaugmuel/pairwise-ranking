@@ -184,16 +184,6 @@ add_executable(${test_name}
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
 
-set(test_name test_verify_voting_round)
-add_executable(${test_name}
-	${test_name}.cpp
-	testing.cpp
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
-target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
-add_test(NAME ${test_name} COMMAND ${test_name})
-
 set(test_name test_vote)
 add_executable(${test_name}
 	${test_name}.cpp

@@ -181,7 +181,7 @@ auto counterString(size_t counter, size_t total) -> std::string {
 } // namespace
 
 
-auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optional<VotingRound> {
+auto VotingRound::create(Items const& items, bool reduce_voting, Seed seed) -> std::optional<VotingRound> {
 	if (items.size() < 2) {
 		printError("Can't generate voting round: Fewer than two items");
 		return std::nullopt;
@@ -193,13 +193,13 @@ auto VotingRound::create(Items const& items, bool reduce_voting) -> std::optiona
 		}
 	}
 	VotingRound voting_round{};
-	voting_round.items = items;
-	voting_round.seed = generateSeed();
-	voting_round.voting_format = VotingFormat::Full;
-	voting_round.index_pairs = generateIndexPairs(static_cast<uint32_t>(voting_round.items.size()));
+	voting_round.items_ = items;
+	voting_round.seed_ = (seed == 0 ? generateSeed() : seed);
+	voting_round.voting_format_ = VotingFormat::Full;
+	voting_round.index_pairs_ = generateIndexPairs(static_cast<uint32_t>(voting_round.items_.size()));
 
 	// Retain item order, to make seeded item shuffling deterministic
-	voting_round.original_items_order = items;
+	voting_round.original_items_order_ = items;
 
 	if (reduce_voting) {
 		voting_round.prune();
@@ -216,19 +216,19 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 		if (lines[line_index].empty()) {
 			break;
 		}
-		voting_round.items.emplace_back(lines[line_index]);
+		voting_round.items_.emplace_back(lines[line_index]);
 	}
-	if (voting_round.items.size() < 2) {
+	if (voting_round.items_.size() < 2) {
 		printError("Parsed items are fewer than two");
 		return std::nullopt;
 	}
-	if (!itemsAreUnique(voting_round.items)) {
+	if (!itemsAreUnique(voting_round.items_)) {
 		printError("Parsed items are not unique");
 		return std::nullopt;
 	}
 
 	// Retain item order, to make seeded item shuffling deterministic
-	voting_round.original_items_order = voting_round.items;
+	voting_round.original_items_order_ = voting_round.items_;
 
 	// Skip empty line
 	line_index++;
@@ -243,7 +243,7 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 		printError("Invalid seed");
 		return std::nullopt;
 	}
-	voting_round.seed = seed.value();
+	voting_round.seed_ = seed.value();
 
 	// Load reduced voting round setting
 	if (line_index >= lines.size()) {
@@ -264,12 +264,12 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 	}
 	line_index++;
 
-	voting_round.index_pairs = generateIndexPairs(static_cast<uint32_t>(voting_round.items.size()));
+	voting_round.index_pairs_ = generateIndexPairs(static_cast<uint32_t>(voting_round.items_.size()));
 	if (reduced_voting) {
 		voting_round.prune();
 	}
 	else {
-		voting_round.voting_format = VotingFormat::Full;
+		voting_round.voting_format_ = VotingFormat::Full;
 	}
 
 	voting_round.shuffle();
@@ -281,168 +281,190 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 			printError("Failed to parse vote");
 			return std::nullopt;
 		}
-		voting_round.votes.emplace_back(vote);
+		voting_round.votes_.emplace_back(vote);
 	}
-	if (!votingIndicesAreSmallerThanNumberOfItems(voting_round.votes, voting_round.items.size())) {
+	if (!votingIndicesAreSmallerThanNumberOfItems(voting_round.votes_, voting_round.items_.size())) {
 		printError("Some parsed indices in vote are larger than allowed");
 		return std::nullopt;
 	}
 
-	if (hasDuplicateMatchups(voting_round.votes)) {
+	if (hasDuplicateMatchups(voting_round.votes_)) {
 		printError("Some vote matchups are duplicated");
 		return std::nullopt;
 	}
 
-	if (voting_round.votes.size() > voting_round.numberOfScheduledVotes()) {
+	if (voting_round.votes_.size() > voting_round.numberOfScheduledVotes()) {
 		printError("Too many votes parsed. Voting round is invalidated");
 		return std::nullopt;
 	}
 
-	voting_round.is_saved = true;
+	voting_round.is_saved_ = true;
 	return voting_round;
 }
 auto VotingRound::prune() -> bool {
-	if (voting_format == VotingFormat::Reduced) {
+	if (voting_format_ == VotingFormat::Reduced) {
 		printError("Already pruned. Can't prune again");
 		return false;
 	}
-	if (!votes.empty()) {
+	if (!votes_.empty()) {
 		printError("Can't prune when votes exist");
 		return false;
 	}
-	auto const number_of_items = static_cast<uint32_t>(items.size());
-	index_pairs = reduceVotes(index_pairs, number_of_items);
-	voting_format = (index_pairs.size() < sumOfFirstIntegers(number_of_items - 1) ? VotingFormat::Reduced : VotingFormat::Full);
+	auto const number_of_items = static_cast<uint32_t>(items_.size());
+	index_pairs_ = reduceVotes(index_pairs_, number_of_items);
+	voting_format_ = (index_pairs_.size() < sumOfFirstIntegers(number_of_items - 1) ? VotingFormat::Reduced : VotingFormat::Full);
 	return true;
 }
 auto VotingRound::shuffle() -> bool {
-	std::default_random_engine random_engine(seed);
-	std::shuffle(index_pairs.begin(), index_pairs.end(), random_engine);
-	std::shuffle(items.begin(), items.end(), random_engine);
+	std::default_random_engine random_engine(seed_);
+	std::shuffle(index_pairs_.begin(), index_pairs_.end(), random_engine);
+	std::shuffle(items_.begin(), items_.end(), random_engine);
 	return true;
 }
 auto VotingRound::vote(Option option) -> bool {
 	if (!hasRemainingVotes()) {
 		return false;
 	}
-	votes.emplace_back(index_pairs[votes.size()].first, index_pairs[votes.size()].second, option);
-	is_saved = false;
+	votes_.emplace_back(index_pairs_[votes_.size()].first, index_pairs_[votes_.size()].second, option);
+	is_saved_ = false;
 	return true;
 }
 auto VotingRound::undoVote() -> bool {
 	// Need to check since pop_back() decrements vector size even when it's 0, causing a size_t underflow
-	if (votes.empty()) {
+	if (votes_.empty()) {
 		return false;
 	}
-	votes.pop_back();
-	is_saved = false;
+	votes_.pop_back();
+	is_saved_ = false;
 	return true;
 }
 auto VotingRound::save(std::string const& file_name) -> bool {
 	if (!saveFile(file_name, convertToText())) {
 		return false;
 	}
-	is_saved = true;
+	is_saved_ = true;
 	return true;
 }
-auto VotingRound::getItems() const->Items const& {
-	return items;
+auto VotingRound::items() const->Items const& {
+	return items_;
 }
-auto VotingRound::getVotes() const->Votes const& {
-	return votes;
+auto VotingRound::originalItemOrder() const -> Items const& {
+	return original_items_order_;
 }
-auto VotingRound::verify() const -> bool {
-	// Verify state of items, seed, index pairs, and votes
-
-	if (items.size() < 2) {
-		printError("At least two items are required");
-		return false;
+auto VotingRound::format() const->VotingFormat {
+	return voting_format_;
+}
+auto VotingRound::seed() const->Seed {
+	return seed_;
+}
+auto VotingRound::indexPairs() const->IndexPairs const& {
+	return index_pairs_;
+}
+auto VotingRound::votes() const->Votes const& {
+	return votes_;
+}
+auto VotingRound::isSaved() const -> bool {
+	return is_saved_;
+}
+// TODO: Deprecated in favor of VotingRound::create().
+// Either move some of these into VotingRound::create(), or call this from within it.
+// auto VotingRound::verify() const -> bool {
+// 	// Verify state of items, seed, index pairs, and votes
+// 
+// 	if (items_.size() < 2) {
+// 		printError("At least two items are required");
+// 		return false;
+// 	}
+// 	if (hasDuplicateItems(items_)) {
+// 		printError("Duplicate items found");
+// 		return false;
+// 	}
+// 	if (hasInvalidScheduledVotes(index_pairs_, items_.size())) {
+// 		printError("Scheduled votes are invalid");
+// 		return false;
+// 	}
+// 	if (hasDuplicateScheduledVotes(index_pairs_)) {
+// 		printError("Scheduled votes have duplicates");
+// 		return false;
+// 	}
+// 	if (seed_ == 0) {
+// 		printError("Seed is 0");
+// 		return false;
+// 	}
+// 	uint32_t const expected_pairs = expectedIndexPairs(items_, voting_format_ == VotingFormat::Reduced);
+// 	if (numberOfScheduledVotes() != expected_pairs) {
+// 		printError("Generated pairs: " + std::to_string(index_pairs_.size()) + ". Expected: " + std::to_string(expected_pairs));
+// 		return false;
+// 	}
+// 	if (hasVotesWithInvalidIndices(votes_, items_.size())) {
+// 		printError("Invalid indices in votes");
+// 		return false;
+// 	}
+// 	if (hasVotesWithInvalidVoteOption(votes_)) {
+// 		printError("Invalid option voted for");
+// 		return false;
+// 	}
+// 	if (hasDuplicateVotes(votes_)) {
+// 		printError("Votes are duplicated");
+// 		return false;
+// 	}
+// 	if (votes_.size() > numberOfScheduledVotes()) {
+// 		printError("Number of votes exceed maximum amount");
+// 		return false;
+// 	}
+// 	return true;
+// }
+auto VotingRound::currentMatchup() const -> std::optional<Matchup> {
+	if (!hasRemainingVotes()) {
+		printError("No active matchup");
+		return std::nullopt;
 	}
-	if (hasDuplicateItems(items)) {
-		printError("Duplicate items found");
-		return false;
-	}
-	if (hasInvalidScheduledVotes(index_pairs, items.size())) {
-		printError("Scheduled votes are invalid");
-		return false;
-	}
-	if (hasDuplicateScheduledVotes(index_pairs)) {
-		printError("Scheduled votes have duplicates");
-		return false;
-	}
-	if (seed == 0) {
-		printError("Seed is 0");
-		return false;
-	}
-	uint32_t const expected_pairs = expectedIndexPairs(items, voting_format == VotingFormat::Reduced);
-	if (numberOfScheduledVotes() != expected_pairs) {
-		printError("Generated pairs: " + std::to_string(index_pairs.size()) + ". Expected: " + std::to_string(expected_pairs));
-		return false;
-	}
-	if (hasVotesWithInvalidIndices(votes, items.size())) {
-		printError("Invalid indices in votes");
-		return false;
-	}
-	if (hasVotesWithInvalidVoteOption(votes)) {
-		printError("Invalid option voted for");
-		return false;
-	}
-	if (hasDuplicateVotes(votes)) {
-		printError("Votes are duplicated");
-		return false;
-	}
-	if (votes.size() > numberOfScheduledVotes()) {
-		printError("Number of votes exceed maximum amount");
-		return false;
-	}
-	return true;
+	auto const indices = index_pairs_[votes_.size()];
+	return Matchup{ items_[indices.first], items_[indices.second] };
 }
 auto VotingRound::currentVotingLine() const -> std::optional<std::string> {
 	if (!hasRemainingVotes()) {
 		printError("Voting finished. No active votes to print");
 		return std::nullopt;
 	}
-	size_t    const  counter = votes.size();
-	IndexPair const& indices = index_pairs[counter];
-
-	size_t const max_length = findMaxLength(items);
-	size_t const length_a = items[indices.first].size();
-	size_t const length_b = items[indices.second].size();
-
-	size_t const padding_length_a = max_length - length_a;
-	size_t const padding_length_b = max_length - length_b;
-	return counterString(counter + 1, index_pairs.size()) + " "
+	auto const matchup = currentMatchup();
+	auto const max_length = findMaxLength(items_);
+	auto const length_a = matchup.value().item_a.size();
+	auto const length_b = matchup.value().item_b.size();
+	auto const padding_length_a = max_length - length_a;
+	auto const padding_length_b = max_length - length_b;
+	return counterString(votes_.size() + 1, index_pairs_.size()) + " "
 		"H: help. "
-		"A: \'" + items[indices.first] + "\'." + std::string(padding_length_a, ' ') + " "
-		"B: \'" + items[indices.second] + "\'." + std::string(padding_length_b, ' ') + " Your choice: ";
+		"A: \'" + matchup.value().item_a + "\'." + std::string(padding_length_a, ' ') + " "
+		"B: \'" + matchup.value().item_b + "\'." + std::string(padding_length_b, ' ') + " Your choice: ";
 }
 auto VotingRound::hasRemainingVotes() const -> bool {
-	return votes.size() < index_pairs.size();
+	return votes_.size() < index_pairs_.size();
 }
 auto VotingRound::numberOfScheduledVotes() const -> uint32_t {
-	return static_cast<uint32_t>(index_pairs.size());
+	return static_cast<uint32_t>(index_pairs_.size());
 }
 auto VotingRound::convertToText() const -> std::vector<std::string> {
 	std::vector<std::string> lines{};
 
 	// Original item order, to make seeded item shuffling deterministic
-	if (original_items_order.empty() ||
-		items.empty()) {
+	if (original_items_order_.empty() ||
+		items_.empty()) {
 		printError("Failed to generate voting file data: No items");
 		return lines;
 	}
 
 	// Items
-	for (Item const& item : original_items_order) {
+	for (Item const& item : original_items_order_) {
 		lines.emplace_back(item);
 	}
 	lines.emplace_back("");
 
 	// Seed
-	lines.emplace_back(std::to_string(seed));
+	lines.emplace_back(std::to_string(seed_));
 
 	// Voting format
-	if (voting_format == VotingFormat::Reduced) {
+	if (voting_format_ == VotingFormat::Reduced) {
 		lines.emplace_back("reduced");
 	}
 	else {
@@ -450,7 +472,7 @@ auto VotingRound::convertToText() const -> std::vector<std::string> {
 	}
 
 	// Votes
-	for (Vote const& vote : votes) {
+	for (Vote const& vote : votes_) {
 		lines.emplace_back(std::to_string(vote.a_idx) + " " + std::to_string(vote.b_idx) + " " + std::to_string(to_underlying(vote.winner)));
 	}
 	return lines;

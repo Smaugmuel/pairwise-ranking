@@ -21,21 +21,21 @@ void generateWithFullVoting() {
 	for (size_t number_of_items = 2; number_of_items < 25; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), false);
 		ASSERT_TRUE(voting_round.has_value());
-		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
+		ASSERT_EQ(voting_round.value().format(), VotingFormat::Full);
 	}
 }
 void generateWithReducedVotingIfTooFewItemsToReduce() {
 	for (size_t number_of_items = 2; number_of_items < kMinimumItemsForPruning; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), true);
 		ASSERT_TRUE(voting_round.has_value());
-		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
+		ASSERT_EQ(voting_round.value().format(), VotingFormat::Full);
 	}
 }
 void generateWithReducedVotingIfEnoughItemsToReduce() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 25; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), true);
 		ASSERT_TRUE(voting_round.has_value());
-		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
+		ASSERT_EQ(voting_round.value().format(), VotingFormat::Reduced);
 	}
 }
 void generateWithFullVotingGivesCorrectAmountOfScheduledVotes() {
@@ -66,7 +66,7 @@ void generateWithReducedVotingGivesCorrectAmountOfScheduledVotes() {
 }
 void generateWithFullVotingGivesCorrectScheduledVotes() {
 	auto const generate_and_get_index_pairs = [](uint32_t number_of_items) -> IndexPairs {
-		return VotingRound::create(getNItems(number_of_items), false).value().index_pairs;
+		return VotingRound::create(getNItems(number_of_items), false).value().indexPairs();
 	};
 
 	ASSERT_EQ(generate_and_get_index_pairs(2), IndexPairs{

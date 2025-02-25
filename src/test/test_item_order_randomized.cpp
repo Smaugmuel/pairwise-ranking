@@ -22,8 +22,7 @@ auto findScore(Scores const& scores, Item const& item) -> Score {
 
 void itemOrderIsShuffledWhenShufflingNewVotingRound() {
 	auto const items = getNItems(10);
-	auto voting_round = VotingRound::create(items, false);
-	voting_round.value().seed = 12345;
+	auto voting_round = VotingRound::create(items, false, 12345);
 	voting_round.value().shuffle();
 	Items const expected_item_order{
 		"item7",
@@ -37,13 +36,13 @@ void itemOrderIsShuffledWhenShufflingNewVotingRound() {
 		"item8",
 		"item1"
 	};
-	ASSERT_EQ(voting_round.value().items, expected_item_order);
+	ASSERT_EQ(voting_round.value().items(), expected_item_order);
 }
 void originalItemOrderIsRetainedWhenShufflingNewVotingRound() {
 	auto const items = getNItems(10);
 	auto voting_round = VotingRound::create(items, false);
 	voting_round.value().shuffle();
-	ASSERT_EQ(voting_round.value().original_items_order, items);
+	ASSERT_EQ(voting_round.value().originalItemOrder(), items);
 }
 void itemOrderIsShuffledWhenShufflingParsedVotingRound() {
 	auto const items = getNItems(10);
@@ -65,7 +64,7 @@ void itemOrderIsShuffledWhenShufflingParsedVotingRound() {
 		"item8",
 		"item1"
 	};
-	ASSERT_EQ(voting_round.value().items, expected_item_order);
+	ASSERT_EQ(voting_round.value().items(), expected_item_order);
 }
 void originalItemOrderIsRetainedWhenShufflingParsedVotingRound() {
 	auto const items = getNItems(10);
@@ -75,12 +74,11 @@ void originalItemOrderIsRetainedWhenShufflingParsedVotingRound() {
 		"full"
 	};
 	auto const voting_round = VotingRound::create(voting_round_text);
-	ASSERT_EQ(voting_round.value().original_items_order, items);
+	ASSERT_EQ(voting_round.value().originalItemOrder(), items);
 }
 void convertingVotingRoundToTextUsesOriginalItemOrder() {
 	auto const items = getNItems(10);
-	auto voting_round = VotingRound::create(items, false);
-	voting_round.value().seed = 12345;
+	auto voting_round = VotingRound::create(items, false, 12345);
 	voting_round.value().shuffle();
 	auto const text = voting_round.value().convertToText();
 	for (size_t i = 0; i < items.size(); i++) {
@@ -89,15 +87,14 @@ void convertingVotingRoundToTextUsesOriginalItemOrder() {
 }
 void scoresAreCalculatedWithCorrectItems() {
 	auto const items = getNItems(10);
-	auto voting_round = VotingRound::create(items, false);
-	voting_round.value().seed = 12345;
+	auto voting_round = VotingRound::create(items, false, 12345);
 	voting_round.value().shuffle();
 
 	// Vote A on each option
 	for (uint32_t i = 0; i < voting_round.value().numberOfScheduledVotes(); i++) {
 		voting_round.value().vote(Option::A);
 	}
-	auto const scores = calculateScores(voting_round.value().getItems(), voting_round.value().getVotes());
+	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
 
 	// Because of the order in which matchups are generated, voting for A each time
 	// will mean the first item gets N-1 wins, where N is the number of items.
@@ -105,9 +102,9 @@ void scoresAreCalculatedWithCorrectItems() {
 	// Nth item will get 0 wins. The actual order in which the options are presented
 	// thus doesn't matter, as the total number of wins will be the same regardless.
 
-	uint32_t const max_wins = voting_round.value().items.size() - 1;
-	for (uint32_t i = 0; i < voting_round.value().items.size(); i++) {
-		ASSERT_EQ(findScore(scores, voting_round.value().items[i]).wins, max_wins - i);
+	uint32_t const max_wins = voting_round.value().items().size() - 1;
+	for (uint32_t i = 0; i < voting_round.value().items().size(); i++) {
+		ASSERT_EQ(findScore(scores, voting_round.value().items()[i]).wins, max_wins - i);
 	}
 }
 

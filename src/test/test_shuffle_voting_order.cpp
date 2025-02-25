@@ -2,7 +2,7 @@
 #include "voting_round.h"
 
 int main() {
-	auto voting_round = VotingRound::create(getNItems(8), false, 123456);
+	auto voting_round = VotingRound::create(getNItems(8), VotingFormat::Full, 123456);
 	voting_round.value().shuffle();
 
 	ASSERT_EQ(voting_round.value().indexPairs(), IndexPairs{

@@ -39,7 +39,7 @@ struct Matchup {
 class VotingRound final {
 public:
 
-	static auto create(Items const& items, bool reduce_voting, Seed seed = 0) -> std::optional<VotingRound>;
+	static auto create(Items const& items, VotingFormat voting_format, Seed seed = 0) -> std::optional<VotingRound>;
 	static auto create(std::vector<std::string> const& lines) -> std::optional<VotingRound>;
 
 	auto prune() -> bool;

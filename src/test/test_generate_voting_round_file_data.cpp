@@ -9,7 +9,7 @@ void emptyVotingRound() {
 	ASSERT_EQ(VotingRound{}.convertToText(), std::vector<std::string>{});
 }
 void votingRoundWithFullVoting() {
-	auto const voting_round = VotingRound::create(getNItems(2), false);
+	auto const voting_round = VotingRound::create(getNItems(2), VotingFormat::Full);
 	ASSERT_EQ(voting_round.value().convertToText(), std::vector<std::string>{
 		"item1",
 		"item2",
@@ -19,7 +19,7 @@ void votingRoundWithFullVoting() {
 	});
 }
 void votingRoundWithReducedVoting() {
-	auto const voting_round = VotingRound::create(getNItems(6), true);
+	auto const voting_round = VotingRound::create(getNItems(6), VotingFormat::Reduced);
 	ASSERT_EQ(voting_round.value().convertToText(), std::vector<std::string>{
 		"item1",
 		"item2",
@@ -33,7 +33,7 @@ void votingRoundWithReducedVoting() {
 	});
 }
 void votingRoundWithOneVote() {
-	auto voting_round = VotingRound::create(getNItems(3), false);
+	auto voting_round = VotingRound::create(getNItems(3), VotingFormat::Full);
 	voting_round.value().shuffle();
 	voting_round.value().vote(Option::A);
 

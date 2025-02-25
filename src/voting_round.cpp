@@ -181,7 +181,7 @@ auto counterString(size_t counter, size_t total) -> std::string {
 } // namespace
 
 
-auto VotingRound::create(Items const& items, bool reduce_voting, Seed seed) -> std::optional<VotingRound> {
+auto VotingRound::create(Items const& items, VotingFormat voting_format, Seed seed) -> std::optional<VotingRound> {
 	if (items.size() < 2) {
 		printError("Can't generate voting round: Fewer than two items");
 		return std::nullopt;
@@ -201,7 +201,7 @@ auto VotingRound::create(Items const& items, bool reduce_voting, Seed seed) -> s
 	// Retain item order, to make seeded item shuffling deterministic
 	voting_round.original_items_order_ = items;
 
-	if (reduce_voting) {
+	if (voting_format == VotingFormat::Reduced) {
 		voting_round.prune();
 	}
 

@@ -5,14 +5,14 @@ namespace
 {
 
 void firstVoteForA() {
-	auto voting_round = VotingRound::create(getNItems(3), false);
+	auto voting_round = VotingRound::create(getNItems(3), VotingFormat::Full);
 	ASSERT_TRUE(voting_round.value().votes().empty());
 	ASSERT_TRUE(voting_round.value().vote(Option::A));
 	ASSERT_EQ(voting_round.value().votes().size(), 1ui64);
 	ASSERT_EQ(voting_round.value().votes()[0], Vote{ 0, 1, Option::A });
 }
 void firstVoteForB() {
-	auto voting_round = VotingRound::create(getNItems(3), false);
+	auto voting_round = VotingRound::create(getNItems(3), VotingFormat::Full);
 	ASSERT_TRUE(voting_round.value().votes().empty());
 	ASSERT_TRUE(voting_round.value().vote(Option::B));
 	ASSERT_EQ(voting_round.value().votes().size(), 1ui64);
@@ -20,7 +20,7 @@ void firstVoteForB() {
 }
 void votingForAForEachScheduledVote() {
 	for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
-		auto voting_round = VotingRound::create(getNItems(number_of_items), false);
+		auto voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Full);
 		while (voting_round.value().hasRemainingVotes()) {
 			voting_round.value().vote(Option::A);
 		}
@@ -34,7 +34,7 @@ void votingForAForEachScheduledVote() {
 }
 void votingForBForEachScheduledVote() {
 	for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
-		auto voting_round = VotingRound::create(getNItems(number_of_items), false);
+		auto voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Full);
 		while (voting_round.value().hasRemainingVotes()) {
 			voting_round.value().vote(Option::B);
 		}
@@ -47,7 +47,7 @@ void votingForBForEachScheduledVote() {
 	}
 }
 void votingAfterRoundCompleted() {
-	auto voting_round = VotingRound::create(getNItems(3), false);
+	auto voting_round = VotingRound::create(getNItems(3), VotingFormat::Full);
 
 	voting_round.value().vote(Option::B);
 	voting_round.value().vote(Option::B);

@@ -6,17 +6,17 @@ namespace
 
 void firstVoteForA() {
 	auto voting_round = VotingRound::create(getNItems(3), false);
-	ASSERT_TRUE(voting_round.value().getVotes().empty());
+	ASSERT_TRUE(voting_round.value().votes().empty());
 	ASSERT_TRUE(voting_round.value().vote(Option::A));
-	ASSERT_EQ(voting_round.value().getVotes().size(), 1ui64);
-	ASSERT_EQ(voting_round.value().getVotes()[0], Vote{ 0, 1, Option::A });
+	ASSERT_EQ(voting_round.value().votes().size(), 1ui64);
+	ASSERT_EQ(voting_round.value().votes()[0], Vote{ 0, 1, Option::A });
 }
 void firstVoteForB() {
 	auto voting_round = VotingRound::create(getNItems(3), false);
-	ASSERT_TRUE(voting_round.value().getVotes().empty());
+	ASSERT_TRUE(voting_round.value().votes().empty());
 	ASSERT_TRUE(voting_round.value().vote(Option::B));
-	ASSERT_EQ(voting_round.value().getVotes().size(), 1ui64);
-	ASSERT_EQ(voting_round.value().getVotes()[0], Vote{ 0, 1, Option::B });
+	ASSERT_EQ(voting_round.value().votes().size(), 1ui64);
+	ASSERT_EQ(voting_round.value().votes()[0], Vote{ 0, 1, Option::B });
 }
 void votingForAForEachScheduledVote() {
 	for (uint32_t number_of_items = 2; number_of_items < 25; number_of_items++) {
@@ -25,7 +25,7 @@ void votingForAForEachScheduledVote() {
 			voting_round.value().vote(Option::A);
 		}
 
-		auto const& votes = voting_round.value().getVotes();
+		auto const& votes = voting_round.value().votes();
 		ASSERT_EQ(static_cast<uint32_t>(votes.size()), voting_round.value().numberOfScheduledVotes());
 		for (auto const& vote : votes) {
 			ASSERT_EQ(vote.winner, Option::A);
@@ -39,7 +39,7 @@ void votingForBForEachScheduledVote() {
 			voting_round.value().vote(Option::B);
 		}
 
-		auto const& votes = voting_round.value().getVotes();
+		auto const& votes = voting_round.value().votes();
 		ASSERT_EQ(static_cast<uint32_t>(votes.size()), voting_round.value().numberOfScheduledVotes());
 		for (auto const& vote : votes) {
 			ASSERT_EQ(vote.winner, Option::B);
@@ -55,7 +55,7 @@ void votingAfterRoundCompleted() {
 
 	ASSERT_FALSE(voting_round.value().vote(Option::A));
 	ASSERT_FALSE(voting_round.value().vote(Option::B));
-	ASSERT_EQ(voting_round.value().getVotes().size(), 3ui64);
+	ASSERT_EQ(voting_round.value().votes().size(), 3ui64);
 }
 
 } // namespace

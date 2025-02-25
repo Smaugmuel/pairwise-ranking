@@ -149,7 +149,7 @@ auto getConfirmation() -> bool {
 }
 auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::string const& str) -> bool {
 	bool response = true;
-	if (voting_round.has_value() && !voting_round.value().is_saved) {
+	if (voting_round.has_value() && !voting_round.value().isSaved()) {
 		print("You have unsaved data. Do you still wish to " + str + "? (Y / N) : ", false);
 		if (!getConfirmation()) {
 			response = false;
@@ -197,27 +197,26 @@ void newRound(std::optional<VotingRound>& voting_round) {
 	// Create voting round
 	Items items = parseItems(lines);
 	voting_round = VotingRound::create(items, format == VotingFormat::Reduced);
-	voting_round.value().shuffle();
-	if (!voting_round.value().verify()) {
+	if (!voting_round.has_value()) {
 		printError("Could not generate voting round");
-		voting_round.reset();
 		return;
 	}
+	voting_round.value().shuffle();
 }
 void loadRound(std::optional<VotingRound>& voting_round, std::vector<std::string> const& lines) {
-	std::optional<VotingRound> temp = VotingRound::create(lines);
-	if (!temp.has_value() || !temp.value().verify()) {
+	std::optional<VotingRound> loaded_voting_round = VotingRound::create(lines);
+	if (!loaded_voting_round.has_value()) {
 		printError("Could not load voting round");
 		return;
 	}
-	voting_round = temp;
+	voting_round = loaded_voting_round;
 }
 void printScores(std::optional<VotingRound> const& voting_round) {
 	if (!voting_round.has_value()) {
 		printError("No voting round to print");
 		return;
 	}
-	print(createScoreTable(calculateScores(voting_round.value().getItems(), voting_round.value().getVotes())), false);
+	print(createScoreTable(calculateScores(voting_round.value().items(), voting_round.value().votes())), false);
 }
 void combine() {
 	// Input names of two or more files to combine

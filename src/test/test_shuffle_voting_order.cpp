@@ -2,11 +2,10 @@
 #include "voting_round.h"
 
 int main() {
-	auto voting_round = VotingRound::create(getNItems(8), false);
-	voting_round.value().seed = 123456;
+	auto voting_round = VotingRound::create(getNItems(8), false, 123456);
 	voting_round.value().shuffle();
 
-	ASSERT_EQ(voting_round.value().index_pairs, IndexPairs{
+	ASSERT_EQ(voting_round.value().indexPairs(), IndexPairs{
 		IndexPair{0, 6},
 		IndexPair{0, 3},
 		IndexPair{6, 7},

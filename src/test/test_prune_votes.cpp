@@ -8,7 +8,7 @@ namespace
 
 /* -------------- Test helpers -------------- */
 auto hasAnyAdjacentPair(VotingRound const& voting_round) -> bool {
-	auto number_of_items = voting_round.index_pairs.size();
+	auto number_of_items = voting_round.indexPairs().size();
 	auto is_adjacent = [number_of_items](IndexPair const& index_pair) -> bool {
 		if (std::labs(static_cast<int>(index_pair.first) - static_cast<int>(index_pair.second)) == 1) {
 			return true;
@@ -18,8 +18,8 @@ auto hasAnyAdjacentPair(VotingRound const& voting_round) -> bool {
 		}
 		return false;
 	};
-	auto it = std::find_if(voting_round.index_pairs.begin(), voting_round.index_pairs.end(), is_adjacent);
-	return it != voting_round.index_pairs.end();
+	auto it = std::find_if(voting_round.indexPairs().begin(), voting_round.indexPairs().end(), is_adjacent);
+	return it != voting_round.indexPairs().end();
 }
 
 template<typename T>
@@ -81,20 +81,20 @@ void pruningWhenVotesAlreadyExist() {
 	auto voting_round = VotingRound::create(getNItems(15), false);
 	voting_round.value().vote(Option::A);
 	voting_round.value().prune();
-	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Full);
-	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items.size() - 1)));
+	ASSERT_EQ(voting_round.value().format(), VotingFormat::Full);
+	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items().size() - 1)));
 }
 void pruningWhenAlreadyPruned() {
 	auto voting_round = VotingRound::create(getNItems(15), true);
 	auto const number_of_votes_total_before = voting_round.value().numberOfScheduledVotes();
 	voting_round.value().prune();
-	ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
+	ASSERT_EQ(voting_round.value().format(), VotingFormat::Reduced);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), number_of_votes_total_before);
 }
 void parseVotingRoundWithPruning() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items) + std::vector<std::string>{ "", "1", "reduced" });
-		ASSERT_EQ(voting_round.value().voting_format, VotingFormat::Reduced);
+		ASSERT_EQ(voting_round.value().format(), VotingFormat::Reduced);
 		auto const number_of_pruned_votes = number_of_items * pruningAmount(number_of_items);
 		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
 		ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));
@@ -102,7 +102,7 @@ void parseVotingRoundWithPruning() {
 }
 void pruningRemovesCorrectScheduledVotes() {
 	auto const generate_and_get_index_pairs = [](uint32_t number_of_items) -> IndexPairs {
-		return VotingRound::create(getNItems(number_of_items), true).value().index_pairs;
+		return VotingRound::create(getNItems(number_of_items), true).value().indexPairs();
 	};
 
 	ASSERT_EQ(generate_and_get_index_pairs(2), IndexPairs{

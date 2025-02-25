@@ -67,7 +67,7 @@ void programLoop() {
 			else {
 				print("Votes saved to " + kVotesFile + ".");
 			}
-			if (!saveScores(calculateScores(voting_round.value().getItems(), voting_round.value().getVotes()), kResultFile)) {
+			if (!saveScores(calculateScores(voting_round.value().items(), voting_round.value().votes()), kResultFile)) {
 				printError("Could not save scores to " + kResultFile + ".");
 			}
 			else {

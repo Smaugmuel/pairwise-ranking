@@ -30,35 +30,46 @@ enum class VotingFormat : uint32_t {
 	Reduced,
 };
 
+struct Matchup {
+	Item item_a{};
+	Item item_b{};
+};
+
 /* -------------- Voting round -------------- */
 class VotingRound final {
 public:
 
-	static auto create(Items const& items, bool reduce_voting) -> std::optional<VotingRound>;
+	static auto create(Items const& items, bool reduce_voting, Seed seed = 0) -> std::optional<VotingRound>;
 	static auto create(std::vector<std::string> const& lines) -> std::optional<VotingRound>;
 
 	auto prune() -> bool;
 	auto shuffle() -> bool;
+
 	auto vote(Option option) -> bool;
 	auto undoVote() -> bool;
 	auto save(std::string const& file_name) -> bool;
-	auto getItems() const -> Items const&;
-	auto getVotes() const -> Votes const&;
-	auto verify() const -> bool;
+
+	// Internal members access
+	auto items() const -> Items const&;
+	auto originalItemOrder() const -> Items const&;
+	auto format() const -> VotingFormat;
+	auto seed() const -> Seed;
+	auto indexPairs() const -> IndexPairs const&;
+	auto votes() const -> Votes const&;
+	auto isSaved() const -> bool;
+
+	auto currentMatchup() const -> std::optional<Matchup>;
 	auto currentVotingLine() const -> std::optional<std::string>;
 	auto hasRemainingVotes() const -> bool;
-	auto numberOfScheduledVotes() const -> uint32_t;
 	auto convertToText() const -> std::vector<std::string>;
+	auto numberOfScheduledVotes() const -> uint32_t;
 
-	Items original_items_order{};
-	Items items{};
-	Seed seed{ 0 };
-
-	// index_pairs is used for score-based voting. ranked_items is used for rank-based voting.
-	IndexPairs index_pairs{};
-	Items ranked_items;
-
-	Votes votes{};
-	bool is_saved{ false };
-	VotingFormat voting_format{ VotingFormat::Invalid };
+private:
+	Items original_items_order_{};
+	Items items_{};
+	Seed seed_{ 0 };
+	IndexPairs index_pairs_{};
+	Votes votes_{};
+	bool is_saved_{ false };
+	VotingFormat voting_format_{ VotingFormat::Invalid };
 };

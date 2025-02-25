@@ -33,7 +33,7 @@ void oneVoteForB() {
 }
 void allVotesForA() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		voting_round.value().vote(Option::A);
 	}
 	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
@@ -47,7 +47,7 @@ void allVotesForA() {
 }
 void allVotesForB() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		voting_round.value().vote(Option::B);
 	}
 	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
@@ -61,7 +61,7 @@ void allVotesForB() {
 }
 void votingForItem2AndOptionAIfNotPresent() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 
 		if (current_items.value().item_a == "item2") {
@@ -86,7 +86,7 @@ void votingForItem2AndOptionAIfNotPresent() {
 }
 void votingForItem3AndOptionAIfNotPresent() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 
 		if (current_items.value().item_a == "item3") {
@@ -111,7 +111,7 @@ void votingForItem3AndOptionAIfNotPresent() {
 }
 void votingForItem2AndOptionBIfNotPresent() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 
 		if (current_items.value().item_a == "item2") {
@@ -136,7 +136,7 @@ void votingForItem2AndOptionBIfNotPresent() {
 }
 void votingForItem3AndOptionBIfNotPresent() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 
 		if (current_items.value().item_a == "item3") {
@@ -161,7 +161,7 @@ void votingForItem3AndOptionBIfNotPresent() {
 }
 void votingForItem2AndAgainstItem3AndOptionAIfNeither() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 		
 		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {
@@ -186,7 +186,7 @@ void votingForItem2AndAgainstItem3AndOptionAIfNeither() {
 }
 void votingForItem2AndAgainstItem3AndOptionBIfNeither() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 
 		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {
@@ -211,7 +211,7 @@ void votingForItem2AndAgainstItem3AndOptionBIfNeither() {
 }
 void votingForItem3AndAgainstItem2AndOptionAIfNeither() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 
 		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {
@@ -236,7 +236,7 @@ void votingForItem3AndAgainstItem2AndOptionAIfNeither() {
 }
 void votingForItem3AndAgainstItem2AndOptionBIfNeither() {
 	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < voting_round.value().numberOfScheduledVotes(); ++i) {
+	while (voting_round.value().hasRemainingVotes()) {
 		auto const current_items = voting_round.value().currentMatchup();
 
 		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {

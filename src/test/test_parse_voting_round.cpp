@@ -4,12 +4,6 @@
 namespace
 {
 
-auto operator+(std::vector<std::string> const& vec, std::string&& str) -> std::vector<std::string> {
-	auto new_vec = vec;
-	new_vec.emplace_back(str);
-	return new_vec;
-}
-
 void noLinesToParse() {
 	ASSERT_FALSE(VotingRound::create({}).has_value());
 }
@@ -104,7 +98,7 @@ void reducedVotingWithTooFewItems() {
 		"1",
 		"reduced" });
 	ASSERT_TRUE(voting_round.has_value());
-	ASSERT_EQ(voting_round.value().format(), VotingFormat::Full);
+	ASSERT_EQ(voting_round.value().format(), VotingFormat::Reduced);
 }
 void reducedVotingWithEnoughItems() {
 	std::optional<VotingRound> const voting_round = VotingRound::create({
@@ -198,23 +192,23 @@ void voteDoesNotHaveThreeIntegers() {
 		"",
 		"1",
 		"full" };
-	ASSERT_FALSE(VotingRound::create(base_lines + "").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + " ").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "a").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "a b").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "a 1").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0 b").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0 1").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "a b c").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "a b 0").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "a 1 c").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "a 1 0").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0 b c").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0 b 0").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0 1 c").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0 1 0 d").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "0 1 0 1").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ " " }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "a" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "a b" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "a 1" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0 b" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0 1" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "a b c" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "a b 0" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "a 1 c" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "a 1 0" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0 b c" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0 b 0" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0 1 c" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0 1 0 d" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "0 1 0 1" }).has_value());
 }
 void voteOptionIndicesAreGreaterThanNumberOfItems() {
 	ASSERT_FALSE(VotingRound::create({
@@ -296,9 +290,9 @@ void chosenVoteIsNotZeroOrOne() {
 		"",
 		"1",
 		"full" };
-	ASSERT_FALSE(VotingRound::create(base_lines + "1 2 2").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "1 2 -0").has_value());
-	ASSERT_FALSE(VotingRound::create(base_lines + "1 2 -1").has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "1 2 2" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "1 2 -0" }).has_value());
+	ASSERT_FALSE(VotingRound::create(base_lines + std::string{ "1 2 -1" }).has_value());
 }
 
 // Combined tests
@@ -325,7 +319,7 @@ void fourItemsAndReducedVotingAndFourVotes() {
 	ASSERT_TRUE(hasItem(voting_round.value().items(), "item four"));
 	ASSERT_EQ(voting_round.value().originalItemOrder(), Items{ "item1", "item 2", "itemthree", "item four" });
 	ASSERT_EQ(voting_round.value().seed(), 12345678ui32);
-	ASSERT_EQ(voting_round.value().format(), VotingFormat::Full);
+	ASSERT_EQ(voting_round.value().format(), VotingFormat::Reduced);
 	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), 6ui32);
 	ASSERT_EQ(voting_round.value().votes(), Votes{
 		Vote{1, 3, Option::A},

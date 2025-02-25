@@ -99,4 +99,18 @@ void run_tests() {
 }
 #endif
 
+template<typename T>
+auto operator+(std::vector<T> const& vec, T&& str) -> decltype(auto) {
+	auto new_vec = vec;
+	new_vec.emplace_back(str);
+	return new_vec;
+}
+template<typename T>
+auto operator+(std::vector<T> const& a, std::vector<T> const& b) -> decltype(auto) {
+	std::vector<T> vec;
+	vec.reserve(a.size() + b.size());
+	vec.insert(vec.end(), a.begin(), a.end());
+	vec.insert(vec.end(), b.begin(), b.end());
+	return vec;
+}
 auto getNItems(size_t n) -> std::vector<std::string>;

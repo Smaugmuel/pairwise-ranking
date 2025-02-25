@@ -7,13 +7,6 @@ namespace
 {
 
 /* -------------- Test helpers -------------- */
-template<typename T>
-auto operator+(std::vector<T> const& a, std::vector<T> const& b) -> decltype(auto) {
-	std::vector<T> vec = a;
-	vec.insert(vec.end(), b.begin(), b.end());
-	return vec;
-}
-
 auto findScore(Scores const& scores, Item const& item) -> Score {
 	return *std::find_if(scores.begin(), scores.end(), [&](Score const& score) { return score.item == item; });
 }

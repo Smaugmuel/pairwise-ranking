@@ -6,58 +6,11 @@
 namespace
 {
 
-/* -------------- Test helpers -------------- */
-auto hasAnyAdjacentPair(VotingRound const& voting_round) -> bool {
-	auto number_of_items = voting_round.indexPairs().size();
-	auto is_adjacent = [number_of_items](IndexPair const& index_pair) -> bool {
-		if (std::labs(static_cast<int>(index_pair.first) - static_cast<int>(index_pair.second)) == 1) {
-			return true;
-		}
-		if (index_pair.first == 0 && index_pair.second == number_of_items - 1) {
-			return true;
-		}
-		return false;
-	};
-	auto it = std::find_if(voting_round.indexPairs().begin(), voting_round.indexPairs().end(), is_adjacent);
-	return it != voting_round.indexPairs().end();
-}
-
-template<typename T>
-auto operator+(std::vector<T> const& a, std::vector<T> const& b) -> decltype(auto) {
-	std::vector<T> vec;
-	vec.reserve(a.size() + b.size());
-	vec.insert(vec.end(), a.begin(), a.end());
-	vec.insert(vec.end(), b.begin(), b.end());
-	return vec;
-}
-
-/* -------------- Tests -------------- */
 void pruningDuringVotingRoundCreationWithTooFewItems() {
 	for (size_t number_of_items = 2; number_of_items < kMinimumItemsForPruning; number_of_items++) {
 		auto const voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Reduced).value();
 		auto const expected_amount = static_cast<uint32_t>(sumOfFirstIntegers(number_of_items - 1));
 		ASSERT_EQ(voting_round.numberOfScheduledVotes(), expected_amount);
-	}
-}
-void pruningAfterVotingRoundCreationWithTooFewItems() {
-	for (size_t number_of_items = 2; number_of_items < kMinimumItemsForPruning; number_of_items++) {
-		auto voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Full).value();
-		voting_round.prune();
-		auto const expected_amount = static_cast<uint32_t>(sumOfFirstIntegers(number_of_items - 1));
-		ASSERT_EQ(voting_round.numberOfScheduledVotes(), expected_amount);
-	}
-}
-void pruningDuringVotingRoundCreationRemovesAdjacentPairs() {
-	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
-		auto const voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Reduced).value();
-		ASSERT_FALSE(hasAnyAdjacentPair(voting_round));
-	}
-}
-void pruningAfterVotingRoundCreationRemovesAdjacentPairs() {
-	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
-		auto voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Full).value();
-		voting_round.prune();
-		ASSERT_FALSE(hasAnyAdjacentPair(voting_round));
 	}
 }
 void pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems() {
@@ -67,29 +20,6 @@ void pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems() {
 		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
 		ASSERT_EQ(voting_round.numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));
 	}
-}
-void pruningAmountAfterVotingRoundCreationDependsOnNumberOfItems() {
-	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
-		auto voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Full).value();
-		voting_round.prune();
-		auto const number_of_pruned_votes = number_of_items * pruningAmount(number_of_items);
-		auto const number_of_votes_after_pruning = sumOfFirstIntegers(number_of_items - 1) - number_of_pruned_votes;
-		ASSERT_EQ(voting_round.numberOfScheduledVotes(), static_cast<uint32_t>(number_of_votes_after_pruning));
-	}
-}
-void pruningWhenVotesAlreadyExist() {
-	auto voting_round = VotingRound::create(getNItems(15), VotingFormat::Full);
-	voting_round.value().vote(Option::A);
-	voting_round.value().prune();
-	ASSERT_EQ(voting_round.value().format(), VotingFormat::Full);
-	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), static_cast<uint32_t>(sumOfFirstIntegers(voting_round.value().items().size() - 1)));
-}
-void pruningWhenAlreadyPruned() {
-	auto voting_round = VotingRound::create(getNItems(15), VotingFormat::Reduced);
-	auto const number_of_votes_total_before = voting_round.value().numberOfScheduledVotes();
-	voting_round.value().prune();
-	ASSERT_EQ(voting_round.value().format(), VotingFormat::Reduced);
-	ASSERT_EQ(voting_round.value().numberOfScheduledVotes(), number_of_votes_total_before);
 }
 void parseVotingRoundWithPruning() {
 	for (size_t number_of_items = kMinimumItemsForPruning; number_of_items < 24; number_of_items++) {
@@ -101,189 +31,188 @@ void parseVotingRoundWithPruning() {
 	}
 }
 void pruningRemovesCorrectScheduledVotes() {
-	auto const generate_and_get_index_pairs = [](uint32_t number_of_items) -> IndexPairs {
-		return VotingRound::create(getNItems(number_of_items), VotingFormat::Reduced).value().indexPairs();
+	// NOTE: Scheduled votes are an implementation detail. To determine whether the matchups were
+	// generated as expected, complete the voting and check the matchups afterwards.
+
+	auto const generate_and_get_votes = [](uint32_t number_of_items) -> Votes {
+		auto voting_round = VotingRound::create(getNItems(number_of_items), VotingFormat::Reduced);
+		while (voting_round.value().vote(Option::A));
+		return voting_round.value().votes();
 	};
 
-	ASSERT_EQ(generate_and_get_index_pairs(2), IndexPairs{
-		IndexPair{0, 1} });
-	ASSERT_EQ(generate_and_get_index_pairs(3), IndexPairs{
-		IndexPair{0, 1},
-		IndexPair{0, 2},
-		IndexPair{1, 2} });
-	ASSERT_EQ(generate_and_get_index_pairs(4), IndexPairs{
-		IndexPair{0, 1},
-		IndexPair{0, 2},
-		IndexPair{0, 3},
-		IndexPair{1, 2},
-		IndexPair{1, 3},
-		IndexPair{2, 3} });
-	ASSERT_EQ(generate_and_get_index_pairs(5), IndexPairs{
-		IndexPair{0, 1},
-		IndexPair{0, 2},
-		IndexPair{0, 3},
-		IndexPair{0, 4},
-		IndexPair{1, 2},
-		IndexPair{1, 3},
-		IndexPair{1, 4},
-		IndexPair{2, 3},
-		IndexPair{2, 4},
-		IndexPair{3, 4} });
-	ASSERT_EQ(generate_and_get_index_pairs(6), IndexPairs{
-		IndexPair{0, 2},
-		IndexPair{0, 3},
-		IndexPair{0, 4},
-		IndexPair{1, 3},
-		IndexPair{1, 4},
-		IndexPair{1, 5},
-		IndexPair{2, 4},
-		IndexPair{2, 5},
-		IndexPair{3, 5} });
-	ASSERT_EQ(generate_and_get_index_pairs(7), IndexPairs{
-		IndexPair{0, 2},
-		IndexPair{0, 3},
-		IndexPair{0, 4},
-		IndexPair{0, 5},
-		IndexPair{1, 3},
-		IndexPair{1, 4},
-		IndexPair{1, 5},
-		IndexPair{1, 6},
-		IndexPair{2, 4},
-		IndexPair{2, 5},
-		IndexPair{2, 6},
-		IndexPair{3, 5},
-		IndexPair{3, 6},
-		IndexPair{4, 6} });
-	ASSERT_EQ(generate_and_get_index_pairs(8), IndexPairs{
-		IndexPair{0, 3},
-		IndexPair{0, 4},
-		IndexPair{0, 5},
-		IndexPair{1, 4},
-		IndexPair{1, 5},
-		IndexPair{1, 6},
-		IndexPair{2, 5},
-		IndexPair{2, 6},
-		IndexPair{2, 7},
-		IndexPair{3, 6},
-		IndexPair{3, 7},
-		IndexPair{4, 7} });
-	ASSERT_EQ(generate_and_get_index_pairs(9), IndexPairs{
-		IndexPair{0, 3},
-		IndexPair{0, 4},
-		IndexPair{0, 5},
-		IndexPair{0, 6},
-		IndexPair{1, 4},
-		IndexPair{1, 5},
-		IndexPair{1, 6},
-		IndexPair{1, 7},
-		IndexPair{2, 5},
-		IndexPair{2, 6},
-		IndexPair{2, 7},
-		IndexPair{2, 8},
-		IndexPair{3, 6},
-		IndexPair{3, 7},
-		IndexPair{3, 8},
-		IndexPair{4, 7},
-		IndexPair{4, 8},
-		IndexPair{5, 8} });
-	ASSERT_EQ(generate_and_get_index_pairs(10), IndexPairs{
-		IndexPair{0, 4},
-		IndexPair{0, 5},
-		IndexPair{0, 6},
-		IndexPair{1, 5},
-		IndexPair{1, 6},
-		IndexPair{1, 7},
-		IndexPair{2, 6},
-		IndexPair{2, 7},
-		IndexPair{2, 8},
-		IndexPair{3, 7},
-		IndexPair{3, 8},
-		IndexPair{3, 9},
-		IndexPair{4, 8},
-		IndexPair{4, 9},
-		IndexPair{5, 9} });
-	ASSERT_EQ(generate_and_get_index_pairs(11), IndexPairs{
-		IndexPair{0, 4},
-		IndexPair{0, 5},
-		IndexPair{0, 6},
-		IndexPair{0, 7},
-		IndexPair{1, 5},
-		IndexPair{1, 6},
-		IndexPair{1, 7},
-		IndexPair{1, 8},
-		IndexPair{2, 6},
-		IndexPair{2, 7},
-		IndexPair{2, 8},
-		IndexPair{2, 9},
-		IndexPair{3, 7},
-		IndexPair{3, 8},
-		IndexPair{3, 9},
-		IndexPair{3, 10},
-		IndexPair{4, 8},
-		IndexPair{4, 9},
-		IndexPair{4, 10},
-		IndexPair{5, 9},
-		IndexPair{5, 10},
-		IndexPair{6, 10} });
-	ASSERT_EQ(generate_and_get_index_pairs(12), IndexPairs{
-		IndexPair{0, 5},
-		IndexPair{0, 6},
-		IndexPair{0, 7},
-		IndexPair{1, 6},
-		IndexPair{1, 7},
-		IndexPair{1, 8},
-		IndexPair{2, 7},
-		IndexPair{2, 8},
-		IndexPair{2, 9},
-		IndexPair{3, 8},
-		IndexPair{3, 9},
-		IndexPair{3, 10},
-		IndexPair{4, 9},
-		IndexPair{4, 10},
-		IndexPair{4, 11},
-		IndexPair{5, 10},
-		IndexPair{5, 11},
-		IndexPair{6, 11} });
-	ASSERT_EQ(generate_and_get_index_pairs(13), IndexPairs{
-		IndexPair{0, 5},
-		IndexPair{0, 6},
-		IndexPair{0, 7},
-		IndexPair{0, 8},
-		IndexPair{1, 6},
-		IndexPair{1, 7},
-		IndexPair{1, 8},
-		IndexPair{1, 9},
-		IndexPair{2, 7},
-		IndexPair{2, 8},
-		IndexPair{2, 9},
-		IndexPair{2, 10},
-		IndexPair{3, 8},
-		IndexPair{3, 9},
-		IndexPair{3, 10},
-		IndexPair{3, 11},
-		IndexPair{4, 9},
-		IndexPair{4, 10},
-		IndexPair{4, 11},
-		IndexPair{4, 12},
-		IndexPair{5, 10},
-		IndexPair{5, 11},
-		IndexPair{5, 12},
-		IndexPair{6, 11},
-		IndexPair{6, 12},
-		IndexPair{7, 12} });
+	ASSERT_EQ(generate_and_get_votes(2), Votes{
+		Vote{0, 1, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(3), Votes{
+		Vote{0, 1, Option::A},
+		Vote{0, 2, Option::A},
+		Vote{1, 2, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(4), Votes{
+		Vote{0, 1, Option::A},
+		Vote{0, 2, Option::A},
+		Vote{0, 3, Option::A},
+		Vote{1, 2, Option::A},
+		Vote{1, 3, Option::A},
+		Vote{2, 3, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(5), Votes{
+		Vote{0, 1, Option::A},
+		Vote{0, 2, Option::A},
+		Vote{0, 3, Option::A},
+		Vote{0, 4, Option::A},
+		Vote{1, 2, Option::A},
+		Vote{1, 3, Option::A},
+		Vote{1, 4, Option::A},
+		Vote{2, 3, Option::A},
+		Vote{2, 4, Option::A},
+		Vote{3, 4, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(6), Votes{
+		Vote{0, 2, Option::A},
+		Vote{0, 3, Option::A},
+		Vote{0, 4, Option::A},
+		Vote{1, 3, Option::A},
+		Vote{1, 4, Option::A},
+		Vote{1, 5, Option::A},
+		Vote{2, 4, Option::A},
+		Vote{2, 5, Option::A},
+		Vote{3, 5, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(7), Votes{
+		Vote{0, 2, Option::A},
+		Vote{0, 3, Option::A},
+		Vote{0, 4, Option::A},
+		Vote{0, 5, Option::A},
+		Vote{1, 3, Option::A},
+		Vote{1, 4, Option::A},
+		Vote{1, 5, Option::A},
+		Vote{1, 6, Option::A},
+		Vote{2, 4, Option::A},
+		Vote{2, 5, Option::A},
+		Vote{2, 6, Option::A},
+		Vote{3, 5, Option::A},
+		Vote{3, 6, Option::A},
+		Vote{4, 6, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(8), Votes{
+		Vote{0, 3, Option::A},
+		Vote{0, 4, Option::A},
+		Vote{0, 5, Option::A},
+		Vote{1, 4, Option::A},
+		Vote{1, 5, Option::A},
+		Vote{1, 6, Option::A},
+		Vote{2, 5, Option::A},
+		Vote{2, 6, Option::A},
+		Vote{2, 7, Option::A},
+		Vote{3, 6, Option::A},
+		Vote{3, 7, Option::A},
+		Vote{4, 7, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(9), Votes{
+		Vote{0, 3, Option::A},
+		Vote{0, 4, Option::A},
+		Vote{0, 5, Option::A},
+		Vote{0, 6, Option::A},
+		Vote{1, 4, Option::A},
+		Vote{1, 5, Option::A},
+		Vote{1, 6, Option::A},
+		Vote{1, 7, Option::A},
+		Vote{2, 5, Option::A},
+		Vote{2, 6, Option::A},
+		Vote{2, 7, Option::A},
+		Vote{2, 8, Option::A},
+		Vote{3, 6, Option::A},
+		Vote{3, 7, Option::A},
+		Vote{3, 8, Option::A},
+		Vote{4, 7, Option::A},
+		Vote{4, 8, Option::A},
+		Vote{5, 8, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(10), Votes{
+		Vote{0, 4, Option::A},
+		Vote{0, 5, Option::A},
+		Vote{0, 6, Option::A},
+		Vote{1, 5, Option::A},
+		Vote{1, 6, Option::A},
+		Vote{1, 7, Option::A},
+		Vote{2, 6, Option::A},
+		Vote{2, 7, Option::A},
+		Vote{2, 8, Option::A},
+		Vote{3, 7, Option::A},
+		Vote{3, 8, Option::A},
+		Vote{3, 9, Option::A},
+		Vote{4, 8, Option::A},
+		Vote{4, 9, Option::A},
+		Vote{5, 9, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(11), Votes{
+		Vote{0, 4, Option::A},
+		Vote{0, 5, Option::A},
+		Vote{0, 6, Option::A},
+		Vote{0, 7, Option::A},
+		Vote{1, 5, Option::A},
+		Vote{1, 6, Option::A},
+		Vote{1, 7, Option::A},
+		Vote{1, 8, Option::A},
+		Vote{2, 6, Option::A},
+		Vote{2, 7, Option::A},
+		Vote{2, 8, Option::A},
+		Vote{2, 9, Option::A},
+		Vote{3, 7, Option::A},
+		Vote{3, 8, Option::A},
+		Vote{3, 9, Option::A},
+		Vote{3, 10, Option::A},
+		Vote{4, 8, Option::A},
+		Vote{4, 9, Option::A},
+		Vote{4, 10, Option::A},
+		Vote{5, 9, Option::A},
+		Vote{5, 10, Option::A},
+		Vote{6, 10, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(12), Votes{
+		Vote{0, 5, Option::A},
+		Vote{0, 6, Option::A},
+		Vote{0, 7, Option::A},
+		Vote{1, 6, Option::A},
+		Vote{1, 7, Option::A},
+		Vote{1, 8, Option::A},
+		Vote{2, 7, Option::A},
+		Vote{2, 8, Option::A},
+		Vote{2, 9, Option::A},
+		Vote{3, 8, Option::A},
+		Vote{3, 9, Option::A},
+		Vote{3, 10, Option::A},
+		Vote{4, 9, Option::A},
+		Vote{4, 10, Option::A},
+		Vote{4, 11, Option::A},
+		Vote{5, 10, Option::A},
+		Vote{5, 11, Option::A},
+		Vote{6, 11, Option::A} });
+	ASSERT_EQ(generate_and_get_votes(13), Votes{
+		Vote{0, 5, Option::A},
+		Vote{0, 6, Option::A},
+		Vote{0, 7, Option::A},
+		Vote{0, 8, Option::A},
+		Vote{1, 6, Option::A},
+		Vote{1, 7, Option::A},
+		Vote{1, 8, Option::A},
+		Vote{1, 9, Option::A},
+		Vote{2, 7, Option::A},
+		Vote{2, 8, Option::A},
+		Vote{2, 9, Option::A},
+		Vote{2, 10, Option::A},
+		Vote{3, 8, Option::A},
+		Vote{3, 9, Option::A},
+		Vote{3, 10, Option::A},
+		Vote{3, 11, Option::A},
+		Vote{4, 9, Option::A},
+		Vote{4, 10, Option::A},
+		Vote{4, 11, Option::A},
+		Vote{4, 12, Option::A},
+		Vote{5, 10, Option::A},
+		Vote{5, 11, Option::A},
+		Vote{5, 12, Option::A},
+		Vote{6, 11, Option::A},
+		Vote{6, 12, Option::A},
+		Vote{7, 12, Option::A} });
 }
 
 } // namsepace
 
 int main() {
 	pruningDuringVotingRoundCreationWithTooFewItems();
-	pruningAfterVotingRoundCreationWithTooFewItems();
-	pruningDuringVotingRoundCreationRemovesAdjacentPairs();
-	pruningAfterVotingRoundCreationRemovesAdjacentPairs();
 	pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems();
-	pruningAmountAfterVotingRoundCreationDependsOnNumberOfItems();
-	pruningWhenVotesAlreadyExist();
-	pruningWhenAlreadyPruned();
 	parseVotingRoundWithPruning();
 	pruningRemovesCorrectScheduledVotes();
 	return 0;

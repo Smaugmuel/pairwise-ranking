@@ -22,7 +22,7 @@ auto findScore(Scores const& scores, Item const& item) -> Score {
 
 void itemOrderIsShuffledWhenShufflingNewVotingRound() {
 	auto const items = getNItems(10);
-	auto voting_round = VotingRound::create(items, false, 12345);
+	auto voting_round = VotingRound::create(items, VotingFormat::Full, 12345);
 	voting_round.value().shuffle();
 	Items const expected_item_order{
 		"item7",
@@ -40,7 +40,7 @@ void itemOrderIsShuffledWhenShufflingNewVotingRound() {
 }
 void originalItemOrderIsRetainedWhenShufflingNewVotingRound() {
 	auto const items = getNItems(10);
-	auto voting_round = VotingRound::create(items, false);
+	auto voting_round = VotingRound::create(items, VotingFormat::Full);
 	voting_round.value().shuffle();
 	ASSERT_EQ(voting_round.value().originalItemOrder(), items);
 }
@@ -78,7 +78,7 @@ void originalItemOrderIsRetainedWhenShufflingParsedVotingRound() {
 }
 void convertingVotingRoundToTextUsesOriginalItemOrder() {
 	auto const items = getNItems(10);
-	auto voting_round = VotingRound::create(items, false, 12345);
+	auto voting_round = VotingRound::create(items, VotingFormat::Full, 12345);
 	voting_round.value().shuffle();
 	auto const text = voting_round.value().convertToText();
 	for (size_t i = 0; i < items.size(); i++) {
@@ -87,7 +87,7 @@ void convertingVotingRoundToTextUsesOriginalItemOrder() {
 }
 void scoresAreCalculatedWithCorrectItems() {
 	auto const items = getNItems(10);
-	auto voting_round = VotingRound::create(items, false, 12345);
+	auto voting_round = VotingRound::create(items, VotingFormat::Full, 12345);
 	voting_round.value().shuffle();
 
 	// Vote A on each option

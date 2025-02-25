@@ -196,7 +196,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 
 	// Create voting round
 	Items items = parseItems(lines);
-	voting_round = VotingRound::create(items, format == VotingFormat::Reduced);
+	voting_round = VotingRound::create(items, format);
 	if (!voting_round.has_value()) {
 		printError("Could not generate voting round");
 		return;

@@ -5,7 +5,7 @@ namespace
 {
 
 void undoWhenVotesExist() {
-	auto voting_round = VotingRound::create(getNItems(3), false);
+	auto voting_round = VotingRound::create(getNItems(3), VotingFormat::Full);
 	voting_round.value().vote(Option::A);
 	voting_round.value().vote(Option::B);
 	ASSERT_TRUE(voting_round.value().undoVote());
@@ -13,7 +13,7 @@ void undoWhenVotesExist() {
 	ASSERT_EQ(voting_round.value().votes()[0].winner, Option::A);
 }
 void undoWhenNoVotesExist() {
-	auto voting_round = VotingRound::create(getNItems(3), false);
+	auto voting_round = VotingRound::create(getNItems(3), VotingFormat::Full);
 	ASSERT_FALSE(voting_round.value().undoVote());
 }
 

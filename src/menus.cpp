@@ -1,4 +1,7 @@
 #include "menus.h"
+
+#include <cmath>
+
 #include "helpers.h"
 
 auto activeMenuString(std::optional<VotingRound> const& voting_round, bool const show_intro_screen) -> std::string {
@@ -39,9 +42,11 @@ auto helpString() -> std::string {
 auto newRoundFormatString(uint32_t const number_of_items) -> std::string {
 	auto const full_voting_size{ sumOfFirstIntegers(number_of_items - 1) };
 	auto const reduced_voting_size{ full_voting_size - number_of_items * pruningAmount(number_of_items) };
+	auto const ranked_voting_size{ static_cast<uint32_t>(number_of_items * std::log2f(number_of_items)) };
 	return
 		"Please choose voting format:\n"
-		"[F]ull    score-based voting - " + std::to_string(full_voting_size) + " votes\n"
-		"[R]educed score-based voting - " + std::to_string(reduced_voting_size) + " votes\n"
+		"[F]ull     score-based voting - " + std::to_string(full_voting_size) + " votes\n"
+		"[R]educed  score-based voting - " + std::to_string(reduced_voting_size) + " votes\n"
+		"[I]nsertion rank-based voting - Around " + std::to_string(ranked_voting_size) + " votes\n"
 		"[C]ancel";
 }

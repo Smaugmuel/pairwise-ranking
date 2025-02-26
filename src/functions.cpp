@@ -98,7 +98,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 	char ch{};
 	while (true) {
 		ch = getKey();
-		if (ch == 'f' || ch == 'r' || ch == 'c') {
+		if (ch == 'f' || ch == 'r' || ch == 'c' || ch == 'i') {
 			break;
 		}
 	}
@@ -130,5 +130,28 @@ void printScores(std::optional<VotingRound> const& voting_round) {
 		printError("No voting round to print");
 		return;
 	}
-	print(createScoreTable(calculateScores(voting_round.value().items(), voting_round.value().votes())), false);
+
+	switch (voting_round.value().format())
+	{
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+		print(createScoreTable(calculateScores(voting_round.value().items(), voting_round.value().votes())), false);
+		break;
+	case VotingFormat::Ranked: {
+		auto const& items = voting_round.value().items();
+		std::string str{};
+		for (size_t i = 0; i < items.size(); i++) {
+			str += items[i];
+			if (i + 1 == voting_round.value().numberOfSortedItems()) {
+				str += " <-- sorted until here";
+			}
+			str += '\n';
+		}
+		print(str, false);
+		break;
+	}
+	case VotingFormat::Invalid:
+	default:
+		break;
+	}
 }

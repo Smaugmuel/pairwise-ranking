@@ -42,6 +42,18 @@ class VotingRound final {
 	private:
 		IndexPairs index_pairs_{};
 	};
+	class RankBased final {
+	public:
+		static auto create() -> std::optional<RankBased>;
+
+		void vote(Items& items, Option option);
+		auto currentIndexPair() const -> IndexPair;
+		auto numberOfSortedItems() const -> uint32_t;
+	private:
+		uint32_t number_of_sorted_items_{ 1 };
+		uint32_t start_index_{ 0 };
+		uint32_t end_index_{ 1 };
+	};
 public:
 
 	static auto create(Items const& items, VotingFormat voting_format, Seed seed = 0) -> std::optional<VotingRound>;
@@ -61,7 +73,14 @@ public:
 	auto votes() const -> Votes const&;
 	auto isSaved() const -> bool;
 
+	// TODO: This is an implementation detail currently, only applicable for
+	// VotingFormat::Ranking. Find a better way to deal with this.
+	auto numberOfSortedItems() const -> uint32_t;
+
+	// TODO: This is an implementation detail currently, only applicable for
+	// VotingFormat::Full or Reduced. Find a better way to deal with this.
 	auto numberOfScheduledVotes() const -> uint32_t;
+
 	auto currentMatchup() const -> std::optional<Matchup>;
 	auto currentVotingLine() const -> std::optional<std::string>;
 	auto hasRemainingVotes() const -> bool;
@@ -69,12 +88,16 @@ public:
 
 private:
 	auto shuffleImpl() -> bool;
+	auto counterStringImpl() const -> std::string;
+	auto voteImpl(Option option) -> bool;
+	auto createFormatImpl() -> bool;
 	auto currentIndexPairImpl() const -> IndexPair;
 	auto hasRemainingVotesImpl() const -> bool;
+	auto numberOfSortedItemsImpl() const -> uint32_t;
 	auto numberOfScheduledVotesImpl() const -> uint32_t;
-	auto currentMatchupImpl() const -> std::optional<Matchup>;
 
 	std::optional<ScoreBased> score_based_{};
+	std::optional<RankBased> rank_based_{};
 
 	Items original_items_order_{};
 	Items items_{};

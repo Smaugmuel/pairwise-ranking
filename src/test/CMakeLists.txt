@@ -301,6 +301,26 @@ addTestSuite(test_prune_votes "${test_dependencies}" "${test_cases}")
 list(APPEND test_dependencies
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/menus.cpp
+	${PROJECT_SOURCE_DIR}/src/vote.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
+)
+list(APPEND test_cases
+	newRoundFormatStringPresentsAvailableVotingFormatsAndNumberOfVotes
+	createNewRankedVotingRound
+	parseRankedVotingRoundWithNoVotes
+	parseRankedVotingRoundWithSomeVotes
+	rankItemsBySortingWhenInitiallyRanked
+	rankItemsBySortingWhenInitiallyUnranked
+	voteCounterAndApproximateTotalVotesIsPresented
+)
+addTestSuite(test_rank_based_voting "${test_dependencies}" "${test_cases}")
+
+
+list(APPEND test_dependencies
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/score.cpp
 	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
 )

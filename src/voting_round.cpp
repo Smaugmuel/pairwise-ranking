@@ -172,10 +172,20 @@ auto findMaxLength(Items const& items) -> size_t {
 auto counterString(size_t counter, size_t total) -> std::string {
 	size_t const total_length = numberOfDigits(total);
 	size_t const counter_length = numberOfDigits(counter);
+	size_t const max_length = std::max(total_length, counter_length);
 
 	return
-		"(" + std::string(total_length - counter_length, ' ') + std::to_string(counter) +
-		"/" + std::to_string(total) + ")";
+		"(" + std::string(max_length - counter_length, ' ') + std::to_string(counter) +
+		"/" + std::string(max_length - total_length, ' ') + std::to_string(total) + ")";
+}
+auto counterString(size_t counter, std::string const& total_str) -> std::string {
+	size_t const total_length = total_str.size();
+	size_t const counter_length = numberOfDigits(counter);
+	size_t const max_length = std::max(total_length, counter_length);
+
+	return
+		"(" + std::string(max_length - counter_length, ' ') + std::to_string(counter) +
+		"/" + std::string(max_length - total_length, ' ') + total_str + ")";
 }
 
 } // namespace
@@ -208,6 +218,46 @@ auto VotingRound::ScoreBased::numberOfScheduledVotes() const -> uint32_t {
 	return static_cast<uint32_t>(index_pairs_.size());
 }
 
+auto VotingRound::RankBased::create() -> std::optional<VotingRound::RankBased> {
+	VotingRound::RankBased rank_based{};
+	rank_based.number_of_sorted_items_ = 1;
+	rank_based.end_index_ = rank_based.number_of_sorted_items_;
+	return rank_based;
+}
+void VotingRound::RankBased::vote(Items& items, Option option) {
+	uint32_t const mid_index = (start_index_ + end_index_) / 2;
+	if (option == Option::A) {
+		start_index_ = mid_index + 1;
+	}
+	else {
+		end_index_ = mid_index;
+	}
+
+	// Check if the insertion index is known
+	if (start_index_ < end_index_) {
+		return;
+	}
+	uint32_t const insertion_spot = start_index_;
+	Item const item_to_insert = items[number_of_sorted_items_];
+
+	// Move each item in [insertion_spot, number_of_sorted_items_) one position down the vector
+	for (size_t i = number_of_sorted_items_; i > insertion_spot; i--) {
+		items[i] = items[i - 1];
+	}
+
+	items[insertion_spot] = item_to_insert;
+	number_of_sorted_items_++;
+	start_index_ = 0;
+	end_index_ = number_of_sorted_items_;
+}
+auto VotingRound::RankBased::currentIndexPair() const -> IndexPair {
+	uint32_t const mid_index = (start_index_ + end_index_) / 2;
+	return { mid_index, number_of_sorted_items_ };
+}
+auto VotingRound::RankBased::numberOfSortedItems() const->uint32_t {
+	return number_of_sorted_items_;
+}
+
 auto VotingRound::create(Items const& items, VotingFormat voting_format, Seed seed) -> std::optional<VotingRound> {
 	if (items.size() < 2) {
 		printError("Can't generate voting round: Fewer than two items");
@@ -226,7 +276,10 @@ auto VotingRound::create(Items const& items, VotingFormat voting_format, Seed se
 	voting_round.items_ = items;
 	voting_round.seed_ = (seed == 0 ? generateSeed() : seed);
 	voting_round.voting_format_ = voting_format;
-	voting_round.score_based_ = ScoreBased::create(static_cast<uint32_t>(items.size()), voting_format);
+
+	if (!voting_round.createFormatImpl()) {
+		return std::nullopt;
+	}
 
 	return voting_round;
 }
@@ -241,17 +294,17 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 		}
 		voting_round.items_.emplace_back(lines[line_index]);
 	}
-	if (voting_round.items_.size() < 2) {
+	if (voting_round.items().size() < 2) {
 		printError("Parsed items are fewer than two");
 		return std::nullopt;
 	}
-	if (!itemsAreUnique(voting_round.items_)) {
+	if (!itemsAreUnique(voting_round.items())) {
 		printError("Parsed items are not unique");
 		return std::nullopt;
 	}
 
 	// Retain item order, to make seeded item shuffling deterministic
-	voting_round.original_items_order_ = voting_round.items_;
+	voting_round.original_items_order_ = voting_round.items();
 
 	// Skip empty line
 	line_index++;
@@ -281,13 +334,6 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 	}
 	line_index++;
 
-	voting_round.score_based_ = ScoreBased::create(static_cast<uint32_t>(voting_round.items_.size()), voting_round.format());
-	if (!voting_round.score_based_.has_value()) {
-		return std::nullopt;
-	}
-
-	voting_round.shuffle();
-
 	// Load votes
 	for (; line_index < lines.size(); line_index++) {
 		auto const vote = parseVote(lines[line_index]);
@@ -297,19 +343,47 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 		}
 		voting_round.votes_.emplace_back(vote);
 	}
-	if (!votingIndicesAreSmallerThanNumberOfItems(voting_round.votes_, voting_round.items_.size())) {
+	if (!votingIndicesAreSmallerThanNumberOfItems(voting_round.votes(), voting_round.items().size())) {
 		printError("Some parsed indices in vote are larger than allowed");
 		return std::nullopt;
 	}
 
-	if (hasDuplicateMatchups(voting_round.votes_)) {
+	if (hasDuplicateMatchups(voting_round.votes())) {
 		printError("Some vote matchups are duplicated");
 		return std::nullopt;
 	}
 
-	if (voting_round.votes_.size() > voting_round.numberOfScheduledVotes()) {
-		printError("Too many votes parsed. Voting round is invalidated");
+	if (!voting_round.createFormatImpl()) {
 		return std::nullopt;
+	}
+
+	switch (voting_round.format()) {
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+		if (voting_round.votes().size() > voting_round.numberOfScheduledVotes()) {
+			printError("Too many votes parsed. Voting round is invalidated");
+			return std::nullopt;
+		}
+		break;
+	case VotingFormat::Ranked:
+	case VotingFormat::Invalid:
+	default:
+		break;
+	}
+
+	voting_round.shuffle();
+
+	switch (voting_round.format()) {
+	case VotingFormat::Ranked:
+		for (auto const& vote : voting_round.votes()) {
+			voting_round.rank_based_.value().vote(voting_round.items_, vote.winner);
+		}
+		break;
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+	case VotingFormat::Invalid:
+	default:
+		break;
 	}
 
 	voting_round.is_saved_ = true;
@@ -326,6 +400,7 @@ auto VotingRound::vote(Option option) -> bool {
 	}
 	auto const index_pair = currentIndexPairImpl();
 	votes_.emplace_back(index_pair.first, index_pair.second, option);
+	voteImpl(option);
 	is_saved_ = false;
 	return true;
 }
@@ -411,6 +486,9 @@ auto VotingRound::isSaved() const -> bool {
 // 	}
 // 	return true;
 // }
+auto VotingRound::numberOfSortedItems() const -> uint32_t {
+	return numberOfSortedItemsImpl();
+}
 auto VotingRound::numberOfScheduledVotes() const -> uint32_t {
 	return numberOfScheduledVotesImpl();
 }
@@ -419,7 +497,11 @@ auto VotingRound::currentMatchup() const -> std::optional<Matchup> {
 		printError("No active matchup");
 		return std::nullopt;
 	}
-	return currentMatchupImpl();
+	IndexPair const index_pair = currentIndexPairImpl();
+	if (index_pair == IndexPair{ 0, 0 }) {
+		return std::nullopt;
+	}
+	return Matchup{ items_[index_pair.first], items_[index_pair.second] };
 }
 auto VotingRound::currentVotingLine() const -> std::optional<std::string> {
 	if (!hasRemainingVotes()) {
@@ -427,12 +509,18 @@ auto VotingRound::currentVotingLine() const -> std::optional<std::string> {
 		return std::nullopt;
 	}
 	auto const matchup = currentMatchup();
+	if (!matchup.has_value()) {
+		printError("No matchup");
+		return std::nullopt;
+	}
+
 	auto const max_length = findMaxLength(items_);
 	auto const length_a = matchup.value().item_a.size();
 	auto const length_b = matchup.value().item_b.size();
 	auto const padding_length_a = max_length - length_a;
 	auto const padding_length_b = max_length - length_b;
-	return counterString(votes_.size() + 1, numberOfScheduledVotes()) + " "
+
+	return counterStringImpl() + " "
 		"H: help. "
 		"A: \'" + matchup.value().item_a + "\'." + std::string(padding_length_a, ' ') + " "
 		"B: \'" + matchup.value().item_b + "\'." + std::string(padding_length_b, ' ') + " Your choice: ";
@@ -469,11 +557,55 @@ auto VotingRound::convertToText() const -> std::vector<std::string> {
 	return lines;
 }
 
+auto VotingRound::counterStringImpl() const -> std::string {
+	switch (voting_format_) {
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+		return counterString(votes_.size() + 1, numberOfScheduledVotes());
+	case VotingFormat::Ranked:
+		return counterString(votes_.size() + 1, '~' + std::to_string(static_cast<uint32_t>(items_.size() * std::log2(items_.size()))));
+	case VotingFormat::Invalid:
+	default:
+		return {};
+	}
+}
+auto VotingRound::voteImpl(Option option) -> bool {
+	switch (voting_format_) {
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+		return true;
+	case VotingFormat::Ranked:
+		if (!rank_based_.has_value()) {
+			return false;
+		}
+		rank_based_.value().vote(items_, option);
+		return true;
+	case VotingFormat::Invalid:
+	default:
+		return false;
+	}
+}
+auto VotingRound::createFormatImpl() -> bool {
+	switch (voting_format_) {
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+		score_based_ = ScoreBased::create(static_cast<uint32_t>(items_.size()), voting_format_);
+		return score_based_.has_value();
+	case VotingFormat::Ranked:
+		rank_based_ = RankBased::create();
+		return rank_based_.has_value();
+	case VotingFormat::Invalid:
+	default:
+		return false;
+	}
+}
 auto VotingRound::currentIndexPairImpl() const -> IndexPair {
 	switch (voting_format_) {
 	case VotingFormat::Full:
 	case VotingFormat::Reduced:
 		return score_based_.value().indexPairs()[votes_.size()];
+	case VotingFormat::Ranked:
+		return rank_based_.value().currentIndexPair();
 	case VotingFormat::Invalid:
 	default:
 		return {};
@@ -487,6 +619,8 @@ auto VotingRound::shuffleImpl() -> bool {
 			return false;
 		}
 		return score_based_.value().shuffle(seed_);
+	case VotingFormat::Ranked:
+		return true;
 	case VotingFormat::Invalid:
 	default:
 		return false;
@@ -500,9 +634,28 @@ auto VotingRound::hasRemainingVotesImpl() const -> bool {
 			return false;
 		}
 		return votes_.size() < score_based_.value().numberOfScheduledVotes();
+	case VotingFormat::Ranked:
+		if (!rank_based_.has_value()) {
+			return false;
+		}
+		return rank_based_.value().numberOfSortedItems() < items_.size();
 	case VotingFormat::Invalid:
 	default:
 		return false;
+	}
+}
+auto VotingRound::numberOfSortedItemsImpl() const -> uint32_t {
+	switch (voting_format_) {
+	case VotingFormat::Ranked:
+		if (!rank_based_.has_value()) {
+			return 0;
+		}
+		return rank_based_.value().numberOfSortedItems();
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+	case VotingFormat::Invalid:
+	default:
+		return 0;
 	}
 }
 auto VotingRound::numberOfScheduledVotesImpl() const -> uint32_t {
@@ -513,23 +666,9 @@ auto VotingRound::numberOfScheduledVotesImpl() const -> uint32_t {
 			return 0;
 		}
 		return score_based_.value().numberOfScheduledVotes();
+	case VotingFormat::Ranked:
 	case VotingFormat::Invalid:
 	default:
 		return 0;
-	}
-}
-auto VotingRound::currentMatchupImpl() const -> std::optional<Matchup> {
-	switch (voting_format_) {
-	case VotingFormat::Full:
-	case VotingFormat::Reduced: {
-		if (!score_based_.has_value()) {
-			return std::nullopt;
-		}
-		auto const index_pair = currentIndexPairImpl();
-		return Matchup{ items_[index_pair.first], items_[index_pair.second] };
-	}
-	case VotingFormat::Invalid:
-	default:
-		return std::nullopt;
 	}
 }

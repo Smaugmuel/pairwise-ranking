@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "vote.h"
+#include "voting_format.h"
 
 /* -------------- Items -------------- */
 using Item = std::string;
@@ -28,14 +29,6 @@ struct Matchup {
 	Item item_a{};
 	Item item_b{};
 };
-
-/* -------------- Format -------------- */
-enum class VotingFormat : uint32_t {
-	Invalid,
-	Full,
-	Reduced,
-};
-
 
 /* -------------- Voting round -------------- */
 class VotingRound final {

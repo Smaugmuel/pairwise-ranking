@@ -10,6 +10,7 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/score.cpp
 	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -42,6 +43,7 @@ add_executable(${test_name}
 	testing.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -53,6 +55,7 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/vote.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -74,6 +77,7 @@ add_executable(${test_name}
 	testing.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -87,6 +91,7 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/score.cpp				# TODO: Remove dependency to this file here
 	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp		# TODO: Remove dependency to this file here
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp		# TODO: Remove dependency to this file here
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -99,6 +104,7 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/score.cpp				# calculateScores compares scores
 	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp		# For calculateScores
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -130,6 +136,7 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/vote.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -141,6 +148,7 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/vote.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -162,6 +170,7 @@ add_executable(${test_name}
 	testing.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -173,6 +182,7 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/vote.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -183,6 +193,7 @@ add_executable(${test_name}
 	testing.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -194,6 +205,15 @@ add_executable(${test_name}
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/vote.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
+target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_test(NAME ${test_name} COMMAND ${test_name})
+
+set(test_name test_voting_format)
+add_executable(${test_name}
+	${test_name}.cpp
+	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})

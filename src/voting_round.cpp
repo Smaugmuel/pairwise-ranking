@@ -177,15 +177,6 @@ auto counterString(size_t counter, size_t total) -> std::string {
 		"(" + std::string(total_length - counter_length, ' ') + std::to_string(counter) +
 		"/" + std::to_string(total) + ")";
 }
-auto convertToVotingFormat(std::string const& str) -> VotingFormat {
-	if (str == "reduced") {
-		return VotingFormat::Reduced;
-	}
-	if (str == "full") {
-		return VotingFormat::Full;
-	}
-	return VotingFormat::Invalid;
-}
 
 } // namespace
 
@@ -283,7 +274,7 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 		return std::nullopt;
 	}
 
-	voting_round.voting_format_ = convertToVotingFormat(lines[line_index]);
+	voting_round.voting_format_ = stringToVotingFormat(lines[line_index]);
 	if (voting_round.format() == VotingFormat::Invalid) {
 		printError("Incorrect voting format: " + lines[line_index]);
 		return std::nullopt;
@@ -472,12 +463,7 @@ auto VotingRound::convertToText() const -> std::vector<std::string> {
 	lines.emplace_back(std::to_string(seed_));
 
 	// Voting format
-	if (voting_format_ == VotingFormat::Reduced) {
-		lines.emplace_back("reduced");
-	}
-	else {
-		lines.emplace_back("full");
-	}
+	lines.emplace_back(votingFormatToString(voting_format_));
 
 	// Votes
 	for (Vote const& vote : votes_) {

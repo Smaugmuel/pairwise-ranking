@@ -11,6 +11,7 @@
 #include "helpers.h"
 #include "print.h"
 #include "score_helpers.h"
+#include "voting_format.h"
 
 namespace
 {
@@ -160,17 +161,6 @@ auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::
 }
 
 /* -------------- Menu alternatives -------------- */
-VotingFormat toVotingFormat(char const ch) {
-	switch (ch) {
-	case 'f':
-		return VotingFormat::Full;
-	case 'r':
-		return VotingFormat::Reduced;
-	case 'c':
-		return VotingFormat::Invalid;
-	}
-	return VotingFormat::Invalid;
-}
 void newRound(std::optional<VotingRound>& voting_round) {
 	std::vector<std::string> const lines = loadFile(kItemsFile);
 	if (lines.size() < 2) {
@@ -189,7 +179,7 @@ void newRound(std::optional<VotingRound>& voting_round) {
 		}
 	}
 	print(std::string() + ch);
-	VotingFormat const format{ toVotingFormat(ch) };
+	VotingFormat const format{ characterToVotingFormat(ch) };
 	if (format == VotingFormat::Invalid) {
 		return;
 	}

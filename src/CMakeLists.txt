@@ -15,6 +15,8 @@ add_executable(${PROJECT_NAME}
 	score_helpers.h
 	vote.cpp
 	vote.h
+	voting_format.cpp
+	voting_format.h
 	voting_round.cpp
 	voting_round.h
 )

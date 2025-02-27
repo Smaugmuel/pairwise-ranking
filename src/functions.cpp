@@ -238,8 +238,8 @@ void combine() {
 
 	Scores const combined_scores = combineScores(scores_sets);
 
-	if (!saveFile(kCombinedResultFile, generateScoreFileData(sortScores(combined_scores)))) {
-		printError("Couldn't save file \'" + kCombinedResultFile + "\'");
+	if (!saveFile(kCombinedScoresFile, generateScoreFileData(sortScores(combined_scores)))) {
+		printError("Couldn't save file \'" + kCombinedScoresFile + "\'");
 	}
-	print("Saved combined results to \'" + kCombinedResultFile + "\'");
+	print("Saved combined scores to \'" + kCombinedScoresFile + "\'");
 }

@@ -5,8 +5,7 @@
 
 std::string const kItemsFile = "items.txt";
 std::string const kVotesFile = "votes.txt";
-std::string const kSeedFile = "seed.txt";
-std::string const kResultFile = "results.txt";
-std::string const kCombinedResultFile = "combined_results.txt";
+std::string const kScoresFile = "scores.txt";
+std::string const kCombinedScoresFile = "combined_scores.txt";
 
 constexpr uint32_t kMinimumItemsForPruning = 6;

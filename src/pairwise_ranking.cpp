@@ -67,11 +67,11 @@ void programLoop() {
 			else {
 				print("Votes saved to " + kVotesFile + ".");
 			}
-			if (!saveScores(calculateScores(voting_round.value().items(), voting_round.value().votes()), kResultFile)) {
-				printError("Could not save scores to " + kResultFile + ".");
+			if (!saveScores(calculateScores(voting_round.value().items(), voting_round.value().votes()), kScoresFile)) {
+				printError("Could not save scores to " + kScoresFile + ".");
 			}
 			else {
-				print("Scores saved to " + kResultFile + ".");
+				print("Scores saved to " + kScoresFile + ".");
 			}
 		}
 		else if (ch == 'p') {

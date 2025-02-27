@@ -1,7 +1,6 @@
 #include "score.h"
 #include "score_helpers.h"
 #include "testing.h"
-#include "voting_round.h"
 
 namespace
 {
@@ -11,33 +10,39 @@ auto findScoreForItem(Scores const& scores, std::string const& item) -> Score {
 	});
 }
 
+void zeroItemsAndVotes() {
+	ASSERT_EQ(calculateScores({}, {}).size(), 0ui64);
+}
 void zeroVotes() {
-	VotingRound const voting_round{};
-	ASSERT_EQ(calculateScores(voting_round.items(), voting_round.votes()).size(), 0ui64);
+	for (size_t number_of_items = 0; number_of_items < 25; number_of_items++) {
+		ASSERT_EQ(calculateScores(getNItems(number_of_items), {}).size(), 0ui64);
+	}
 }
 void oneVoteForA() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(2), VotingFormat::Full)};
-	voting_round.value().vote(Option::A);
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 2 };
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{ Vote{ 0, 1, Option::A } });
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 1, 0 });
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 0, 1 });
 }
 void oneVoteForB() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(2), VotingFormat::Full) };
-	voting_round.value().vote(Option::B);
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 2 };
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{ Vote{ 0, 1, Option::B } });
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 0, 1 });
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 1, 0 });
 }
 void allVotesForA() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		voting_round.value().vote(Option::A);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::A },
+		Vote{ 0, 2, Option::A },
+		Vote{ 0, 3, Option::A },
+		Vote{ 1, 2, Option::A },
+		Vote{ 1, 3, Option::A },
+		Vote{ 2, 3, Option::A },
+	});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 	
 	// ASSUMPTION: In each matchup, the earlier item will be option A (left)
 	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 3, 0 });
@@ -46,12 +51,16 @@ void allVotesForA() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 0, 3 });
 }
 void allVotesForB() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		voting_round.value().vote(Option::B);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::B },
+		Vote{ 0, 2, Option::B },
+		Vote{ 0, 3, Option::B },
+		Vote{ 1, 2, Option::B },
+		Vote{ 1, 3, Option::B },
+		Vote{ 2, 3, Option::B },
+	});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	// ASSUMPTION: In each matchup, the earlier item will be option A (left)
 	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 0, 3 });
@@ -60,22 +69,17 @@ void allVotesForB() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 4, 0 });
 }
 void votingForItem2AndOptionAIfNotPresent() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-
-		if (current_items.value().item_a == "item2") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		if (current_items.value().item_b == "item2") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		voting_round.value().vote(Option::A);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item2 will be the second element (index 1)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::B },
+		Vote{ 0, 2, Option::A },
+		Vote{ 0, 3, Option::A },
+		Vote{ 1, 2, Option::A },
+		Vote{ 1, 3, Option::A },
+		Vote{ 2, 3, Option::A },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 3, 0 });
 
@@ -85,22 +89,17 @@ void votingForItem2AndOptionAIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 0, 3 });
 }
 void votingForItem3AndOptionAIfNotPresent() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-
-		if (current_items.value().item_a == "item3") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		if (current_items.value().item_b == "item3") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		voting_round.value().vote(Option::A);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item3 will be the third element (index 2)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::A },
+		Vote{ 0, 2, Option::B },
+		Vote{ 0, 3, Option::A },
+		Vote{ 1, 2, Option::B },
+		Vote{ 1, 3, Option::A },
+		Vote{ 2, 3, Option::A },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 3, 0 });
 
@@ -110,22 +109,17 @@ void votingForItem3AndOptionAIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 0, 3 });
 }
 void votingForItem2AndOptionBIfNotPresent() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-
-		if (current_items.value().item_a == "item2") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		if (current_items.value().item_b == "item2") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		voting_round.value().vote(Option::B);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item2 will be the second element (index 1)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::B },
+		Vote{ 0, 2, Option::B },
+		Vote{ 0, 3, Option::B },
+		Vote{ 1, 2, Option::A },
+		Vote{ 1, 3, Option::A },
+		Vote{ 2, 3, Option::B },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 3, 0 });
 
@@ -135,22 +129,17 @@ void votingForItem2AndOptionBIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForItem3AndOptionBIfNotPresent() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-
-		if (current_items.value().item_a == "item3") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		if (current_items.value().item_b == "item3") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		voting_round.value().vote(Option::B);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item3 will be the third element (index 2)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::B },
+		Vote{ 0, 2, Option::B },
+		Vote{ 0, 3, Option::B },
+		Vote{ 1, 2, Option::B },
+		Vote{ 1, 3, Option::B },
+		Vote{ 2, 3, Option::A },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 3, 0 });
 
@@ -160,22 +149,17 @@ void votingForItem3AndOptionBIfNotPresent() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForItem2AndAgainstItem3AndOptionAIfNeither() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-		
-		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		if (current_items.value().item_b == "item2" || current_items.value().item_a == "item3") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		voting_round.value().vote(Option::A);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item2 and item3 will be the second and third element respectively (index 1 and 2)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::B },
+		Vote{ 0, 2, Option::A },
+		Vote{ 0, 3, Option::A },
+		Vote{ 1, 2, Option::A },
+		Vote{ 1, 3, Option::A },
+		Vote{ 2, 3, Option::B },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 3, 0 });
 	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 0, 3 });
@@ -185,22 +169,17 @@ void votingForItem2AndAgainstItem3AndOptionAIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 1, 2 });
 }
 void votingForItem2AndAgainstItem3AndOptionBIfNeither() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-
-		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		if (current_items.value().item_b == "item2" || current_items.value().item_a == "item3") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		voting_round.value().vote(Option::B);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item2 and item3 will be the second and third element respectively (index 1 and 2)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::B },
+		Vote{ 0, 2, Option::A },
+		Vote{ 0, 3, Option::B },
+		Vote{ 1, 2, Option::A },
+		Vote{ 1, 3, Option::A },
+		Vote{ 2, 3, Option::B },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 3, 0 });
 	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 0, 3 });
@@ -210,22 +189,17 @@ void votingForItem2AndAgainstItem3AndOptionBIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForItem3AndAgainstItem2AndOptionAIfNeither() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-
-		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		if (current_items.value().item_b == "item2" || current_items.value().item_a == "item3") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		voting_round.value().vote(Option::A);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item2 and item3 will be the second and third element respectively (index 1 and 2)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::A },
+		Vote{ 0, 2, Option::B },
+		Vote{ 0, 3, Option::A },
+		Vote{ 1, 2, Option::B },
+		Vote{ 1, 3, Option::B },
+		Vote{ 2, 3, Option::A },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 0, 3 });
 	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 3, 0 });
@@ -235,22 +209,17 @@ void votingForItem3AndAgainstItem2AndOptionAIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 1, 2 });
 }
 void votingForItem3AndAgainstItem2AndOptionBIfNeither() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	while (voting_round.value().hasRemainingVotes()) {
-		auto const current_items = voting_round.value().currentMatchup();
-
-		if (current_items.value().item_a == "item2" || current_items.value().item_b == "item3") {
-			voting_round.value().vote(Option::B);
-			continue;
-		}
-		if (current_items.value().item_b == "item2" || current_items.value().item_a == "item3") {
-			voting_round.value().vote(Option::A);
-			continue;
-		}
-		voting_round.value().vote(Option::B);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	// ASSUMPTION: With getNItems(), item2 and item3 will be the second and third element respectively (index 1 and 2)
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::A },
+		Vote{ 0, 2, Option::B },
+		Vote{ 0, 3, Option::B },
+		Vote{ 1, 2, Option::B },
+		Vote{ 1, 3, Option::B },
+		Vote{ 2, 3, Option::A },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 0, 3 });
 	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 3, 0 });
@@ -260,38 +229,43 @@ void votingForItem3AndAgainstItem2AndOptionBIfNeither() {
 	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 2, 1 });
 }
 void votingForOptionAButNotFullRound() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < 4; ++i) {
-		voting_round.value().vote(Option::A);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::A },
+		Vote{ 0, 2, Option::A },
+		Vote{ 0, 3, Option::A },
+		Vote{ 1, 2, Option::A },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
-	ASSERT_TRUE(findScoreForItem(scores, "item1").wins >= 1);
-	ASSERT_EQ(findScoreForItem(scores, "item1").losses, 0ui32);
-
-	ASSERT_EQ(findScoreForItem(scores, "item4").wins, 0ui32);
-	ASSERT_TRUE(findScoreForItem(scores, "item4").losses >= 0);
-
-	ASSERT_TRUE(findScoreForItem(scores, "item2").wins + findScoreForItem(scores, "item2").losses >= 1);
-	ASSERT_TRUE(findScoreForItem(scores, "item3").wins + findScoreForItem(scores, "item3").losses >= 1);
+	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 3, 0 });
+	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 1, 1 });
+	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 0, 2 });
+	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 0, 1 });
 }
 void votingForOptionBButNotFullRound() {
-	std::optional<VotingRound> voting_round{ VotingRound::create(getNItems(4), VotingFormat::Full) };
-	for (auto i = 0; i < 4; ++i) {
-		voting_round.value().vote(Option::B);
-	}
-	auto const scores = calculateScores(voting_round.value().items(), voting_round.value().votes());
-	ASSERT_EQ(scores.size(), voting_round.value().items().size());
+	uint64_t const kNumberOfItems{ 4 };
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::B },
+		Vote{ 0, 2, Option::B },
+		Vote{ 0, 3, Option::B },
+		Vote{ 1, 2, Option::B },
+		});
+	ASSERT_EQ(scores.size(), kNumberOfItems);
 
-	ASSERT_EQ(findScoreForItem(scores, "item1").wins, 0ui32);
-	ASSERT_TRUE(findScoreForItem(scores, "item1").losses >= 1);
-
-	ASSERT_TRUE(findScoreForItem(scores, "item4").wins >= 0);
-	ASSERT_EQ(findScoreForItem(scores, "item4").losses, 0ui32);
-
-	ASSERT_TRUE(findScoreForItem(scores, "item2").wins + findScoreForItem(scores, "item2").losses >= 1);
-	ASSERT_TRUE(findScoreForItem(scores, "item3").wins + findScoreForItem(scores, "item3").losses >= 1);
+	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 0, 3 });
+	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 1, 1 });
+	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 2, 0 });
+	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 1, 0 });
+}
+void tooFewVotesToScoreAllItems() {
+	uint64_t const kNumberOfItems{ 5 };
+	auto const scores = calculateScores(getNItems(kNumberOfItems), Votes{
+		Vote{ 0, 1, Option::A },
+		Vote{ 0, 2, Option::A },
+		Vote{ 0, 3, Option::A },
+		});
+	ASSERT_TRUE(scores.size() < kNumberOfItems);
 }
 
 } // namespace
@@ -310,5 +284,6 @@ int main() {
 	votingForItem3AndAgainstItem2AndOptionBIfNeither();
 	votingForOptionAButNotFullRound();
 	votingForOptionBButNotFullRound();
+	tooFewVotesToScoreAllItems();
 	return 0;
 }

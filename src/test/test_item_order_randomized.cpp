@@ -12,23 +12,24 @@ auto findScore(Scores const& scores, Item const& item) -> Score {
 }
 
 /* -------------- Tests -------------- */
-
 void itemOrderIsShuffledWhenShufflingNewVotingRound() {
 	auto const items = getNItems(10);
 	auto voting_round = VotingRound::create(items, VotingFormat::Full, 12345);
 	voting_round.value().shuffle();
+
 	Items const expected_item_order{
-		"item7",
 		"item6",
-		"item3",
-		"item9",
-		"item4",
-		"item2",
-		"item5",
 		"item10",
+		"item9",
+		"item5",
+		"item1",
+		"item3",
 		"item8",
-		"item1"
+		"item2",
+		"item7",
+		"item4"
 	};
+
 	ASSERT_EQ(voting_round.value().items(), expected_item_order);
 }
 void originalItemOrderIsRetainedWhenShufflingNewVotingRound() {
@@ -46,16 +47,16 @@ void itemOrderIsShuffledWhenShufflingParsedVotingRound() {
 	};
 	auto const voting_round = VotingRound::create(voting_round_text);
 	Items const expected_item_order{
-		"item7",
 		"item6",
-		"item3",
-		"item9",
-		"item4",
-		"item2",
-		"item5",
 		"item10",
+		"item9",
+		"item5",
+		"item1",
+		"item3",
 		"item8",
-		"item1"
+		"item2",
+		"item7",
+		"item4"
 	};
 	ASSERT_EQ(voting_round.value().items(), expected_item_order);
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <random>
 #include <string>
 #include <vector>
 
@@ -36,7 +35,7 @@ class VotingRound final {
 	public:
 		static auto create(uint32_t const number_of_items, VotingFormat const voting_format) -> std::optional<ScoreBased>;
 
-		auto shuffle(std::default_random_engine& engine) -> bool;
+		auto shuffle(Seed const seed) -> bool;
 		auto currentIndexPair(uint32_t const counter) const -> IndexPair;
 		auto indexPairs() const -> IndexPairs const&;
 		auto numberOfScheduledVotes() const -> uint32_t;
@@ -69,7 +68,7 @@ public:
 	auto convertToText() const -> std::vector<std::string>;
 
 private:
-	auto shuffleImpl(std::default_random_engine& engine) -> bool;
+	auto shuffleImpl() -> bool;
 	auto currentIndexPairImpl() const -> IndexPair;
 	auto hasRemainingVotesImpl() const -> bool;
 	auto numberOfScheduledVotesImpl() const -> uint32_t;

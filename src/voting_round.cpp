@@ -193,8 +193,8 @@ auto VotingRound::ScoreBased::create(uint32_t const number_of_items, VotingForma
 	}
 	return score_based;
 }
-auto VotingRound::ScoreBased::shuffle(std::default_random_engine& engine) -> bool {
-	//std::default_random_engine random_engine(seed);
+auto VotingRound::ScoreBased::shuffle(Seed const seed) -> bool {
+	std::default_random_engine engine(seed);
 	std::shuffle(index_pairs_.begin(), index_pairs_.end(), engine);
 	return true;
 }
@@ -317,11 +317,8 @@ auto VotingRound::create(std::vector<std::string> const& lines) -> std::optional
 }
 auto VotingRound::shuffle() -> bool {
 	std::default_random_engine random_engine(seed_);
-	if (!shuffleImpl(random_engine)) {
-		return false;
-	}
 	std::shuffle(items_.begin(), items_.end(), random_engine);
-	return true;
+	return shuffleImpl();
 }
 auto VotingRound::vote(Option option) -> bool {
 	if (!hasRemainingVotes()) {
@@ -482,14 +479,14 @@ auto VotingRound::currentIndexPairImpl() const -> IndexPair {
 		return {};
 	}
 }
-auto VotingRound::shuffleImpl(std::default_random_engine& engine) -> bool {
+auto VotingRound::shuffleImpl() -> bool {
 	switch (voting_format_) {
 	case VotingFormat::Full:
 	case VotingFormat::Reduced:
 		if (!score_based_.has_value()) {
 			return false;
 		}
-		return score_based_.value().shuffle(engine);
+		return score_based_.value().shuffle(seed_);
 	case VotingFormat::Invalid:
 	default:
 		return false;

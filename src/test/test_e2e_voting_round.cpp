@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include "calculate_scores.h"
 #include "helpers.h"
 #include "score_helpers.h"
 #include "testing.h"

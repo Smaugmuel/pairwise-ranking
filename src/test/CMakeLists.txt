@@ -6,10 +6,8 @@ set(test_name test_calculate_scores)
 add_executable(${test_name}
 	${test_name}.cpp
 	testing.cpp
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp)
+	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
+	${PROJECT_SOURCE_DIR}/src/score.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
 
@@ -50,6 +48,7 @@ set(test_name test_e2e_voting_round)
 add_executable(${test_name}
 	${test_name}.cpp
 	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
 	${PROJECT_SOURCE_DIR}/src/score.cpp
@@ -98,12 +97,10 @@ set(test_name test_get_active_menu_string)
 add_executable(${test_name}
 	${test_name}.cpp
 	testing.cpp
-	${PROJECT_SOURCE_DIR}/src/functions.cpp			# TODO: Remove dependency to this file here
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/menus.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp				# TODO: Remove dependency to this file here
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp		# TODO: Remove dependency to this file here
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp		# TODO: Remove dependency to this file here
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 add_test(NAME ${test_name} COMMAND ${test_name})
@@ -112,10 +109,10 @@ set(test_name test_item_order_randomized)
 add_executable(${test_name}
 	${test_name}.cpp
 	testing.cpp
+	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
 	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp				# calculateScores compares scores
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp		# For calculateScores
+	${PROJECT_SOURCE_DIR}/src/score.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp)
 target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)

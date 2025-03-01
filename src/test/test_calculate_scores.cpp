@@ -1,5 +1,5 @@
+#include "calculate_scores.h"
 #include "score.h"
-#include "score_helpers.h"
 #include "testing.h"
 
 namespace

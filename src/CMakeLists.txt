@@ -2,11 +2,15 @@ cmake_minimum_required(VERSION 3.15)
 
 add_executable(${PROJECT_NAME}
 	pairwise_ranking.cpp
+	calculate_scores.cpp
+	calculate_scores.h
 	constants.h
 	functions.cpp
 	functions.h
 	helpers.cpp
 	helpers.h
+	menus.cpp
+	menus.h
 	print.cpp
 	print.h
 	score.cpp

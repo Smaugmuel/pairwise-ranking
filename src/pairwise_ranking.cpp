@@ -15,9 +15,11 @@
 #include <type_traits>
 #include <vector>
 
+#include "calculate_scores.h"
 #include "constants.h"
 #include "functions.h"
 #include "helpers.h"
+#include "menus.h"
 #include "print.h"
 #include "score_helpers.h"
 

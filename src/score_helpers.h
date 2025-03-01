@@ -1,11 +1,6 @@
 #pragma once
 
 #include "score.h"
-#include "vote.h"
-
-using Items = std::vector<Item>;
-
-auto calculateScores(Items const& items, Votes const& votes) -> Scores;
 
 /* -------------- Print scores -------------- */
 auto sortScores(Scores const& scores) -> Scores;

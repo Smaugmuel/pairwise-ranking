@@ -98,21 +98,25 @@ void nonNumbers() {
 }
 } // namespace
 
-int main() {
-	stringIsEmpty();
-	stringIsValid();
-	itemIsAnInteger();
-	itemHasMultipleWords();
-	itemHasIntegersAfterSpace();
-	stringMissingWinsOrLosses();
-	stringMissingItem();
-	winsOrLossesAreNegative();
-	winsOrLossesAreAfterItem();
-	multipleItemsWithoutWinsOrLosses();
-	noStringsSent();
-	allStringsAreValid();
-	onlyOneStringIsValid();
-	validNumbers();
-	nonNumbers();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+
+	RUN_TEST_IF_ARGUMENT_EQUALS(stringIsEmpty);
+	RUN_TEST_IF_ARGUMENT_EQUALS(stringIsEmpty);
+	RUN_TEST_IF_ARGUMENT_EQUALS(stringIsValid);
+	RUN_TEST_IF_ARGUMENT_EQUALS(itemIsAnInteger);
+	RUN_TEST_IF_ARGUMENT_EQUALS(itemHasMultipleWords);
+	RUN_TEST_IF_ARGUMENT_EQUALS(itemHasIntegersAfterSpace);
+	RUN_TEST_IF_ARGUMENT_EQUALS(stringMissingWinsOrLosses);
+	RUN_TEST_IF_ARGUMENT_EQUALS(stringMissingItem);
+	RUN_TEST_IF_ARGUMENT_EQUALS(winsOrLossesAreNegative);
+	RUN_TEST_IF_ARGUMENT_EQUALS(winsOrLossesAreAfterItem);
+	RUN_TEST_IF_ARGUMENT_EQUALS(multipleItemsWithoutWinsOrLosses);
+	RUN_TEST_IF_ARGUMENT_EQUALS(noStringsSent);
+	RUN_TEST_IF_ARGUMENT_EQUALS(allStringsAreValid);
+	RUN_TEST_IF_ARGUMENT_EQUALS(onlyOneStringIsValid);
+	RUN_TEST_IF_ARGUMENT_EQUALS(validNumbers);
+	RUN_TEST_IF_ARGUMENT_EQUALS(nonNumbers);
+
 	return 0;
 }

@@ -36,11 +36,12 @@ void formatToString() {
 
 } // namespace
 
-int main() {
-	charToFormatWithValidOptions();
-	charToFormatWithInvalidOptions();
-	stringToFormatWithValidOptions();
-	stringToFormatWithInalidOptions();
-	formatToString();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(charToFormatWithValidOptions);
+	RUN_TEST_IF_ARGUMENT_EQUALS(charToFormatWithInvalidOptions);
+	RUN_TEST_IF_ARGUMENT_EQUALS(stringToFormatWithValidOptions);
+	RUN_TEST_IF_ARGUMENT_EQUALS(stringToFormatWithInalidOptions);
+	RUN_TEST_IF_ARGUMENT_EQUALS(formatToString);
 	return 0;
 }

@@ -54,10 +54,11 @@ void votingRoundWithOneVote() {
 
 } // namespace
 
-int main() {
-	emptyVotingRound();
-	votingRoundWithFullVoting();
-	votingRoundWithReducedVoting();
-	votingRoundWithOneVote();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(emptyVotingRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundWithFullVoting);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundWithReducedVoting);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundWithOneVote);
 	return 0;
 }

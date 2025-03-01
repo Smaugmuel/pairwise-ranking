@@ -1,7 +1,10 @@
 #include "testing.h"
 #include "voting_round.h"
 
-int main() {
+namespace
+{
+
+void shufflingWithSeedIsDeterministic() {
 	auto voting_round = VotingRound::create(getNItems(8), VotingFormat::Full, 123456);
 	voting_round.value().shuffle();
 
@@ -36,6 +39,12 @@ int main() {
 		Vote{1, 3, Option::A},
 		Vote{1, 5, Option::A},
 		Vote{1, 7, Option::A} });
+}
 
+} // namespace
+
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(shufflingWithSeedIsDeterministic);
 	return 0;
 }

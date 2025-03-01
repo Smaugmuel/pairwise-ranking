@@ -36,11 +36,12 @@ void saveWhenNoVotesRemain() {
 
 } // namespace
 
-int main() {
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
 	std::filesystem::remove(kTestFileName);
 
-	saveWhenSomeVotesRemain();
-	saveWhenNoVotesRemain();
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenSomeVotesRemain);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenNoVotesRemain);
 
 	std::filesystem::remove(kTestFileName);
 	return 0;

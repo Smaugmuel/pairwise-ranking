@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 
+/* -------------- Test definitions -------------- */
+#define RUN_TEST_IF_ARGUMENT_EQUALS(test_name) if (std::string{ argv[1] } == #test_name) { test_name(); return 0; }
+
+/* -------------- Assertions details -------------- */
 void assert_true(std::source_location const& location, bool val);
 
 template<typename T>
@@ -52,6 +56,7 @@ void assert_ne(std::source_location const& location, std::optional<T> const& a, 
 void assert_eq(std::source_location const& location, std::nullopt_t const& a, std::nullopt_t const& b);
 void assert_ne(std::source_location const& location, std::nullopt_t const& a, std::nullopt_t const& b);
 
+/* -------------- Assertions to use in tests -------------- */
 template<typename A, typename B>
 void ASSERT_EQ(A const& a, B const& b, std::source_location const location = std::source_location::current()) {
 	assert_eq(location, a, b);
@@ -60,42 +65,10 @@ template<typename T>
 void ASSERT_NE(T const& a, T const& b, std::source_location const location = std::source_location::current()) {
 	assert_ne(location, a, b);
 }
-
 void ASSERT_TRUE(bool a, std::source_location const location = std::source_location::current());
 void ASSERT_FALSE(bool a, std::source_location const location = std::source_location::current());
 
-#if false
-class BaseTest {
-public:
-	virtual void test() const = 0;
-};
-
-template<typename T>
-class TypedBaseTest : public BaseTest {
-public:
-	void test() const override {
-		constexpr size_t kOmitHeadLength = 6;
-		std::cout << std::string(typeid(T).name()).substr(kOmitHeadLength) << std::endl;
-		test_impl();
-	}
-protected:
-	virtual void test_impl() const = 0;
-};
-
-#define TEST(name) class name : public TypedBaseTest<name> { \
-protected: \
-	void test_impl() const override; \
-}; \
-void name::test_impl() const
-
-template<typename ... T>
-void run_tests() {
-	std::tuple<T...> tests;
-
-	std::apply([](auto&&... args) { (args.test(), ...); }, tests);
-}
-#endif
-
+/* -------------- Test helpers -------------- */
 template<typename T>
 auto operator+(std::vector<T> const& vec, T&& str) -> decltype(auto) {
 	auto new_vec = vec;

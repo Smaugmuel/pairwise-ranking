@@ -118,15 +118,16 @@ void longItemNameAndWinsAndLosses() {
 
 } // namespace
 
-int main() {
-	noScores();
-	alreadySorted();
-	reversedOrder();
-	winLossDifferenceIsZeroAndTotalIsDifferent();
-	winLossDifferenceIsZeroAndTotalIsTheSame();
-	winLossDifferenceIsEqualAndPositive();
-	winLossDifferenceIsEqualAndNegative();
-	shortItemNameAndWinsAndLosses();
-	longItemNameAndWinsAndLosses();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(noScores);
+	RUN_TEST_IF_ARGUMENT_EQUALS(alreadySorted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(reversedOrder);
+	RUN_TEST_IF_ARGUMENT_EQUALS(winLossDifferenceIsZeroAndTotalIsDifferent);
+	RUN_TEST_IF_ARGUMENT_EQUALS(winLossDifferenceIsZeroAndTotalIsTheSame);
+	RUN_TEST_IF_ARGUMENT_EQUALS(winLossDifferenceIsEqualAndPositive);
+	RUN_TEST_IF_ARGUMENT_EQUALS(winLossDifferenceIsEqualAndNegative);
+	RUN_TEST_IF_ARGUMENT_EQUALS(shortItemNameAndWinsAndLosses);
+	RUN_TEST_IF_ARGUMENT_EQUALS(longItemNameAndWinsAndLosses);
 	return 0;
 }

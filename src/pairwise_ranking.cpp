@@ -1,18 +1,6 @@
-﻿#include <algorithm>
-#include <chrono>
-#include <clocale>
-#include <conio.h>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
+﻿#include <clocale>
 #include <optional>
-#include <random>
-#include <regex>
-#include <source_location>
 #include <string>
-#include <sstream>
-#include <tuple>
-#include <type_traits>
 #include <vector>
 
 #include "calculate_scores.h"
@@ -32,7 +20,7 @@ void programLoop() {
 		first_iteration = false;
 
 		char const ch = getKey();
-		std::cout << ch << std::endl;
+		print(std::to_string(ch));
 		if (ch == 'q') {
 			if (continueWithoutSaving(voting_round, "quit")) {
 				break;

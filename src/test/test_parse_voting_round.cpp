@@ -405,32 +405,32 @@ void fourItemsAndFullVotingAndZeroVotes() {
 
 } // namespace
 
-int main() {
-	noLinesToParse();
-	noItemsBeforeEmptyLine();
-	fewerThanTwoItems();
-	itemAppearsMultipleTimes();
-	anItemIsEmpty();
-	noEmptyLineBetweenItemsAndSeed();
-	seedIsMissing();
-	seedIsEmpty();
-	seedIsNotAPositiveInteger();
-	fullVoting();
-	reducedVotingWithTooFewItems();
-	reducedVotingWithEnoughItems();
-	reducedVotingSettingIsMissing();
-	reducedVotingSettingIsEmpty();
-	reducedVotingSettingIsInvalid();
-	noVotes();
-	voteDoesNotHaveThreeIntegers();
-	chosenVoteIsNotZeroOrOne();
-	voteOptionIndicesAreGreaterThanNumberOfItems();
-	moreVotesThanPossible();
-	sameMatchupMultipleTimes();
-	chosenVoteIsNotZeroOrOne();
-	fourItemsAndReducedVotingAndFourVotes();
-	fourItemsAndFullVotingAndOneVote();
-	fourItemsAndFullVotingAndZeroVotes();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(noLinesToParse);
+	RUN_TEST_IF_ARGUMENT_EQUALS(noItemsBeforeEmptyLine);
+	RUN_TEST_IF_ARGUMENT_EQUALS(fewerThanTwoItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(itemAppearsMultipleTimes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(anItemIsEmpty);
+	RUN_TEST_IF_ARGUMENT_EQUALS(noEmptyLineBetweenItemsAndSeed);
+	RUN_TEST_IF_ARGUMENT_EQUALS(seedIsMissing);
+	RUN_TEST_IF_ARGUMENT_EQUALS(seedIsEmpty);
+	RUN_TEST_IF_ARGUMENT_EQUALS(seedIsNotAPositiveInteger);
+	RUN_TEST_IF_ARGUMENT_EQUALS(fullVoting);
+	RUN_TEST_IF_ARGUMENT_EQUALS(reducedVotingWithTooFewItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(reducedVotingWithEnoughItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(reducedVotingSettingIsMissing);
+	RUN_TEST_IF_ARGUMENT_EQUALS(reducedVotingSettingIsEmpty);
+	RUN_TEST_IF_ARGUMENT_EQUALS(reducedVotingSettingIsInvalid);
+	RUN_TEST_IF_ARGUMENT_EQUALS(noVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(voteDoesNotHaveThreeIntegers);
+	RUN_TEST_IF_ARGUMENT_EQUALS(voteOptionIndicesAreGreaterThanNumberOfItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(moreVotesThanPossible);
+	RUN_TEST_IF_ARGUMENT_EQUALS(sameMatchupMultipleTimes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(chosenVoteIsNotZeroOrOne);
+	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndReducedVotingAndFourVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndOneVote);
+	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndZeroVotes);
 
 	return 0;
 }

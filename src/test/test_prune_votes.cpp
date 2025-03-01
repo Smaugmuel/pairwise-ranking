@@ -210,10 +210,11 @@ void pruningRemovesCorrectScheduledVotes() {
 
 } // namsepace
 
-int main() {
-	pruningDuringVotingRoundCreationWithTooFewItems();
-	pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems();
-	parseVotingRoundWithPruning();
-	pruningRemovesCorrectScheduledVotes();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(pruningDuringVotingRoundCreationWithTooFewItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(parseVotingRoundWithPruning);
+	RUN_TEST_IF_ARGUMENT_EQUALS(pruningRemovesCorrectScheduledVotes);
 	return 0;
 }

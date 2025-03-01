@@ -270,20 +270,21 @@ void tooFewVotesToScoreAllItems() {
 
 } // namespace
 
-int main() {
-	zeroVotes();
-	oneVoteForA();
-	oneVoteForB();
-	votingForItem2AndOptionAIfNotPresent();
-	votingForItem3AndOptionAIfNotPresent();
-	votingForItem2AndOptionBIfNotPresent();
-	votingForItem3AndOptionBIfNotPresent();
-	votingForItem2AndAgainstItem3AndOptionAIfNeither();
-	votingForItem2AndAgainstItem3AndOptionBIfNeither();
-	votingForItem3AndAgainstItem2AndOptionAIfNeither();
-	votingForItem3AndAgainstItem2AndOptionBIfNeither();
-	votingForOptionAButNotFullRound();
-	votingForOptionBButNotFullRound();
-	tooFewVotesToScoreAllItems();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(zeroVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(oneVoteForA);
+	RUN_TEST_IF_ARGUMENT_EQUALS(oneVoteForB);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem2AndOptionAIfNotPresent);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem3AndOptionAIfNotPresent);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem2AndOptionBIfNotPresent);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem3AndOptionBIfNotPresent);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem2AndAgainstItem3AndOptionAIfNeither);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem2AndAgainstItem3AndOptionBIfNeither);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem3AndAgainstItem2AndOptionAIfNeither);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem3AndAgainstItem2AndOptionBIfNeither);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForOptionAButNotFullRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForOptionBButNotFullRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(tooFewVotesToScoreAllItems);
 	return 0;
 }

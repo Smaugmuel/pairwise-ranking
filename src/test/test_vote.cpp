@@ -60,11 +60,12 @@ void votingAfterRoundCompleted() {
 
 } // namespace
 
-int main() {
-	firstVoteForA();
-	firstVoteForB();
-	votingForAForEachScheduledVote();
-	votingForBForEachScheduledVote();
-	votingAfterRoundCompleted();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(firstVoteForA);
+	RUN_TEST_IF_ARGUMENT_EQUALS(firstVoteForB);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForAForEachScheduledVote);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingForBForEachScheduledVote);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingAfterRoundCompleted);
 	return 0;
 }

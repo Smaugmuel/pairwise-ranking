@@ -375,16 +375,17 @@ void generateWithFullVotingGivesCorrectScheduledVotes() {
 
 } // namespace
 
-int main() {
-	generateWithTooFewItems();
-	generateWithOnlyEmptyItems();
-	generateWithSomeEmptyItems();
-	generateWithFullVoting();
-	generateWithReducedVotingIfTooFewItemsToReduce();
-	generateWithReducedVotingIfEnoughItemsToReduce();
-	generateWithFullVotingGivesCorrectAmountOfScheduledVotes();
-	generateWithReducedVotingGivesCorrectAmountOfScheduledVotes();
-	generateWithFullVotingGivesCorrectScheduledVotes();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithTooFewItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithOnlyEmptyItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithSomeEmptyItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithFullVoting);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithReducedVotingIfTooFewItemsToReduce);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithReducedVotingIfEnoughItemsToReduce);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithFullVotingGivesCorrectAmountOfScheduledVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithReducedVotingGivesCorrectAmountOfScheduledVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithFullVotingGivesCorrectScheduledVotes);
 
 	return 0;
 }

@@ -78,16 +78,17 @@ void loadingNonExistingFile() {
 
 } // namespace
 
-int main() {
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
 	std::filesystem::remove(kTestFileName);
 
-	savingAndLoadingLines();
-	savingAndLoadingLinesWithEmptyLines();
-	savingAndLoadingOnlyEmptyLines();
-	savingNoLines();
-	loadingNoLines();
-	savingToExistingFile();
-	loadingNonExistingFile();
+	RUN_TEST_IF_ARGUMENT_EQUALS(savingAndLoadingLines);
+	RUN_TEST_IF_ARGUMENT_EQUALS(savingAndLoadingLinesWithEmptyLines);
+	RUN_TEST_IF_ARGUMENT_EQUALS(savingAndLoadingOnlyEmptyLines);
+	RUN_TEST_IF_ARGUMENT_EQUALS(savingNoLines);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadingNoLines);
+	RUN_TEST_IF_ARGUMENT_EQUALS(savingToExistingFile);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadingNonExistingFile);
 
 	std::filesystem::remove(kTestFileName);
 	return 0;

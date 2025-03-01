@@ -48,13 +48,14 @@ void combiningTwoScoreSetsWithDifferentItems() {
 
 } // namespace
 
-int main() {
-	combiningNoScoreSet();
-	combiningOneScoreSetWithZeroScores();
-	combiningOneScoreSetWithOneScore();
-	combiningOneScoreSetWithMultipleScores();
-	combiningTwoScoreSetsWhenOneScoreSetIsEmpty();
-	combiningTwoScoreSetsWithSameItem();
-	combiningTwoScoreSetsWithDifferentItems();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combiningNoScoreSet);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combiningOneScoreSetWithZeroScores);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combiningOneScoreSetWithOneScore);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combiningOneScoreSetWithMultipleScores);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combiningTwoScoreSetsWhenOneScoreSetIsEmpty);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combiningTwoScoreSetsWithSameItem);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combiningTwoScoreSetsWithDifferentItems);
 	return 0;
 }

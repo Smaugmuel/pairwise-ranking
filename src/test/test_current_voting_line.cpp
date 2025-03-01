@@ -61,12 +61,13 @@ void incompleteVotingIncreasesCounterAndChangesItem() {
 
 } // namespace
 
-int main() {
-	counterLengthEqualsTotalLength();
-	counterLengthIsLessThanTotalLength();
-	itemIsShorterThanLongestItem();
-	itemLengthIsEqualToHeaderLength();
-	votingIsCompleted();
-	incompleteVotingIncreasesCounterAndChangesItem();
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	RUN_TEST_IF_ARGUMENT_EQUALS(counterLengthEqualsTotalLength);
+	RUN_TEST_IF_ARGUMENT_EQUALS(counterLengthIsLessThanTotalLength);
+	RUN_TEST_IF_ARGUMENT_EQUALS(itemIsShorterThanLongestItem);
+	RUN_TEST_IF_ARGUMENT_EQUALS(itemLengthIsEqualToHeaderLength);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingIsCompleted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(incompleteVotingIncreasesCounterAndChangesItem);
 	return 0;
 }

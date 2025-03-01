@@ -1,13 +1,10 @@
 #pragma once
 
-#include <iostream>
 #include <optional>
 #include <source_location>
 #include <string>
-#include <type_traits>
 #include <vector>
 
-void assertion_failure(std::source_location const& location, std::string const& error);
 void assert_true(std::source_location const& location, bool val);
 
 template<typename T>

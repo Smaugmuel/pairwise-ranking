@@ -1,10 +1,17 @@
 #include "testing.h"
 
+#include <iostream>
+
+namespace
+{
+
 void assertion_failure(std::source_location const& location, std::string const& error) {
 	std::cout << "Assertion failed " << location.file_name() << ":" << location.line() << ": " << error << 
 		". In " << location.function_name() << "()" << std::endl;
 	exit(1);
 }
+
+} // namespace
 
 void assert_true(std::source_location const& location, bool val) {
 	if (!val) {

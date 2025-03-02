@@ -1,9 +1,7 @@
 #include "functions.h"
 
 #include <conio.h>			// _getch()
-#include <filesystem>		// filesystem::current_path(), filesystem::exists()
 #include <fstream>			// ifstream
-#include <iostream>			// getline(), cin
 #include <unordered_set>	// unordered_set
 #include <sstream>			// stringstream
 
@@ -54,36 +52,6 @@ auto parseItems(std::vector<std::string> const& lines) -> Items {
 		items.emplace_back(fixSwedish(line));
 	}
 	return items;
-}
-auto getLine() -> std::string {
-	std::string input{};
-	std::getline(std::cin, input);
-	return input;
-}
-auto verifyFilesExist(std::vector<std::string> const& file_names) -> bool {
-	bool all_files_exist = true;
-	for (auto const& name : file_names) {
-		if (!std::filesystem::exists(name)) {
-			printError("File " + name + " doesn't exist");
-			all_files_exist = false;
-		}
-	}
-	return all_files_exist;
-}
-auto getMultipleFileNames() -> std::vector<std::string> {
-	print("Specify two or more files, e.g. \"file_1.txt file_2.txt\", without the quotation marks (\"): ", false);
-
-	std::vector<std::string> file_names = parseWords(getLine());
-	if (!verifyFilesExist(file_names)) {
-		printError("One or more files don't exist");
-		return {};
-	}
-
-	if (file_names.size() < 2) {
-		printError("Two or more files are required to combine scores");
-		return {};
-	}
-	return file_names;
 }
 
 } // namespace
@@ -163,39 +131,4 @@ void printScores(std::optional<VotingRound> const& voting_round) {
 		return;
 	}
 	print(createScoreTable(calculateScores(voting_round.value().items(), voting_round.value().votes())), false);
-}
-void combine() {
-	// Input names of two or more files to combine
-	//		Verify files exist
-	//		Allow cancelling
-	// Load lines for each file name
-	// Parse scores from lines
-	//		Identify the files which contain scores
-	//			For those that don't, print an error
-	// If there are two or more valid sets of scores, proceed
-	// Combine scores
-	// Return combined scores
-
-	// Get valid file names
-	std::vector<std::string> file_names = getMultipleFileNames();
-	if (file_names.size() < 2) {
-		printError("Too few files. No scores combined");
-		return;
-	}
-
-	// Load files' contents
-	std::vector<Scores> scores_sets{};
-
-	for (auto const& file_name : file_names) {
-		print("Reading " + file_name);
-		auto const lines = loadFile(file_name);
-		scores_sets.emplace_back(parseScores(lines));
-	}
-
-	Scores const combined_scores = combineScores(scores_sets);
-
-	if (!saveFile(kCombinedScoresFile, generateScoreFileData(sortScores(combined_scores)))) {
-		printError("Couldn't save file \'" + kCombinedScoresFile + "\'");
-	}
-	print("Saved combined scores to \'" + kCombinedScoresFile + "\'");
 }

@@ -1,6 +1,7 @@
 #include "score_helpers.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <sstream>
 
 #include "helpers.h"
@@ -196,6 +197,44 @@ auto combineScores(std::vector<Scores> const& score_sets) -> Scores {
 		combined_scores = addScores(combined_scores, scores);
 	}
 	return combined_scores;
+}
+auto verifyFilesExist(std::vector<std::string> const& file_names) -> bool {
+	bool all_files_exist = true;
+	for (auto const& name : file_names) {
+		if (!std::filesystem::exists(name)) {
+			printError("File " + name + " doesn't exist");
+			all_files_exist = false;
+		}
+	}
+	return all_files_exist;
+}
+auto combine(std::string const& file_names_line, std::string const& combined_score_file_name) -> bool {
+	auto const file_names = parseWords(file_names_line);
+	if (file_names.size() < 2) {
+		printError("Too few files. No scores combined");
+		return false;
+	}
+	if (!verifyFilesExist(file_names)) {
+		printError("Not all files exist. No scores combined");
+		return false;
+	}
+
+	// Load files' contents
+	std::vector<Scores> scores_sets{};
+	for (auto const& file_name : file_names) {
+		print("Reading " + file_name);
+		auto const lines = loadFile(file_name);
+		scores_sets.emplace_back(parseScores(lines));
+	}
+
+	Scores const combined_scores = combineScores(scores_sets);
+
+	if (!saveFile(combined_score_file_name, generateScoreFileData(sortScores(combined_scores)))) {
+		printError("Couldn't save file \'" + combined_score_file_name + "\'");
+		return false;
+	}
+	print("Saved combined scores to \'" + combined_score_file_name + "\'");
+	return true;
 }
 
 /* -------------- Score conversion -------------- */

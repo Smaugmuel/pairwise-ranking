@@ -286,5 +286,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForOptionAButNotFullRound);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForOptionBButNotFullRound);
 	RUN_TEST_IF_ARGUMENT_EQUALS(tooFewVotesToScoreAllItems);
-	return 0;
+	return 1;
 }

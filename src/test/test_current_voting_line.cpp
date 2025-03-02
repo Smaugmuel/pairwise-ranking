@@ -69,5 +69,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(itemLengthIsEqualToHeaderLength);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingIsCompleted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(incompleteVotingIncreasesCounterAndChangesItem);
-	return 0;
+	return 1;
 }

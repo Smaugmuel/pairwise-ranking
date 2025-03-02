@@ -118,5 +118,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(validNumbers);
 	RUN_TEST_IF_ARGUMENT_EQUALS(nonNumbers);
 
-	return 0;
+	return 1;
 }

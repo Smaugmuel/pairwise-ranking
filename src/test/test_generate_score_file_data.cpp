@@ -32,5 +32,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneScore);
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneScoreWithSpacesInItemName);
 	RUN_TEST_IF_ARGUMENT_EQUALS(multipleScores);
-	return 0;
+	return 1;
 }

@@ -60,5 +60,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundWithFullVoting);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundWithReducedVoting);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundWithOneVote);
-	return 0;
+	return 1;
 }

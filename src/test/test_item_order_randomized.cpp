@@ -114,5 +114,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(convertingVotingRoundToTextUsesOriginalItemOrder);
 	RUN_TEST_IF_ARGUMENT_EQUALS(scoresAreCalculatedWithCorrectItems);
 
-	return 0;
+	return 1;
 }

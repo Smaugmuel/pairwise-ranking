@@ -2,16 +2,18 @@ cmake_minimum_required(VERSION 3.15)
 
 enable_testing()
 
-function(addTestSuite suite_name test_dependencies test_cases)
+function(addTestSuite suite_name dependencies cases)
 	add_executable(${suite_name}
 		${suite_name}.cpp
 		testing.cpp
-		${test_dependencies}
+		${dependencies}
 	)
 	target_include_directories(${suite_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
-	foreach (test_case ${test_cases})
+	foreach (test_case ${cases})
 		add_test(NAME "${suite_name}/${test_case}" COMMAND ${suite_name} ${test_case})
 	endforeach()
+	unset(test_dependencies PARENT_SCOPE)
+	unset(test_cases PARENT_SCOPE)
 endfunction()
 
 
@@ -36,8 +38,6 @@ list(APPEND test_cases
 	tooFewVotesToScoreAllItems
 )
 addTestSuite(test_calculate_scores "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -62,8 +62,6 @@ list(APPEND test_cases
 	endToEnd_combineFromOneEmptyFile
 )
 addTestSuite(test_combine_scores "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -84,8 +82,6 @@ list(APPEND test_cases
 	longItemNameAndWinsAndLosses
 )
 addTestSuite(test_create_score_table "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -103,8 +99,6 @@ list(APPEND test_cases
 	incompleteVotingIncreasesCounterAndChangesItem
 )
 addTestSuite(test_current_voting_line "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -122,8 +116,6 @@ list(APPEND test_cases
 	scoresAreTheSameDespiteDifferentItemOrderAndSeed
 )
 addTestSuite(test_e2e_voting_round "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -145,8 +137,6 @@ list(APPEND test_cases
 	generateWithFullVotingGivesCorrectScheduledVotes
 )
 addTestSuite(test_generate_new_voting_round "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -162,8 +152,6 @@ list(APPEND test_cases
 	multipleScores
 )
 addTestSuite(test_generate_score_file_data "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -179,8 +167,6 @@ list(APPEND test_cases
 	votingRoundWithOneVote
 )
 addTestSuite(test_generate_voting_round_file_data "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -197,8 +183,6 @@ list(APPEND test_cases
 	votingRoundCompleted
 )
 addTestSuite(test_get_active_menu_string "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -218,8 +202,6 @@ list(APPEND test_cases
 	scoresAreCalculatedWithCorrectItems
 )
 addTestSuite(test_item_order_randomized "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -236,8 +218,6 @@ list(APPEND test_cases
 	loadingNonExistingFile
 )
 addTestSuite(test_load_and_save_file "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -264,8 +244,6 @@ list(APPEND test_cases
 	nonNumbers
 )
 addTestSuite(test_parse_scores "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -302,8 +280,6 @@ list(APPEND test_cases
 	fourItemsAndFullVotingAndZeroVotes
 )
 addTestSuite(test_parse_voting_round "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -320,8 +296,6 @@ list(APPEND test_cases
 	pruningRemovesCorrectScheduledVotes
 )
 addTestSuite(test_prune_votes "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -335,8 +309,6 @@ list(APPEND test_cases
 	saveWhenSomeScores
 )
 addTestSuite(test_save_scores "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -350,8 +322,6 @@ list(APPEND test_cases
 	saveWhenNoVotesRemain
 )
 addTestSuite(test_save_votes "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -365,8 +335,6 @@ list(APPEND test_cases
 	shufflingWithSeedIsDeterministic
 )
 addTestSuite(test_shuffle_voting_order "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -380,8 +348,6 @@ list(APPEND test_cases
 	undoWhenNoVotesExist
 )
 addTestSuite(test_undo "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -399,8 +365,6 @@ list(APPEND test_cases
 	votingAfterRoundCompleted
 )
 addTestSuite(test_vote "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)
 
 
 list(APPEND test_dependencies
@@ -414,5 +378,3 @@ list(APPEND test_cases
 	formatToString
 )
 addTestSuite(test_voting_format "${test_dependencies}" "${test_cases}")
-unset(test_dependencies)
-unset(test_cases)

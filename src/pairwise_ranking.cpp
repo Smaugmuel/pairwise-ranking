@@ -1,4 +1,5 @@
 ﻿#include <clocale>
+#include <iostream>
 #include <optional>
 #include <string>
 #include <vector>
@@ -10,6 +11,12 @@
 #include "menus.h"
 #include "print.h"
 #include "score_helpers.h"
+
+auto getLine() -> std::string {
+	std::string input{};
+	std::getline(std::cin, input);
+	return input;
+}
 
 void programLoop() {
 	std::optional<VotingRound> voting_round{};
@@ -93,7 +100,14 @@ void programLoop() {
 			voting_round.value().undoVote();
 		}
 		else if (ch == 'c') {
-			combine();
+			print("Specify two or more files, e.g. \"file_1.txt file_2.txt\", without the quotation marks (\"): ", false);
+			auto const input_line = getLine();
+			if (input_line.empty()) {
+				continue;
+			}
+			if (!combine(input_line, kCombinedScoresFile)) {
+				printError("Failed to combine scores");
+			}
 		}
 		else {
 			printError("Invalid input");

@@ -54,6 +54,12 @@ list(APPEND test_cases
 	combiningTwoScoreSetsWhenOneScoreSetIsEmpty
 	combiningTwoScoreSetsWithSameItem
 	combiningTwoScoreSetsWithDifferentItems
+	endToEnd_combineFromTwoFiles
+	endToEnd_combineFromThreeFiles
+	endToEnd_combineFromTooFewFiles
+	endToEnd_combineFromInvalidFileName
+	endToEnd_combineFromAllEmptyFiles
+	endToEnd_combineFromOneEmptyFile
 )
 addTestSuite(test_combine_scores "${test_dependencies}" "${test_cases}")
 unset(file_dependencies)

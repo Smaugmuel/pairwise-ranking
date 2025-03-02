@@ -129,5 +129,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(winLossDifferenceIsEqualAndNegative);
 	RUN_TEST_IF_ARGUMENT_EQUALS(shortItemNameAndWinsAndLosses);
 	RUN_TEST_IF_ARGUMENT_EQUALS(longItemNameAndWinsAndLosses);
-	return 0;
+	return 1;
 }

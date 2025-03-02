@@ -432,5 +432,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndOneVote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndZeroVotes);
 
-	return 0;
+	return 1;
 }

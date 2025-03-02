@@ -32,5 +32,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(noVotingRoundCreated);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundStarted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundCompleted);
-	return 0;
+	return 1;
 }

@@ -188,5 +188,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromInvalidFileName);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromAllEmptyFiles);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromOneEmptyFile);
-	return 0;
+	return 1;
 }

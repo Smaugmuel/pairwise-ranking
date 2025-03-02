@@ -46,5 +46,5 @@ void shufflingWithSeedIsDeterministic() {
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
 	RUN_TEST_IF_ARGUMENT_EQUALS(shufflingWithSeedIsDeterministic);
-	return 0;
+	return 1;
 }

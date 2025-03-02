@@ -43,5 +43,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(stringToFormatWithValidOptions);
 	RUN_TEST_IF_ARGUMENT_EQUALS(stringToFormatWithInalidOptions);
 	RUN_TEST_IF_ARGUMENT_EQUALS(formatToString);
-	return 0;
+	return 1;
 }

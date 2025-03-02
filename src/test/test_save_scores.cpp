@@ -35,5 +35,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenSomeScores);
 
 	std::filesystem::remove(kTestFileName);
-	return 0;
+	return 1;
 }

@@ -216,5 +216,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems);
 	RUN_TEST_IF_ARGUMENT_EQUALS(parseVotingRoundWithPruning);
 	RUN_TEST_IF_ARGUMENT_EQUALS(pruningRemovesCorrectScheduledVotes);
-	return 0;
+	return 1;
 }

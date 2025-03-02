@@ -387,5 +387,5 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithReducedVotingGivesCorrectAmountOfScheduledVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithFullVotingGivesCorrectScheduledVotes);
 
-	return 0;
+	return 1;
 }

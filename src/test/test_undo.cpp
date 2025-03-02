@@ -23,5 +23,5 @@ int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
 	RUN_TEST_IF_ARGUMENT_EQUALS(undoWhenVotesExist);
 	RUN_TEST_IF_ARGUMENT_EQUALS(undoWhenNoVotesExist);
-	return 0;
+	return 1;
 }

@@ -237,18 +237,104 @@ void VotingRound::RankBased::vote(Items& items, Option option) {
 	if (start_index_ < end_index_) {
 		return;
 	}
-	uint32_t const insertion_spot = start_index_;
+	uint32_t const insertion_index = start_index_;
 	Item const item_to_insert = items[number_of_sorted_items_];
 
-	// Move each item in [insertion_spot, number_of_sorted_items_) one position down the vector
-	for (size_t i = number_of_sorted_items_; i > insertion_spot; i--) {
+	// Move each item in [insertion_index, number_of_sorted_items_) one position down the vector
+	for (size_t i = number_of_sorted_items_; i > insertion_index; i--) {
 		items[i] = items[i - 1];
 	}
 
-	items[insertion_spot] = item_to_insert;
+	items[insertion_index] = item_to_insert;
 	number_of_sorted_items_++;
 	start_index_ = 0;
 	end_index_ = number_of_sorted_items_;
+}
+auto VotingRound::RankBased::undoVote(Items& items, Votes const& votes) -> bool {
+	if (number_of_sorted_items_ == 1 || votes.empty()) {
+		return false;
+	}
+	// Check if the latest vote resulted in inserting an item
+	if (start_index_ == 0 && end_index_ == number_of_sorted_items_) {
+		// Check votes in reverse to find the first vote containing the previously inserted item.
+		// From that first vote, the succeeding votes will be used to recreate start- and end index
+		// up until right before the latest vote was performed.
+		auto const previously_inserted_item_index = votes.back().b_idx;
+		auto previously_inserted_item_first_vote_index = 0ui32;
+		for (int32_t vote_index = votes.size() - 1; vote_index >= 0; vote_index--) {
+			if (votes[vote_index].b_idx != previously_inserted_item_index) {
+				previously_inserted_item_first_vote_index = vote_index + 1;
+				break;
+			}
+		}
+
+		// Reset internal state to what it was at the first vote containing the previously inserted item
+		number_of_sorted_items_--;
+		start_index_ = 0;
+		end_index_ = number_of_sorted_items_;
+
+		// Simulate voting to set the start- and end indices correctly
+		for (uint32_t vote_index = previously_inserted_item_first_vote_index; vote_index < votes.size() - 1; vote_index++) {
+			uint32_t const mid_index = (start_index_ + end_index_) / 2;
+			if (votes[vote_index].winner == Option::A) {
+				start_index_ = mid_index + 1;
+			}
+			else {
+				end_index_ = mid_index;
+			}
+		}
+
+		// Determine the index where the item was inserted.
+		// Start index should now be equal to end index
+		uint32_t const mid_index = (start_index_ + end_index_) / 2;
+		// if (votes[votes.size() - 1].winner == Option::A) {
+		// 	start_index_ = mid_index + 1;
+		// }
+		// else {
+		// 	end_index_ = mid_index;
+		// }
+		uint32_t const insertion_index = mid_index + (votes.back().winner == Option::A ? 1 : 0);
+
+		// Move each sorted item starting at the insertion index back one position,
+		// and move the previously inserted item to right outside the sorted items
+		Item const previously_inserted_item = items[insertion_index];
+		for (uint32_t item_index = insertion_index; item_index < number_of_sorted_items_; item_index++) {
+			items[item_index] = items[item_index + 1];
+		}
+		items[number_of_sorted_items_] = previously_inserted_item;
+
+		// Start index and end index should now have the correct values
+
+		return true;
+	}
+
+	// Check votes in reverse to find the first vote containing the previously inserted item.
+	// From that first vote, the succeeding votes will be used to recreate start- and end index
+	// up until right before the latest vote was performed.
+	auto const previously_inserted_item_index = votes.back().b_idx;
+	auto previously_inserted_item_first_vote_index = 0ui32;
+	for (int32_t vote_index = votes.size() - 1; vote_index >= 0; vote_index--) {
+		if (votes[vote_index].b_idx != previously_inserted_item_index) {
+			previously_inserted_item_first_vote_index = vote_index + 1;
+			break;
+		}
+	}
+
+	// Reset internal state to what it was at the first vote containing the previously inserted item
+	start_index_ = 0;
+	end_index_ = number_of_sorted_items_;
+
+	// Simulate voting to set the start- and end indices correctly
+	for (uint32_t vote_index = previously_inserted_item_first_vote_index; vote_index < votes.size() - 1; vote_index++) {
+		uint32_t const mid_index = (start_index_ + end_index_) / 2;
+		if (votes[vote_index].winner == Option::A) {
+			start_index_ = mid_index + 1;
+		}
+		else {
+			end_index_ = mid_index;
+		}
+	}
+	return true;
 }
 auto VotingRound::RankBased::currentIndexPair() const -> IndexPair {
 	uint32_t const mid_index = (start_index_ + end_index_) / 2;
@@ -409,6 +495,11 @@ auto VotingRound::undoVote() -> bool {
 	if (votes_.empty()) {
 		return false;
 	}
+
+	if (!undoVoteImpl()) {
+		return false;
+	}
+
 	votes_.pop_back();
 	is_saved_ = false;
 	return true;
@@ -580,6 +671,21 @@ auto VotingRound::voteImpl(Option option) -> bool {
 		}
 		rank_based_.value().vote(items_, option);
 		return true;
+	case VotingFormat::Invalid:
+	default:
+		return false;
+	}
+}
+auto VotingRound::undoVoteImpl() -> bool {
+	switch (voting_format_) {
+	case VotingFormat::Full:
+	case VotingFormat::Reduced:
+		return true;
+	case VotingFormat::Ranked:
+		if (!rank_based_.has_value()) {
+			return false;
+		}
+		return rank_based_.value().undoVote(items_, votes_);
 	case VotingFormat::Invalid:
 	default:
 		return false;

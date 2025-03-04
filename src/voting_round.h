@@ -47,6 +47,7 @@ class VotingRound final {
 		static auto create() -> std::optional<RankBased>;
 
 		void vote(Items& items, Option option);
+		auto undoVote(Items& items, Votes const& votes) -> bool;
 		auto currentIndexPair() const -> IndexPair;
 		auto numberOfSortedItems() const -> uint32_t;
 	private:
@@ -90,6 +91,7 @@ private:
 	auto shuffleImpl() -> bool;
 	auto counterStringImpl() const -> std::string;
 	auto voteImpl(Option option) -> bool;
+	auto undoVoteImpl() -> bool;
 	auto createFormatImpl() -> bool;
 	auto currentIndexPairImpl() const -> IndexPair;
 	auto hasRemainingVotesImpl() const -> bool;

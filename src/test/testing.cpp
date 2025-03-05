@@ -5,7 +5,7 @@
 namespace
 {
 
-void assertion_failure(std::source_location const& location, std::string const& error) {
+void assertion_failure(std::string const& error, std::source_location const& location) {
 	std::cout << "Assertion failed " << location.file_name() << ":" << location.line() << ": " << error << 
 		". In " << location.function_name() << "()" << std::endl;
 	exit(1);
@@ -13,25 +13,30 @@ void assertion_failure(std::source_location const& location, std::string const& 
 
 } // namespace
 
-void assert_true(std::source_location const& location, bool val) {
+namespace detail
+{
+
+void assert_true(bool val, std::source_location const& location) {
 	if (!val) {
-		assertion_failure(location, "");
+		assertion_failure("", location);
 	}
 }
 
-void assert_eq(std::source_location const& location, std::nullopt_t const& a, std::nullopt_t const& b) {
-	assert_true(location, true);
+void assert_eq(std::nullopt_t const& a, std::nullopt_t const& b, std::source_location const& location) {
+	assert_true(true, location);
 }
 
-void assert_ne(std::source_location const& location, std::nullopt_t const& a, std::nullopt_t const& b) {
-	assert_true(location, false);
+void assert_ne(std::nullopt_t const& a, std::nullopt_t const& b, std::source_location const& location) {
+	assert_true(false, location);
 }
+
+} // namespace detail
 
 void ASSERT_TRUE(bool a, std::source_location const location) {
-	assert_true(location, a);
+	detail::assert_true(a, location);
 }
 void ASSERT_FALSE(bool a, std::source_location const location) {
-	assert_true(location, !a);
+	detail::assert_true(!a, location);
 }
 
 auto getNItems(size_t n) -> std::vector<std::string> {

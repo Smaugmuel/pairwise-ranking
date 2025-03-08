@@ -23,7 +23,17 @@ void endToEnd_quit() {
 
 	std::cout.rdbuf(backup);
 
-	ASSERT_EQ(stream.str(), std::string{"Welcome! Press H if you need help: 113\n"});
+	std::string const expected_printout{
+		"-----------------------\n"
+		"|  Pairwise ranking   |\n"
+		"|---------------------|\n"
+		"| [N]ew voting round  |\n"
+		"| [L]oad voting round |\n"
+		"|  [C]ombine scores   |\n"
+		"|       [Q]uit        |\n"
+		"-----------------------\n" 
+	};
+	ASSERT_EQ(stream.str(), expected_printout);
 }
 void endToEnd_combineWithInvalidFiles() {
 	std::streambuf* backup;
@@ -32,19 +42,34 @@ void endToEnd_combineWithInvalidFiles() {
 
 	g_keys.push('c');
 	g_lines.push("file1 file2");
+	g_lines.push("c");
 	g_keys.push('q');
 	programLoop();
 
 	std::cout.rdbuf(backup);
 
 	std::string const expected_printout{
-		"Welcome! Press H if you need help: 99\n"
-		"Specify two or more files, e.g. \"file_1.txt file_2.txt\", without the quotation marks (\"): "
-		"Error: File file1 doesn't exist\n"
-		"Error: File file2 doesn't exist\n"
-		"Error: Not all files exist. No scores combined\n"
-		"Error: Failed to combine scores\n"
-		"Press H if you need help: 113\n"
+		"-----------------------\n"
+		"|  Pairwise ranking   |\n"
+		"|---------------------|\n"
+		"| [N]ew voting round  |\n"
+		"| [L]oad voting round |\n"
+		"|  [C]ombine scores   |\n"
+		"|       [Q]uit        |\n"
+		"-----------------------\n"
+		"Select two or more score files to combine, or just \'c\' to cancel: "		// TODO: Fix newline issue
+		"Error: File 'file1' doesn't exist\n"
+		"Error: File 'file2' doesn't exist\n"
+		"Error: No scores combined\n"
+		"Select two or more score files to combine, or just \'c\' to cancel: "		// TODO: Fix newline issue
+		"-----------------------\n"
+		"|  Pairwise ranking   |\n"
+		"|---------------------|\n"
+		"| [N]ew voting round  |\n"
+		"| [L]oad voting round |\n"
+		"|  [C]ombine scores   |\n"
+		"|       [Q]uit        |\n"
+		"-----------------------\n"
 	};
 	std::cout << expected_printout << std::endl;
 	std::cout << stream.str() << std::endl;

@@ -9,10 +9,14 @@ add_executable(${PROJECT_NAME}
 	functions.h
 	helpers.cpp
 	helpers.h
+	keyboard_input.cpp
+	keyboard_input.h
 	menus.cpp
 	menus.h
 	print.cpp
 	print.h
+	program_loop.cpp
+	program_loop.h
 	score.cpp
 	score.h
 	score_helpers.cpp

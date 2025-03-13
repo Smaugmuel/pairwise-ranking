@@ -407,3 +407,23 @@ list(APPEND test_cases
 	formatToString
 )
 addTestSuite(test_voting_format "${test_dependencies}" "${test_cases}")
+
+
+list(APPEND test_dependencies
+	mock_keyboard_input.cpp
+	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
+	${PROJECT_SOURCE_DIR}/src/functions.cpp
+	${PROJECT_SOURCE_DIR}/src/helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/menus.cpp
+	${PROJECT_SOURCE_DIR}/src/print.cpp
+	${PROJECT_SOURCE_DIR}/src/program_loop.cpp
+	${PROJECT_SOURCE_DIR}/src/score.cpp
+	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
+	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
+)
+list(APPEND test_cases
+	endToEnd_quit
+	endToEnd_combineWithInvalidFiles
+)
+addTestSuite(test_end_to_end "${test_dependencies}" "${test_cases}")

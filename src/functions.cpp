@@ -1,6 +1,5 @@
 #include "functions.h"
 
-#include <conio.h>			// _getch()
 #include <fstream>			// ifstream
 #include <unordered_set>	// unordered_set
 #include <sstream>			// stringstream
@@ -8,6 +7,7 @@
 #include "calculate_scores.h"
 #include "constants.h"
 #include "helpers.h"
+#include "keyboard_input.h"
 #include "menus.h"
 #include "print.h"
 #include "score_helpers.h"
@@ -56,22 +56,6 @@ auto parseItems(std::vector<std::string> const& lines) -> Items {
 
 } // namespace
 
-/* -------------- Command line inputs -------------- */
-auto getKey() -> char {
-	return _getch();
-}
-auto getConfirmation() -> bool {
-	while (true) {
-		char const ch = getKey();
-		if (ch == 'n') {
-			return false;
-		}
-		else if (ch == 'y') {
-			return true;
-		}
-	}
-	return false;
-}
 auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::string const& str) -> bool {
 	bool response = true;
 	if (voting_round.has_value() && !voting_round.value().isSaved()) {

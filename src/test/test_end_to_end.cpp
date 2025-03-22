@@ -1,10 +1,9 @@
 #include "testing.h"
 
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <queue>
 
+#include "mocks/output_catcher.h"
 #include "program_loop.h"
 
 extern std::queue<char> g_keys;
@@ -14,28 +13,22 @@ namespace
 {
 
 void endToEnd_quit() {
-	std::streambuf* backup;
-	std::stringstream stream;
-	backup = std::cout.rdbuf(stream.rdbuf());
-
 	g_keys.push('q');
+
+	OutputCatcher output;
+
 	programLoop();
 
-	std::cout.rdbuf(backup);
-
-	ASSERT_EQ(stream.str(), std::string{"Welcome! Press H if you need help: 113\n"});
+	ASSERT_EQ(output, std::string{"Welcome! Press H if you need help: 113\n"});
 }
 void endToEnd_combineWithInvalidFiles() {
-	std::streambuf* backup;
-	std::stringstream stream;
-	backup = std::cout.rdbuf(stream.rdbuf());
-
 	g_keys.push('c');
 	g_lines.push("file1 file2");
 	g_keys.push('q');
-	programLoop();
 
-	std::cout.rdbuf(backup);
+	OutputCatcher output;
+
+	programLoop();
 
 	std::string const expected_printout{
 		"Welcome! Press H if you need help: 99\n"
@@ -46,9 +39,7 @@ void endToEnd_combineWithInvalidFiles() {
 		"Error: Failed to combine scores\n"
 		"Press H if you need help: 113\n"
 	};
-	std::cout << expected_printout << std::endl;
-	std::cout << stream.str() << std::endl;
-	ASSERT_EQ(stream.str(), expected_printout);
+	ASSERT_EQ(output, expected_printout);
 }
 
 } // namespace

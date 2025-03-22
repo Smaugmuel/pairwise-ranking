@@ -410,7 +410,7 @@ addTestSuite(test_voting_format "${test_dependencies}" "${test_cases}")
 
 
 list(APPEND test_dependencies
-	mock_keyboard_input.cpp
+	mocks/mock_keyboard_input.cpp
 	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
 	${PROJECT_SOURCE_DIR}/src/functions.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp

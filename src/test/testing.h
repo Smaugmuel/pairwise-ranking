@@ -13,50 +13,14 @@ namespace detail
 
 void assert_true(bool val, std::source_location const& location);
 
-template<typename T>
-void assert_eq(T const& a, T const& b, std::source_location const& location) {
+template<typename A, typename B>
+void assert_eq(A const& a, B const& b, std::source_location const& location) {
 	assert_true(a == b, location);
 }
-template<typename T>
-void assert_ne(T const& a, T const& b, std::source_location const& location) {
+template<typename A, typename B>
+void assert_ne(A const& a, B const& b, std::source_location const& location) {
 	assert_true(a != b, location);
 }
-
-template<typename T>
-void assert_eq(std::optional<T> const& a, std::optional<T> const& b, std::source_location const& location) {
-	if (a == b) {
-		return;
-	}
-	if (!a.has_value()) {
-		assert_true(false, location);
-		return;
-	}
-	if (!b.has_value()) {
-		assert_true(false, location);
-		return;
-	}
-	assert_true(false, location);
-}
-template<typename T>
-void assert_ne(std::optional<T> const& a, std::optional<T> const& b, std::source_location const& location) {
-	if (!a.has_value() && !b.has_value()) {
-		assert_true(false, location);
-		return;
-	}
-	if (a.has_value() && b.has_value()) {
-		assert_ne(a.value() == b.value(), location);
-	}
-}
-template<typename T>
-void assert_eq(std::optional<T> const& a, std::nullopt_t const& b, std::source_location const& location) {
-	assert_true(!a.has_value(), location);
-}
-template<typename T>
-void assert_ne(std::optional<T> const& a, std::nullopt_t const& b, std::source_location const& location) {
-	assert_true(a.has_value(), location);
-}
-void assert_eq(std::nullopt_t const& a, std::nullopt_t const& b, std::source_location const& location);
-void assert_ne(std::nullopt_t const& a, std::nullopt_t const& b, std::source_location const& location);
 
 } // namespace detail
 

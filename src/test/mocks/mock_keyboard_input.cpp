@@ -14,7 +14,12 @@ auto getKey() -> char {
 	return key;
 }
 auto getConfirmation() -> bool {
-	return {};
+	if (g_keys.empty()) {
+		exit(1);
+	}
+	auto const key = g_keys.front();
+	g_keys.pop();
+	return key == 'y';
 }
 auto getLine() -> std::string {
 	if (g_lines.empty()) {

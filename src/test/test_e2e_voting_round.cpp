@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <filesystem>
 
 #include "calculate_scores.h"
 #include "helpers.h"
@@ -59,6 +60,8 @@ void votingRoundIsTheSameAfterLoading() {
 		ASSERT_EQ(voting_round.value().currentMatchup().value().item_a, matchup.value().item_a);
 		ASSERT_EQ(voting_round.value().currentMatchup().value().item_b, matchup.value().item_b);
 		ASSERT_EQ(voting_round.value().currentVotingLine().value(), voting_line.value());
+
+		std::filesystem::remove(file_name);
 	}
 }
 void scoresAreTheSameDespiteDifferentItemOrderAndSeed() {

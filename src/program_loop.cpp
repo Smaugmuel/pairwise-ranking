@@ -33,7 +33,7 @@ void programLoop() {
 		}
 		else if (ch == 'n') {
 			if (!continueWithoutSaving(voting_round, "create new voting round")) {
-				break;
+				continue;
 			}
 			newRound(voting_round);
 		}

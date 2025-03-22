@@ -424,6 +424,14 @@ list(APPEND test_dependencies
 )
 list(APPEND test_cases
 	endToEnd_quit
+	endToEnd_continueWithoutSavingWhenCreatingNewRound
+	endToEnd_continueWithoutSavingCancelWhenCreatingNewRound
+	endToEnd_continueWithoutSavingWhenLoadingRound
+	endToEnd_continueWithoutSavingCancelWhenLoadingRound
+	endToEnd_continueWithoutSavingWhenQuitting
+	endToEnd_continueWithoutSavingCancelWhenQuitting
+	endToEnd_loadEmptyRound
+	endToEnd_combine
 	endToEnd_combineWithInvalidFiles
 )
 addTestSuite(test_end_to_end "${test_dependencies}" "${test_cases}")

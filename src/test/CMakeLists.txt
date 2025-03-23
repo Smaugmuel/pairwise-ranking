@@ -424,13 +424,13 @@ list(APPEND test_dependencies
 )
 list(APPEND test_cases
 	endToEnd_quit
-	endToEnd_continueWithoutSavingWhenCreatingNewRound
-	endToEnd_continueWithoutSavingCancelWhenCreatingNewRound
-	endToEnd_continueWithoutSavingWhenLoadingRound
-	endToEnd_continueWithoutSavingCancelWhenLoadingRound
-	endToEnd_continueWithoutSavingWhenQuitting
-	endToEnd_continueWithoutSavingCancelWhenQuitting
-	endToEnd_loadEmptyRound
+	endToEnd_quitWhenUnsaved
+	endToEnd_quitWhenUnsavedThenCancel
+	endToEnd_createNewRoundWhenUnsaved
+	endToEnd_createNewRoundWhenUnsavedThenCancel
+	endToEnd_loadNonExistingRound
+	endToEnd_loadRoundWhenUnsaved
+	endToEnd_loadRoundWhenUnsavedThenCancel
 	endToEnd_saveBeforeCreatingRound
 	endToEnd_saveRoundWithNoVotes
 	endToEnd_saveRoundWithVotes
@@ -441,6 +441,9 @@ list(APPEND test_cases
 	endToEnd_undoWithoutVotes
 	endToEnd_undoScoreVote
 	endToEnd_undoRankVote
+	endToEnd_printWhenNoExistingRound
+	endToEnd_printScore
+	endToEnd_printRank
 	endToEnd_combine
 	endToEnd_combineWithInvalidFiles
 )

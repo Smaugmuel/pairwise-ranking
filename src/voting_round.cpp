@@ -614,7 +614,7 @@ auto VotingRound::currentVotingLine() const -> std::optional<std::string> {
 	return counterStringImpl() + " "
 		"H: help. "
 		"A: \'" + matchup.value().item_a + "\'." + std::string(padding_length_a, ' ') + " "
-		"B: \'" + matchup.value().item_b + "\'." + std::string(padding_length_b, ' ') + " Your choice: ";
+		"B: \'" + matchup.value().item_b + "\'." + std::string(padding_length_b, ' ');
 }
 auto VotingRound::hasRemainingVotes() const -> bool {
 	return hasRemainingVotesImpl();

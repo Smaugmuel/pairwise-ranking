@@ -22,7 +22,7 @@ auto activeMenuString(std::optional<VotingRound> const& voting_round, bool const
 
 	auto const current_voting_line = voting_round.value().currentVotingLine();
 	if (current_voting_line.has_value()) {
-		menu += current_voting_line.value();
+		menu += current_voting_line.value() + " Your choice: ";
 	}
 	return menu;
 }

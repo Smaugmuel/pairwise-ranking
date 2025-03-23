@@ -20,13 +20,14 @@ enum class KeyAction {
 	NewRound = 'n',
 	LoadRound = 'l',
 	FullRound = 'f',
-	RankedRound = 'r',
+	RankedRound = 'i',
 	Save = 's',
 	Yes = 'y',
 	No = 'n',
 	VoteA = 'a',
 	VoteB = 'b',
 	Undo = 'u',
+	Print = 'p',
 	Combine = 'c',
 	Help = 'h'
 };
@@ -77,80 +78,7 @@ void endToEnd_quit() {
 	ASSERT_TRUE(catcher.contains("Welcome! Press H if you need help"));
 	ASSERT_TRUE(allActionsCompleted());
 }
-void endToEnd_continueWithoutSavingWhenCreatingNewRound() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::NewRound);
-	appendAction(KeyAction::Yes);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Yes);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to create new voting round?"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void endToEnd_continueWithoutSavingCancelWhenCreatingNewRound() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::NewRound);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Yes);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to create new voting round?"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void endToEnd_continueWithoutSavingWhenLoadingRound() {
-	createItemsFile(2);
-	createVotesFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::LoadRound);
-	appendAction(KeyAction::Yes);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to load a voting round?"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void endToEnd_continueWithoutSavingCancelWhenLoadingRound() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::LoadRound);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Yes);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to load a voting round?"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void endToEnd_continueWithoutSavingWhenQuitting() {
+void endToEnd_quitWhenUnsaved() {
 	createItemsFile(2);
 
 	appendAction(KeyAction::NewRound);
@@ -166,7 +94,7 @@ void endToEnd_continueWithoutSavingWhenQuitting() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-void endToEnd_continueWithoutSavingCancelWhenQuitting() {
+void endToEnd_quitWhenUnsavedThenCancel() {
 	createItemsFile(2);
 
 	appendAction(KeyAction::NewRound);
@@ -184,7 +112,100 @@ void endToEnd_continueWithoutSavingCancelWhenQuitting() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-void endToEnd_loadEmptyRound() {
+void endToEnd_help() {
+	appendAction(KeyAction::Help);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Display this [H]elp menu"));
+	ASSERT_TRUE(catcher.contains("[Q]uit program"));
+	ASSERT_TRUE(catcher.contains("Start a [N]ew voting round"));
+	ASSERT_TRUE(catcher.contains("[L]oad started voting round"));
+	ASSERT_TRUE(catcher.contains("[S]ave votes and scores"));
+	ASSERT_TRUE(catcher.contains("Vote for option [A]"));
+	ASSERT_TRUE(catcher.contains("Vote for option [B]"));
+	ASSERT_TRUE(catcher.contains("[U]ndo last vote"));
+	ASSERT_TRUE(catcher.contains("[P]rint scores"));
+	ASSERT_TRUE(catcher.contains("[C]ombine previously saved scores"));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_createNewRoundWhenUnsaved() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::Yes);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to create new voting round?"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_createNewRoundWhenUnsavedThenCancel() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to create new voting round?"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_loadRoundWhenUnsaved() {
+	createItemsFile(2);
+	createVotesFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::LoadRound);
+	appendAction(KeyAction::Yes);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to load a voting round?"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_loadRoundWhenUnsavedThenCancel() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::LoadRound);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to load a voting round?"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_loadNonExistingRound() {
 	appendAction(KeyAction::LoadRound);
 	appendAction(KeyAction::Quit);
 
@@ -366,6 +387,53 @@ void endToEnd_undoRankVote() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
+void endToEnd_printWhenNoExistingRound() {
+	appendAction(KeyAction::Print);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No voting round to print"));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_printScore() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Print);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Item"));
+	ASSERT_TRUE(catcher.contains("Wins"));
+	ASSERT_TRUE(catcher.contains("Losses"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_printRank() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::Print);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("<-- sorted until here"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
 void endToEnd_combine() {
 	std::string const file_name_1{ "temp_scores1.txt" };
 	std::string const file_name_2{ "temp_scores2.txt" };
@@ -414,13 +482,13 @@ void endToEnd_combineWithInvalidFiles() {
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_quit);
-	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingWhenCreatingNewRound);
-	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingCancelWhenCreatingNewRound);
-	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingWhenLoadingRound);
-	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingCancelWhenLoadingRound);
-	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingWhenQuitting);
-	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingCancelWhenQuitting);
-	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_loadEmptyRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_quitWhenUnsaved);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_quitWhenUnsavedThenCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_createNewRoundWhenUnsaved);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_createNewRoundWhenUnsavedThenCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_loadNonExistingRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_loadRoundWhenUnsaved);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_loadRoundWhenUnsavedThenCancel);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveBeforeCreatingRound);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveRoundWithNoVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveRoundWithVotes);
@@ -431,6 +499,9 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_undoWithoutVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_undoScoreVote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_undoRankVote);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_printWhenNoExistingRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_printScore);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_printRank);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combine);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineWithInvalidFiles);
 	return 1;

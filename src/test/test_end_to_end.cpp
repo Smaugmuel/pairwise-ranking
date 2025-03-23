@@ -20,6 +20,7 @@ enum class KeyAction {
 	NewRound = 'n',
 	FullRound = 'f',
 	LoadRound = 'l',
+	Save = 's',
 	Yes = 'y',
 	No = 'n',
 	VoteA = 'a',
@@ -57,9 +58,10 @@ void createVotesFile(uint32_t number_of_items) {
 		"full\n";
 	votes_file.close();
 }
-void cleanUp() {
+void cleanUpFiles() {
 	std::filesystem::remove(kItemsFile);
 	std::filesystem::remove(kVotesFile);
+	std::filesystem::remove(kScoresFile);
 }
 
 void endToEnd_quit() {
@@ -89,7 +91,7 @@ void endToEnd_continueWithoutSavingWhenCreatingNewRound() {
 
 	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to create new voting round?"));
 	ASSERT_TRUE(allActionsCompleted());
-	cleanUp();
+	cleanUpFiles();
 }
 void endToEnd_continueWithoutSavingCancelWhenCreatingNewRound() {
 	createItemsFile(2);
@@ -107,7 +109,7 @@ void endToEnd_continueWithoutSavingCancelWhenCreatingNewRound() {
 
 	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to create new voting round?"));
 	ASSERT_TRUE(allActionsCompleted());
-	cleanUp();
+	cleanUpFiles();
 }
 void endToEnd_continueWithoutSavingWhenLoadingRound() {
 	createItemsFile(2);
@@ -125,7 +127,7 @@ void endToEnd_continueWithoutSavingWhenLoadingRound() {
 
 	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to load a voting round?"));
 	ASSERT_TRUE(allActionsCompleted());
-	cleanUp();
+	cleanUpFiles();
 }
 void endToEnd_continueWithoutSavingCancelWhenLoadingRound() {
 	createItemsFile(2);
@@ -143,7 +145,7 @@ void endToEnd_continueWithoutSavingCancelWhenLoadingRound() {
 
 	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to load a voting round?"));
 	ASSERT_TRUE(allActionsCompleted());
-	cleanUp();
+	cleanUpFiles();
 }
 void endToEnd_continueWithoutSavingWhenQuitting() {
 	createItemsFile(2);
@@ -159,7 +161,7 @@ void endToEnd_continueWithoutSavingWhenQuitting() {
 
 	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to quit?"));
 	ASSERT_TRUE(allActionsCompleted());
-	cleanUp();
+	cleanUpFiles();
 }
 void endToEnd_continueWithoutSavingCancelWhenQuitting() {
 	createItemsFile(2);
@@ -177,7 +179,7 @@ void endToEnd_continueWithoutSavingCancelWhenQuitting() {
 
 	ASSERT_TRUE(catcher.contains("You have unsaved data. Do you still wish to quit?", 2));
 	ASSERT_TRUE(allActionsCompleted());
-	cleanUp();
+	cleanUpFiles();
 }
 void endToEnd_loadEmptyRound() {
 	appendAction(KeyAction::LoadRound);
@@ -189,7 +191,58 @@ void endToEnd_loadEmptyRound() {
 
 	ASSERT_TRUE(catcher.contains("No lines loaded"));
 	ASSERT_TRUE(allActionsCompleted());
-	cleanUp();
+	cleanUpFiles();
+}
+void endToEnd_saveBeforeCreatingRound() {
+	appendAction(KeyAction::Save);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No voting round to save from"));
+	ASSERT_FALSE(std::filesystem::exists(kVotesFile));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_saveRoundWithNoVotes() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Save);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Votes saved to " + kVotesFile + "."));
+	ASSERT_TRUE(catcher.contains("Could not save scores to " + kScoresFile + "."));
+	ASSERT_TRUE(std::filesystem::exists(kVotesFile));
+	ASSERT_FALSE(std::filesystem::exists(kScoresFile));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_saveRoundWithVotes() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Votes saved to " + kVotesFile + "."));
+	ASSERT_TRUE(catcher.contains("Scores saved to " + kScoresFile + "."));
+	ASSERT_TRUE(std::filesystem::exists(kVotesFile));
+	ASSERT_TRUE(std::filesystem::exists(kScoresFile));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
 }
 void endToEnd_combine() {
 	std::string const file_name_1{ "temp_scores1.txt" };
@@ -246,6 +299,9 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingWhenQuitting);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_continueWithoutSavingCancelWhenQuitting);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_loadEmptyRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveBeforeCreatingRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveRoundWithNoVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveRoundWithVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combine);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineWithInvalidFiles);
 	return 1;

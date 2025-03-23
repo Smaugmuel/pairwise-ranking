@@ -431,6 +431,9 @@ list(APPEND test_cases
 	endToEnd_continueWithoutSavingWhenQuitting
 	endToEnd_continueWithoutSavingCancelWhenQuitting
 	endToEnd_loadEmptyRound
+	endToEnd_saveBeforeCreatingRound
+	endToEnd_saveRoundWithNoVotes
+	endToEnd_saveRoundWithVotes
 	endToEnd_combine
 	endToEnd_combineWithInvalidFiles
 )

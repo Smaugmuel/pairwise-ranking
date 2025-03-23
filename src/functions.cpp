@@ -5,7 +5,6 @@
 #include <sstream>			// stringstream
 
 #include "calculate_scores.h"
-#include "constants.h"
 #include "helpers.h"
 #include "keyboard_input.h"
 #include "menus.h"
@@ -69,37 +68,19 @@ auto continueWithoutSaving(std::optional<VotingRound> const& voting_round, std::
 }
 
 /* -------------- Menu alternatives -------------- */
-void newRound(std::optional<VotingRound>& voting_round) {
-	std::vector<std::string> const lines = loadFile(kItemsFile);
-	if (lines.size() < 2) {
-		return;
-	}
-
-	// Print voting formats
-	print(newRoundFormatString(static_cast<uint32_t>(lines.size())));
-
-	// Choose voting format
-	char ch{};
-	while (true) {
-		ch = getKey();
-		if (ch == 'f' || ch == 'r' || ch == 'c' || ch == 'i') {
-			break;
-		}
-	}
-	print(std::string() + ch);
-	VotingFormat const format{ characterToVotingFormat(ch) };
+auto newRound(VotingFormat format, Items const& items) -> std::optional<VotingRound> {
 	if (format == VotingFormat::Invalid) {
-		return;
+		return std::nullopt;
 	}
 
 	// Create voting round
-	Items items = parseItems(lines);
-	voting_round = VotingRound::create(items, format);
+	auto voting_round = VotingRound::create(items, format);
 	if (!voting_round.has_value()) {
 		printError("Could not generate voting round");
-		return;
+		return std::nullopt;
 	}
 	voting_round.value().shuffle();
+	return voting_round;
 }
 void loadRound(std::optional<VotingRound>& voting_round, std::vector<std::string> const& lines) {
 	std::optional<VotingRound> loaded_voting_round = VotingRound::create(lines);

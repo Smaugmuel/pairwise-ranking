@@ -18,12 +18,15 @@ namespace
 enum class KeyAction {
 	Quit = 'q',
 	NewRound = 'n',
-	FullRound = 'f',
 	LoadRound = 'l',
+	FullRound = 'f',
+	RankedRound = 'r',
 	Save = 's',
 	Yes = 'y',
 	No = 'n',
 	VoteA = 'a',
+	VoteB = 'b',
+	Undo = 'u',
 	Combine = 'c',
 	Help = 'h'
 };
@@ -244,6 +247,125 @@ void endToEnd_saveRoundWithVotes() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
+void endToEnd_voteWithoutRound() {
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::VoteB);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No voting round to vote in", 2));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_voteWhenVotesRemain() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Yes);
+	appendAction(KeyAction::VoteB);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("No voting round to vote in"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_voteWhenNoVotesRemain() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::VoteB);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No votes pending", 2));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_undoWithoutRound() {
+	appendAction(KeyAction::Undo);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No voting round to undo from"));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_undoWithoutVotes() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Undo);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No votes to undo"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_undoScoreVote() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Undo);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("No voting round to undo from"));
+	ASSERT_FALSE(catcher.contains("No votes to undo"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_undoRankVote() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Undo);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("No voting round to undo from"));
+	ASSERT_FALSE(catcher.contains("No votes to undo"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
 void endToEnd_combine() {
 	std::string const file_name_1{ "temp_scores1.txt" };
 	std::string const file_name_2{ "temp_scores2.txt" };
@@ -263,6 +385,7 @@ void endToEnd_combine() {
 	programLoop();
 	catcher.stop();
 
+	ASSERT_TRUE(catcher.contains("Saved combined scores to '" + kCombinedScoresFile + "'"));
 	ASSERT_TRUE(catcher.contains("Saved combined scores to '" + kCombinedScoresFile + "'"));
 	ASSERT_TRUE(std::filesystem::exists(kCombinedScoresFile));
 	ASSERT_TRUE(allActionsCompleted());
@@ -286,7 +409,6 @@ void endToEnd_combineWithInvalidFiles() {
 	ASSERT_TRUE(allActionsCompleted());
 }
 
-
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -302,6 +424,13 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveBeforeCreatingRound);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveRoundWithNoVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_saveRoundWithVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_voteWithoutRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_voteWhenVotesRemain);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_voteWhenNoVotesRemain);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_undoWithoutRound);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_undoWithoutVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_undoScoreVote);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_undoRankVote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combine);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineWithInvalidFiles);
 	return 1;

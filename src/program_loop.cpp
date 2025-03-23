@@ -92,7 +92,9 @@ void programLoop() {
 				printError("No voting round to undo from");
 				continue;
 			}
-			voting_round.value().undoVote();
+			if (!voting_round.value().undoVote()) {
+				printError("No votes to undo");
+			}
 		}
 		else if (ch == 'c') {
 			print("Specify two or more files, e.g. \"file_1.txt file_2.txt\", without the quotation marks (\"): ", false);

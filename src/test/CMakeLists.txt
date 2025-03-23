@@ -410,7 +410,7 @@ addTestSuite(test_voting_format "${test_dependencies}" "${test_cases}")
 
 
 list(APPEND test_dependencies
-	mocks/mock_keyboard_input.cpp
+	${PROJECT_SOURCE_DIR}/src/test/mocks/mock_keyboard_input.cpp
 	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
 	${PROJECT_SOURCE_DIR}/src/functions.cpp
 	${PROJECT_SOURCE_DIR}/src/helpers.cpp
@@ -426,25 +426,28 @@ list(APPEND test_cases
 	endToEnd_quit
 	endToEnd_quitWhenUnsaved
 	endToEnd_quitWhenUnsavedThenCancel
-	endToEnd_createNewRoundWhenUnsaved
-	endToEnd_createNewRoundWhenUnsavedThenCancel
-	endToEnd_loadNonExistingRound
-	endToEnd_loadRoundWhenUnsaved
-	endToEnd_loadRoundWhenUnsavedThenCancel
-	endToEnd_saveBeforeCreatingRound
-	endToEnd_saveRoundWithNoVotes
-	endToEnd_saveRoundWithVotes
-	endToEnd_voteWithoutRound
-	endToEnd_voteWhenVotesRemain
-	endToEnd_voteWhenNoVotesRemain
-	endToEnd_undoWithoutRound
-	endToEnd_undoWithoutVotes
+	endToEnd_loadVotingRound
+	endToEnd_loadVotingRoundThenCancel
+	endToEnd_loadVotingRoundFromBlankFileName
+	endToEnd_loadNonExistingVotingRound
+	endToEnd_loadVotingRoundFromEmptyFile
+	endToEnd_loadVotingRoundFromInvalidFile
+	endToEnd_saveVotingRound
+	endToEnd_saveScores
+	endToEnd_saveRanking
+	endToEnd_vote
+	endToEnd_voteWhenVotingRoundCompleted
+	endToEnd_undoWithNoVotes
 	endToEnd_undoScoreVote
 	endToEnd_undoRankVote
-	endToEnd_printWhenNoExistingRound
 	endToEnd_printScore
 	endToEnd_printRank
 	endToEnd_combine
-	endToEnd_combineWithInvalidFiles
+	endToEnd_combineCancel
+	endToEnd_combineThenPrintScores
+	endToEnd_combineThenSaveScores
+	endToEnd_combineThenSaveScoresCancel
+	endToEnd_combineWithTooFewFiles
+	endToEnd_combineWithNonExistingFiles
 )
 addTestSuite(test_end_to_end "${test_dependencies}" "${test_cases}")

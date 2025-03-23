@@ -15,7 +15,7 @@ void noVotingRoundCreated() {
 void votingRoundStarted() {
 	auto const voting_round = VotingRound::create(getNItems(2), VotingFormat::Full);
 	ASSERT_EQ(activeMenuString(voting_round, false),
-			  std::string{ "(1/1) H: help. A: \'item1\'. B: \'item2\'. Your choice: " });
+			  std::string{ "(1/1) A: \'item1\'. B: \'item2\'. Your choice: " });
 }
 void votingRoundCompleted() {
 	auto voting_round = VotingRound::create(getNItems(2), VotingFormat::Full);

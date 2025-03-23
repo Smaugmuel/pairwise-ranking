@@ -612,7 +612,6 @@ auto VotingRound::currentVotingLine() const -> std::optional<std::string> {
 	auto const padding_length_b = max_length - length_b;
 
 	return counterStringImpl() + " "
-		"H: help. "
 		"A: \'" + matchup.value().item_a + "\'." + std::string(padding_length_a, ' ') + " "
 		"B: \'" + matchup.value().item_b + "\'." + std::string(padding_length_b, ' ');
 }

@@ -434,6 +434,13 @@ list(APPEND test_cases
 	endToEnd_saveBeforeCreatingRound
 	endToEnd_saveRoundWithNoVotes
 	endToEnd_saveRoundWithVotes
+	endToEnd_voteWithoutRound
+	endToEnd_voteWhenVotesRemain
+	endToEnd_voteWhenNoVotesRemain
+	endToEnd_undoWithoutRound
+	endToEnd_undoWithoutVotes
+	endToEnd_undoScoreVote
+	endToEnd_undoRankVote
 	endToEnd_combine
 	endToEnd_combineWithInvalidFiles
 )

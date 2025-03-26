@@ -76,6 +76,129 @@ void cleanUpFiles() {
 	std::filesystem::remove(kTestCombinedScoresFile);
 }
 
+void endToEnd_mainMenuLegendPrintedOnce() {
+	// Repeat an invalid key
+	for (uint32_t i = 0; i < 10; i++) {
+		appendAction(KeyAction::VoteA);
+	}
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Pairwise ranking"));
+	ASSERT_FALSE(catcher.contains("Pairwise ranking", 2));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_newVotingRoundSelectItemsPromptPrintedEachTime() {
+	appendAction(KeyAction::NewRound);
+	for (uint32_t i = 0; i < 10; i++) {
+		appendLine("");
+	}
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Select file to load items from", 11));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_newVotingRoundSelectItemsCancel() {
+	appendAction(KeyAction::NewRound);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	programLoop();
+
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_newVotingRoundSelectItemsNonExistingFile() {
+	appendAction(KeyAction::NewRound);
+	appendLine("non_existing_file.txt");
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("File 'non_existing_file.txt' does not exist"));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void endToEnd_newVotingRoundSelectItemsTooFewItems() {
+	createItemsFile(1);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Too few items in '" + std::string{ kTestItemsFile } + "'. At least two expected."));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_newVotingRoundSelectFormatLegendPrintedOnce() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	// Repeat an invalid key
+	for (uint32_t i = 0; i < 10; i++) {
+		appendAction(KeyAction::VoteA);
+	}
+	appendAction(KeyAction::Cancel);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Select voting format"));
+	ASSERT_FALSE(catcher.contains("Select voting format", 2));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_newVotingRoundSelectFormatCancel() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::Cancel);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void endToEnd_newVotingRoundSelectFormatPrintHelp() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::Help);
+	appendAction(KeyAction::Cancel);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Score-based voting will"));
+	ASSERT_TRUE(catcher.contains("Rank-based voting will"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+
 void endToEnd_quit() {
 	appendAction(KeyAction::Quit);
 
@@ -615,6 +738,15 @@ void endToEnd_combineWithNonExistingFiles() {
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
 	cleanUpFiles();
+
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_mainMenuLegendPrintedOnce);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_newVotingRoundSelectItemsPromptPrintedEachTime);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_newVotingRoundSelectItemsCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_newVotingRoundSelectItemsNonExistingFile);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_newVotingRoundSelectItemsTooFewItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_newVotingRoundSelectFormatLegendPrintedOnce);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_newVotingRoundSelectFormatCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_newVotingRoundSelectFormatPrintHelp);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_quit);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_quitWhenUnsaved);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_quitWhenUnsavedThenCancel);

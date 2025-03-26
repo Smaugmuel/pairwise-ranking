@@ -423,6 +423,14 @@ list(APPEND test_dependencies
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
 )
 list(APPEND test_cases
+	endToEnd_mainMenuLegendPrintedOnce
+	endToEnd_newVotingRoundSelectItemsPromptPrintedEachTime
+	endToEnd_newVotingRoundSelectItemsCancel
+	endToEnd_newVotingRoundSelectItemsNonExistingFile
+	endToEnd_newVotingRoundSelectItemsTooFewItems
+	endToEnd_newVotingRoundSelectFormatLegendPrintedOnce
+	endToEnd_newVotingRoundSelectFormatCancel
+	endToEnd_newVotingRoundSelectFormatPrintHelp
 	endToEnd_quit
 	endToEnd_quitWhenUnsaved
 	endToEnd_quitWhenUnsavedThenCancel

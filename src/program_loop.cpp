@@ -79,8 +79,8 @@ void selectItemsFileState(ProgramState& state, Items& items) {
 		return;
 	}
 	auto loaded_items = loadFile(file_name);
-	if (loaded_items.empty()) {
-		printError("No items found in '" + file_name + "'");
+	if (loaded_items.size() < 2) {
+		printError("Too few items in '" + file_name + "'. At least two expected.");
 		return;
 	}
 

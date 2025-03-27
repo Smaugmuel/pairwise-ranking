@@ -12,19 +12,17 @@ public:
 	auto output() const -> std::string {
 		return stream.str();
 	}
-	auto contains(std::string const& str, size_t occurrences = 1) const -> bool {
-		if (occurrences == 0) {
-			return output().find(str) == std::string::npos;
+	auto contains(std::string const& str) const -> bool {
+		return output().find(str) != std::string::npos;
+	}
+	auto occurrences(std::string const& str) const -> uint32_t {
+		size_t offset = output().find(str, 0);
+		uint32_t count = 0;
+		while (offset != std::string::npos) {
+			count++;
+			offset = output().find(str, offset + str.size());
 		}
-		size_t offset = 0;
-		for (size_t i = 0; i < occurrences; i++) {
-			size_t idx = output().find(str, offset);
-			if (idx == std::string::npos) {
-				return false;
-			}
-			offset = idx + str.size();
-		}
-		return true;
+		return count;
 	}
 private:
 	std::stringstream stream{};

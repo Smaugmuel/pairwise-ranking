@@ -101,8 +101,7 @@ void mainMenuLegendNotReprinted() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("Pairwise ranking"));
-	ASSERT_FALSE(catcher.contains("Pairwise ranking", 2));
+	ASSERT_EQ(catcher.occurrences("Pairwise ranking"), 1);
 	ASSERT_TRUE(allActionsCompleted());
 }
 void mainMenuNewVotingRound() {
@@ -165,7 +164,7 @@ void newVotingRoundSelectItemsPromptPrintedEachTime() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("Select file to load items from", 11));
+	ASSERT_EQ(catcher.occurrences("Select file to load items from"), 11);
 	ASSERT_TRUE(allActionsCompleted());
 }
 void newVotingRoundSelectItemsEmptyFileName() {
@@ -291,8 +290,7 @@ void newVotingRoundSelectFormatLegendNotReprinted() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("Select voting format"));
-	ASSERT_FALSE(catcher.contains("Select voting format", 2));
+	ASSERT_EQ(catcher.occurrences("Select voting format"), 1);
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
@@ -385,7 +383,7 @@ void quitWhenUnsavedThenCancel() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("You have unsaved progress", 2));
+	ASSERT_EQ(catcher.occurrences("You have unsaved progress"), 2);
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
@@ -399,7 +397,7 @@ void loadVotingRoundFromEmptyFileName() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("Select file name to load voting round from", 2));
+	ASSERT_EQ(catcher.occurrences("Select file name to load voting round from"), 2);
 	ASSERT_TRUE(catcher.contains("No file name selected"));
 	ASSERT_TRUE(allActionsCompleted());
 }
@@ -596,8 +594,8 @@ void voteWhenVotingRoundCompleted() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("Can't vote. Voting round is completed.", 2));
-	ASSERT_TRUE(catcher.contains("Voting round completed", 3));
+	ASSERT_EQ(catcher.occurrences("Can't vote. Voting round is completed."), 2);
+	ASSERT_EQ(catcher.occurrences("Voting round completed"), 3);
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
@@ -830,7 +828,7 @@ void combineThenSaveScoresCancel() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("Scores combined", 2));
+	ASSERT_EQ(catcher.occurrences("Scores combined"), 2);
 	ASSERT_TRUE(catcher.contains("Select file name to save combined scores to"));
 	ASSERT_FALSE(catcher.contains("Saved combined scores"));
 	ASSERT_TRUE(allActionsCompleted());

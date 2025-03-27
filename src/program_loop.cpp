@@ -70,6 +70,10 @@ void selectItemsFileState(ProgramState& state, Items& items) {
 	print("Select file to load items from, or just 'c' to cancel: ", false);
 
 	auto const file_name = getLine();
+	if (file_name.empty()) {
+		printError("No file name selected");
+		return;
+	}
 	if (file_name == "c" || file_name == "C") {
 		state = ProgramState::MainMenu;
 		return;
@@ -142,6 +146,7 @@ void loadVotingRoundState(ProgramState& state, std::optional<VotingRound>& votin
 
 	auto const file_name = getLine();
 	if (file_name.empty()) {
+		printError("No file name selected");
 		return;
 	}
 	if (file_name == "c" || file_name == "C") {
@@ -346,6 +351,10 @@ void combineScoresState(ProgramState& state, std::optional<Scores>& combined_sco
 	print("Select two or more score files to combine, or just 'c' to cancel: ", false);
 
 	auto const input = getLine();
+	if (input.empty()) {
+		printError("No file names selected");
+		return;
+	}
 	if (input == "c" || input == "C") {
 		state = ProgramState::MainMenu;
 		return;

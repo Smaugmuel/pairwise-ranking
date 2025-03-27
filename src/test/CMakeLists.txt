@@ -423,23 +423,32 @@ list(APPEND test_dependencies
 	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
 )
 list(APPEND test_cases
-	mainMenuLegendPrintedOnce
+	mainMenuLegendPrinted
+	mainMenuLegendNotReprinted
+	mainMenuNewVotingRound
+	mainMenuLoadVotingRound
+	mainMenuCombine
+	mainMenuQuit
 	newVotingRoundSelectItemsPromptPrintedEachTime
+	newVotingRoundSelectItemsEmptyFileName
 	newVotingRoundSelectItemsCancel
 	newVotingRoundSelectItemsNonExistingFile
 	newVotingRoundSelectItemsTooFewItems
-	newVotingRoundSelectFormatLegendPrintedOnce
+	newVotingRoundSelectItemsSuccessful
+	newVotingRoundSelectFormatLegendPrinted
+	newVotingRoundSelectFormatEstimatedVotesPrinted
+	newVotingRoundSelectFormatLegendNotReprinted
 	newVotingRoundSelectFormatCancel
 	newVotingRoundSelectFormatPrintHelp
-	quit
+	newVotingRoundSelectFormatSuccessful
 	quitWhenUnsaved
 	quitWhenUnsavedThenCancel
-	loadVotingRound
+	loadVotingRoundFromEmptyFileName
 	loadVotingRoundThenCancel
-	loadVotingRoundFromBlankFileName
 	loadNonExistingVotingRound
 	loadVotingRoundFromEmptyFile
 	loadVotingRoundFromInvalidFile
+	loadVotingRound
 	saveVotingRound
 	saveScores
 	saveRanking
@@ -450,11 +459,12 @@ list(APPEND test_cases
 	undoRankVote
 	printScore
 	printRank
+	combineEmptyFileNames
 	combine
-	combineCancel
 	combineThenPrintScores
 	combineThenSaveScores
 	combineThenSaveScoresCancel
+	combineCancel
 	combineWithTooFewFiles
 	combineWithNonExistingFiles
 )

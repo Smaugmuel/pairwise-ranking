@@ -11,15 +11,34 @@
 namespace detail
 {
 
-void assert_true(bool val, std::source_location const& location);
+void assertion_failure(std::string const& error, std::source_location const& location);
+
+auto equalityStr(std::string const& a, std::string const& b, std::string const& eq_str) -> std::string;
+
+template<typename A, typename B>
+auto equalityString(A const& a, B const& b, std::string const& eq_str) -> std::string {
+	if constexpr (std::is_integral_v<A> && std::is_integral_v<B>) {
+		return equalityStr(std::to_string(a), std::to_string(b), eq_str);
+	}
+	else if constexpr (std::is_same_v<A, std::string> && std::is_same_v<B, std::string>) {
+		return equalityStr("'" + a + "'", "'" + b + "'", eq_str);
+	}
+	return "";
+}
 
 template<typename A, typename B>
 void assert_eq(A const& a, B const& b, std::source_location const& location) {
-	assert_true(a == b, location);
+	if (a == b) {
+		return;
+	}
+	assertion_failure(equalityString(a, b, "equality"), location);
 }
 template<typename A, typename B>
 void assert_ne(A const& a, B const& b, std::source_location const& location) {
-	assert_true(a != b, location);
+	if (a != b) {
+		return;
+	}
+	assertion_failure(equalityString(a, b, "inequality"), location);
 }
 
 } // namespace detail

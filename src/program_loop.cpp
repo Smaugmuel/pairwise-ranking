@@ -176,6 +176,7 @@ void saveVotingRoundState(ProgramState& state, VotingRound& voting_round) {
 
 	auto const file_name = getLine();
 	if (file_name.empty()) {
+		printError("No file name selected");
 		return;
 	}
 	if (file_name == "c" || file_name == "C") {
@@ -209,6 +210,7 @@ void saveScoresState(ProgramState& state, VotingRound const& voting_round) {
 
 	auto const file_name = getLine();
 	if (file_name.empty()) {
+		printError("No file name selected");
 		return;
 	}
 	if (file_name == "c" || file_name == "C") {
@@ -231,6 +233,7 @@ void saveRankingState(ProgramState& state, VotingRound const& voting_round) {
 
 	auto const file_name = getLine();
 	if (file_name.empty()) {
+		printError("No file name selected");
 		return;
 	}
 	if (file_name == "c" || file_name == "C") {

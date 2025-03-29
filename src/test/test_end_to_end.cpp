@@ -5,6 +5,7 @@
 #include <string>
 #include <queue>
 
+#include "helpers.h"
 #include "mocks/output_catcher.h"
 #include "program_loop.h"
 
@@ -345,6 +346,439 @@ void newVotingRoundSelectFormatSuccessful() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
+void loadVotingRoundPromptPrintedEachTime() {
+	appendAction(KeyAction::LoadRound);
+	for (uint32_t i = 0; i < 10; i++) {
+		appendLine("");
+	}
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Select file name to load voting round from"), 11);
+	ASSERT_TRUE(allActionsCompleted());
+}
+void loadVotingRoundEmptyFileName() {
+	appendAction(KeyAction::LoadRound);
+	appendLine("");
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No file name selected"));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void loadVotingRoundCancel() {
+	appendAction(KeyAction::LoadRound);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	programLoop();
+
+	ASSERT_TRUE(allActionsCompleted());
+}
+void loadVotingRoundNonExistingFile() {
+	cleanUpFiles();
+	appendAction(KeyAction::LoadRound);
+	appendLine(kTestVotesFile);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("File '" + std::string{ kTestVotesFile } + "' does not exist"));
+	ASSERT_TRUE(allActionsCompleted());
+}
+void loadVotingRoundEmptyFile() {
+	std::ofstream votes_file(kTestVotesFile);
+	ASSERT_TRUE(votes_file.is_open());
+	votes_file.close();
+
+	appendAction(KeyAction::LoadRound);
+	appendLine(kTestVotesFile);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No lines found in '" + std::string{ kTestVotesFile } + "'"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void loadVotingRoundInvalidFile() {
+	std::ofstream votes_file(kTestVotesFile);
+	ASSERT_TRUE(votes_file.is_open());
+	votes_file << "item1\n";
+	votes_file.close();
+
+	appendAction(KeyAction::LoadRound);
+	appendLine(kTestVotesFile);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Failed to create voting round from '" + std::string{ kTestVotesFile } + "'"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void loadVotingRoundSuccessful() {
+	createVotesFile(2);
+
+	appendAction(KeyAction::LoadRound);
+	appendLine(kTestVotesFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Select file name to load voting round from"));
+	ASSERT_TRUE(catcher.contains("Voting round loaded from '" + std::string{ kTestVotesFile } + "'"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+
+void saveVotingRoundPromptPrintedEachTime() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Save);
+	for (uint32_t i = 0; i < 10; i++) {
+		appendLine("");
+	}
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Select file name to save voting round to"), 11);
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundEmptyFileName() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Save);
+	appendLine("");
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No file name selected"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundCancel() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Save);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	programLoop();
+
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+// NOTE: How to trigger this failing?
+//void saveVotingRoundFails() {
+//}
+void saveVotingRoundSuccessful() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Voting round saved to '" + std::string{ kTestVotesFile } + "'"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundScoresNoVotes() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("Select file name to save scores to"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundScoresPromptPrintedEachTime() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	for (uint32_t i = 0; i < 10; i++) {
+		appendLine("");
+	}
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Select file name to save scores to"), 11);
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundScoresEmptyFileName() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendLine("");
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No file name selected"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundScoresCancel() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	programLoop();
+
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+// NOTE: How to trigger this failing?
+//void saveVotingRoundScoresFails() {
+//}
+void saveVotingRoundScoresSuccessful() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendLine(kTestScoresFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Scores saved to '" + std::string{ kTestScoresFile } + "'"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundRankingNoVotes() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("Select file name to save ranking to"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundRankingPromptPrintedEachTime() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	for (uint32_t i = 0; i < 10; i++) {
+		appendLine("");
+	}
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Select file name to save ranking to"), 11);
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundRankingEmptyFileName() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendLine("");
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No file name selected"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundRankingCancel() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	programLoop();
+
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+// NOTE: How to trigger this failing?
+//void saveVotingRoundRankingFails() {
+//}
+void saveVotingRoundRankingSuccessful() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendLine(kTestRankingFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Ranking saved to '" + std::string{ kTestRankingFile } + "'"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void saveVotingRoundRankingSortedMarked() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendLine(kTestRankingFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	programLoop();
+
+	ASSERT_TRUE(allActionsCompleted());
+
+	auto const ranking_lines = loadFile(kTestRankingFile);
+	auto has_sorted_marker = false;
+	for (auto const& line : ranking_lines) {
+		if (line.find("<-- sorted until here") != std::string::npos) {
+			has_sorted_marker = true;
+			break;
+		}
+	}
+	ASSERT_TRUE(has_sorted_marker);
+
+	cleanUpFiles();
+}
+
 void quitWhenUnsaved() {
 	createItemsFile(2);
 
@@ -384,101 +818,6 @@ void quitWhenUnsavedThenCancel() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("You have unsaved progress"), 2);
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void loadVotingRoundFromEmptyFileName() {
-	appendAction(KeyAction::LoadRound);
-	appendLine("");
-	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_EQ(catcher.occurrences("Select file name to load voting round from"), 2);
-	ASSERT_TRUE(catcher.contains("No file name selected"));
-	ASSERT_TRUE(allActionsCompleted());
-}
-void loadVotingRoundThenCancel() {
-	appendAction(KeyAction::LoadRound);
-	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Select file name to load voting round from"));
-	ASSERT_FALSE(catcher.contains("Voting round loaded"));
-	ASSERT_TRUE(allActionsCompleted());
-}
-void loadNonExistingVotingRound() {
-	cleanUpFiles();
-	appendAction(KeyAction::LoadRound);
-	appendLine(kTestVotesFile);
-	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("File '" + std::string{ kTestVotesFile } + "' does not exist"));
-	ASSERT_TRUE(allActionsCompleted());
-}
-void loadVotingRoundFromEmptyFile() {
-	std::ofstream votes_file(kTestVotesFile);
-	ASSERT_TRUE(votes_file.is_open());
-	votes_file.close();
-
-	appendAction(KeyAction::LoadRound);
-	appendLine(kTestVotesFile);
-	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("No lines found in '" + std::string{ kTestVotesFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void loadVotingRoundFromInvalidFile() {
-	std::ofstream votes_file(kTestVotesFile);
-	ASSERT_TRUE(votes_file.is_open());
-	votes_file << "item1\n";
-	votes_file.close();
-
-	appendAction(KeyAction::LoadRound);
-	appendLine(kTestVotesFile);
-	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Failed to create voting round from '" + std::string{ kTestVotesFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void loadVotingRound() {
-	createVotesFile(2);
-
-	appendAction(KeyAction::LoadRound);
-	appendLine(kTestVotesFile);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Select file name to load voting round from"));
-	ASSERT_TRUE(catcher.contains("Voting round loaded from '" + std::string{ kTestVotesFile } + "'"));
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
@@ -904,15 +1243,28 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(newVotingRoundSelectFormatSuccessful);
 	RUN_TEST_IF_ARGUMENT_EQUALS(quitWhenUnsaved);
 	RUN_TEST_IF_ARGUMENT_EQUALS(quitWhenUnsavedThenCancel);
-	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundFromEmptyFileName);
-	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundThenCancel);
-	RUN_TEST_IF_ARGUMENT_EQUALS(loadNonExistingVotingRound);
-	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundFromEmptyFile);
-	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundFromInvalidFile);
-	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRound);
-	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRound);
-	RUN_TEST_IF_ARGUMENT_EQUALS(saveScores);
-	RUN_TEST_IF_ARGUMENT_EQUALS(saveRanking);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundPromptPrintedEachTime);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundEmptyFileName);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundNonExistingFile);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundEmptyFile);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundInvalidFile);
+	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundSuccessful);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundPromptPrintedEachTime);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundEmptyFileName);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundSuccessful);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundScoresNoVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundScoresPromptPrintedEachTime);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundScoresEmptyFileName);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundScoresCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundScoresSuccessful);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingNoVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingPromptPrintedEachTime);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingEmptyFileName);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingSuccessful);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingSortedMarked);
 	RUN_TEST_IF_ARGUMENT_EQUALS(vote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(voteWhenVotingRoundCompleted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(undoWithNoVotes);

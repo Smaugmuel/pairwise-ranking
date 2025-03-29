@@ -443,15 +443,28 @@ list(APPEND test_cases
 	newVotingRoundSelectFormatSuccessful
 	quitWhenUnsaved
 	quitWhenUnsavedThenCancel
-	loadVotingRoundFromEmptyFileName
-	loadVotingRoundThenCancel
-	loadNonExistingVotingRound
-	loadVotingRoundFromEmptyFile
-	loadVotingRoundFromInvalidFile
-	loadVotingRound
-	saveVotingRound
-	saveScores
-	saveRanking
+	loadVotingRoundPromptPrintedEachTime
+	loadVotingRoundEmptyFileName
+	loadVotingRoundCancel
+	loadVotingRoundNonExistingFile
+	loadVotingRoundEmptyFile
+	loadVotingRoundInvalidFile
+	loadVotingRoundSuccessful
+	saveVotingRoundPromptPrintedEachTime
+	saveVotingRoundEmptyFileName
+	saveVotingRoundCancel
+	saveVotingRoundSuccessful
+	saveVotingRoundScoresNoVotes
+	saveVotingRoundScoresPromptPrintedEachTime
+	saveVotingRoundScoresEmptyFileName
+	saveVotingRoundScoresCancel
+	saveVotingRoundScoresSuccessful
+	saveVotingRoundRankingNoVotes
+	saveVotingRoundRankingPromptPrintedEachTime
+	saveVotingRoundRankingEmptyFileName
+	saveVotingRoundRankingCancel
+	saveVotingRoundRankingSuccessful
+	saveVotingRoundRankingSortedMarked
 	vote
 	voteWhenVotingRoundCompleted
 	undoWithNoVotes

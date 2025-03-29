@@ -26,31 +26,22 @@ auto equalityString(A const& a, B const& b, std::string const& eq_str) -> std::s
 	return "";
 }
 
-template<typename A, typename B>
-void assert_eq(A const& a, B const& b, std::source_location const& location) {
-	if (a == b) {
-		return;
-	}
-	assertion_failure(equalityString(a, b, "equality"), location);
-}
-template<typename A, typename B>
-void assert_ne(A const& a, B const& b, std::source_location const& location) {
-	if (a != b) {
-		return;
-	}
-	assertion_failure(equalityString(a, b, "inequality"), location);
-}
-
 } // namespace detail
 
 /* -------------- Assertions to use in tests -------------- */
 template<typename A, typename B>
 void ASSERT_EQ(A const& a, B const& b, std::source_location const location = std::source_location::current()) {
-	detail::assert_eq(a, b, location);
+	if (a == b) {
+		return;
+	}
+	detail::assertion_failure(detail::equalityString(a, b, "equality"), location);
 }
 template<typename T>
 void ASSERT_NE(T const& a, T const& b, std::source_location const location = std::source_location::current()) {
-	detail::assert_ne(a, b, location);
+	if (a != b) {
+		return;
+	}
+	detail::assertion_failure(detail::equalityString(a, b, "inequality"), location);
 }
 void ASSERT_TRUE(bool a, std::source_location const location = std::source_location::current());
 void ASSERT_FALSE(bool a, std::source_location const location = std::source_location::current());

@@ -388,14 +388,17 @@ void combineScoresState(ProgramState& state, std::optional<Scores>& combined_sco
 		auto const lines = loadFile(file_name);
 		auto const scores = parseScores(lines);
 		if (scores.size() != lines.size()) {
+			printError("File '" + file_name + "' is invalid");
 			all_scores_valid = false;
 		}
 		scores_sets.emplace_back(scores);
 	}
 	if (!all_scores_valid) {
+		printError("No scores combined");
 		return;
 	}
 
+	print("Scores were combined");
 	combined_scores = combineScores(scores_sets);
 	state = ProgramState::ViewCombinedScores;
 }
@@ -432,6 +435,7 @@ void saveCombinedScoresState(ProgramState& state, bool show_menu, Scores const& 
 
 	auto const input = getLine();
 	if (input.empty()) {
+		printError("No file name selected");
 		return;
 	}
 	if (input == "c" || input == "C") {

@@ -69,20 +69,37 @@ void createVotesFile(uint32_t number_of_items) {
 		"full\n";
 	votes_file.close();
 }
-void cleanUpFiles() {
+auto createScoresFiles(uint32_t number_of_files) -> std::vector<std::string> {
+	std::vector<std::string> file_names{};
+	for (uint32_t i = 0; i < number_of_files; i++) {
+		auto file_name = "temp_scores_" + std::to_string(i) + ".txt";
+		std::ofstream score_file(file_name);
+		ASSERT_TRUE(score_file.is_open());
+		score_file << "1 1 item1\n";
+		score_file.close();
+		file_names.emplace_back(std::move(file_name));
+	}
+	return file_names;
+}
+void cleanUpFiles(std::vector<std::string> extra_files = {}) {
 	std::filesystem::remove(kTestItemsFile);
 	std::filesystem::remove(kTestVotesFile);
 	std::filesystem::remove(kTestScoresFile);
 	std::filesystem::remove(kTestRankingFile);
 	std::filesystem::remove(kTestCombinedScoresFile);
+	for (auto file_name : extra_files) {
+		std::filesystem::remove(file_name);
+	}
 }
 
-// NOTE: How to trigger this failing?
+// NOTE: How to trigger these failing?
 //void saveVotingRoundFails() {
 //}
 //void saveVotingRoundScoresFails() {
 //}
 //void saveVotingRoundRankingFails() {
+//}
+//void combineSaveScoresFails() {
 //}
 
 void mainMenuLegendPrinted() {
@@ -1178,6 +1195,21 @@ void votingInvalidKey() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
+void combinePromptPrintedEachTime() {
+	appendAction(KeyAction::Combine);
+	for (uint32_t i = 0; i < 10; i++) {
+		appendLine("");
+	}
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Select two or more score files to combine"), 11);
+	ASSERT_TRUE(allActionsCompleted());
+}
 void combineEmptyFileNames() {
 	appendAction(KeyAction::Combine);
 	appendLine("");
@@ -1191,145 +1223,16 @@ void combineEmptyFileNames() {
 	ASSERT_TRUE(catcher.contains("No file names selected"));
 	ASSERT_TRUE(allActionsCompleted());
 }
-void combine() {
-	std::string const file_name_1{ "temp_scores1.txt" };
-	std::string const file_name_2{ "temp_scores2.txt" };
-	std::ofstream score_file_1(file_name_1);
-	std::ofstream score_file_2(file_name_2);
-	ASSERT_TRUE(score_file_1.is_open() && score_file_2.is_open());
-	score_file_1 << "1 0 item1\n";
-	score_file_2 << "1 1 item1\n";
-	score_file_1.close();
-	score_file_2.close();
-
-	appendAction(KeyAction::Combine);
-	appendLine(file_name_1 + " " + file_name_2);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Select two or more score files to combine"));
-	ASSERT_TRUE(catcher.contains("Reading " + file_name_1));
-	ASSERT_TRUE(catcher.contains("Reading " + file_name_2));
-	ASSERT_TRUE(catcher.contains("Scores combined"));
-	ASSERT_TRUE(catcher.contains("[P]rint combined scores"));
-	ASSERT_TRUE(catcher.contains("[S]ave combined scores"));
-	ASSERT_FALSE(std::filesystem::exists(kTestCombinedScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
-
-	std::filesystem::remove(file_name_1);
-	std::filesystem::remove(file_name_2);
-	cleanUpFiles();
-}
-void combineThenPrintScores() {
-	std::string const file_name_1{ "temp_scores1.txt" };
-	std::string const file_name_2{ "temp_scores2.txt" };
-	std::ofstream score_file_1(file_name_1);
-	std::ofstream score_file_2(file_name_2);
-	ASSERT_TRUE(score_file_1.is_open() && score_file_2.is_open());
-	score_file_1 << "1 0 item1\n";
-	score_file_2 << "1 1 item1\n";
-	score_file_1.close();
-	score_file_2.close();
-
-	appendAction(KeyAction::Combine);
-	appendLine(file_name_1 + " " + file_name_2);
-	appendAction(KeyAction::Print);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Item"));
-	ASSERT_TRUE(catcher.contains("Wins"));
-	ASSERT_TRUE(catcher.contains("Losses"));
-	ASSERT_TRUE(catcher.contains("2"));
-	ASSERT_FALSE(catcher.contains("0"));
-	ASSERT_FALSE(std::filesystem::exists(kTestCombinedScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
-
-	std::filesystem::remove(file_name_1);
-	std::filesystem::remove(file_name_2);
-	cleanUpFiles();
-}
-void combineThenSaveScores() {
-	std::string const file_name_1{ "temp_scores1.txt" };
-	std::string const file_name_2{ "temp_scores2.txt" };
-	std::ofstream score_file_1(file_name_1);
-	std::ofstream score_file_2(file_name_2);
-	ASSERT_TRUE(score_file_1.is_open() && score_file_2.is_open());
-	score_file_1 << "1 0 item1\n";
-	score_file_2 << "1 1 item1\n";
-	score_file_1.close();
-	score_file_2.close();
-
-	appendAction(KeyAction::Combine);
-	appendLine(file_name_1 + " " + file_name_2);
-	appendAction(KeyAction::Save);
-	appendLine(kTestCombinedScoresFile);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Saved combined scores to '" + std::string{ kTestCombinedScoresFile } + "'"));
-	ASSERT_TRUE(std::filesystem::exists(kTestCombinedScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
-
-	std::filesystem::remove(file_name_1);
-	std::filesystem::remove(file_name_2);
-	cleanUpFiles();
-}
-void combineThenSaveScoresCancel() {
-	std::string const file_name_1{ "temp_scores1.txt" };
-	std::string const file_name_2{ "temp_scores2.txt" };
-	std::ofstream score_file_1(file_name_1);
-	std::ofstream score_file_2(file_name_2);
-	ASSERT_TRUE(score_file_1.is_open() && score_file_2.is_open());
-	score_file_1 << "1 0 item1\n";
-	score_file_2 << "1 1 item1\n";
-	score_file_1.close();
-	score_file_2.close();
-
-	appendAction(KeyAction::Combine);
-	appendLine(file_name_1 + " " + file_name_2);
-	appendAction(KeyAction::Save);
-	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_EQ(catcher.occurrences("Scores combined"), 2);
-	ASSERT_TRUE(catcher.contains("Select file name to save combined scores to"));
-	ASSERT_FALSE(catcher.contains("Saved combined scores"));
-	ASSERT_TRUE(allActionsCompleted());
-
-	std::filesystem::remove(file_name_1);
-	std::filesystem::remove(file_name_2);
-	cleanUpFiles();
-}
 void combineCancel() {
 	appendAction(KeyAction::Combine);
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
 	programLoop();
-	catcher.stop();
 
-	ASSERT_TRUE(catcher.contains("Select two or more score files to combine"));
 	ASSERT_TRUE(allActionsCompleted());
 }
-void combineWithTooFewFiles() {
+void combineTooFewFiles() {
 	appendAction(KeyAction::Combine);
 	appendLine("file1");
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
@@ -1342,7 +1245,7 @@ void combineWithTooFewFiles() {
 	ASSERT_TRUE(catcher.contains("Too few files. No scores combined"));
 	ASSERT_TRUE(allActionsCompleted());
 }
-void combineWithNonExistingFiles() {
+void combineNonExistingFiles() {
 	appendAction(KeyAction::Combine);
 	appendLine("file1 file2");
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
@@ -1356,6 +1259,201 @@ void combineWithNonExistingFiles() {
 	ASSERT_TRUE(catcher.contains("File 'file2' doesn't exist"));
 	ASSERT_TRUE(catcher.contains("No scores combined"));
 	ASSERT_TRUE(allActionsCompleted());
+}
+void combineInvalidFiles() {
+	auto file_names = createScoresFiles(1);
+	std::string const invalid_file_name{ "temp_scores_2.txt" };
+	std::ofstream invalid_score_file(invalid_file_name);
+	ASSERT_TRUE(invalid_score_file.is_open());
+	invalid_score_file << "0 item1\n";
+	invalid_score_file.close();
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + invalid_file_name);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("File '" + invalid_file_name + "' is invalid"));
+	ASSERT_TRUE(catcher.contains("No scores combined"));
+	ASSERT_FALSE(std::filesystem::exists(kTestCombinedScoresFile));
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names + std::vector<std::string>{ invalid_file_name });
+}
+void combineSuccessful() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Reading " + file_names[0]));
+	ASSERT_TRUE(catcher.contains("Reading " + file_names[1]));
+	ASSERT_TRUE(catcher.contains("Scores were combined"));
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineViewScoresLegendPrinted() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Scores combined"));
+	ASSERT_TRUE(catcher.contains("[P]rint combined scores"));
+	ASSERT_TRUE(catcher.contains("[S]ave combined scores"));
+	ASSERT_TRUE(catcher.contains("[Q]uit to main menu"));
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineViewScoresLegendNotReprinted() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Scores combined"), 1);
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineViewScoresDoesNotAutomaticallySave() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(std::filesystem::exists(kTestCombinedScoresFile));
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineViewScoresPrint() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Print);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Item"));
+	ASSERT_TRUE(catcher.contains("Wins"));
+	ASSERT_TRUE(catcher.contains("Losses"));
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineSaveScoresPromptPrintedEachTime() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Save);
+	// Repeat invalid action
+	for (uint32_t i = 0; i < 10; i++) {
+		appendLine("");
+	}
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Select file name to save combined scores to"), 11);
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineSaveScoresEmptyFileName() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Save);
+	appendLine("");
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No file name selected"));
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineSaveScoresCancel() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Save);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	programLoop();
+
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
+}
+void combineSaveScoresSuccessful() {
+	auto const file_names = createScoresFiles(2);
+
+	appendAction(KeyAction::Combine);
+	appendLine(file_names[0] + " " + file_names[1]);
+	appendAction(KeyAction::Save);
+	appendLine(kTestCombinedScoresFile);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Saved combined scores to '" + std::string{ kTestCombinedScoresFile } + "'"));
+	ASSERT_TRUE(std::filesystem::exists(kTestCombinedScoresFile));
+	ASSERT_TRUE(allActionsCompleted());
+
+	cleanUpFiles(file_names);
 }
 
 } // namespace
@@ -1424,13 +1522,20 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenUnsavedThenDontSave);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenUnsavedThenCancel);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingInvalidKey);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combinePromptPrintedEachTime);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combineEmptyFileNames);
-	RUN_TEST_IF_ARGUMENT_EQUALS(combine);
-	RUN_TEST_IF_ARGUMENT_EQUALS(combineThenPrintScores);
-	RUN_TEST_IF_ARGUMENT_EQUALS(combineThenSaveScores);
-	RUN_TEST_IF_ARGUMENT_EQUALS(combineThenSaveScoresCancel);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combineCancel);
-	RUN_TEST_IF_ARGUMENT_EQUALS(combineWithTooFewFiles);
-	RUN_TEST_IF_ARGUMENT_EQUALS(combineWithNonExistingFiles);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineTooFewFiles);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineNonExistingFiles);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineInvalidFiles);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineSuccessful);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineViewScoresLegendPrinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineViewScoresLegendNotReprinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineViewScoresDoesNotAutomaticallySave);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineViewScoresPrint);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineSaveScoresPromptPrintedEachTime);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineSaveScoresEmptyFileName);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineSaveScoresCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(combineSaveScoresSuccessful);
 	return 1;
 }

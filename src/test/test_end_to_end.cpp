@@ -114,7 +114,6 @@ void mainMenuLegendPrinted() {
 	ASSERT_TRUE(catcher.contains("[L]oad voting round"));
 	ASSERT_TRUE(catcher.contains("[C]ombine scores"));
 	ASSERT_TRUE(catcher.contains("[Q]uit"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void mainMenuLegendNotReprinted() {
 	// Repeat an invalid key
@@ -128,7 +127,6 @@ void mainMenuLegendNotReprinted() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Pairwise ranking"), 1);
-	ASSERT_TRUE(allActionsCompleted());
 }
 void mainMenuNewVotingRound() {
 	appendAction(KeyAction::NewRound);
@@ -140,7 +138,6 @@ void mainMenuNewVotingRound() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Select file to load items from"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void mainMenuLoadVotingRound() {
 	appendAction(KeyAction::LoadRound);
@@ -152,7 +149,6 @@ void mainMenuLoadVotingRound() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Select file name to load voting round from"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void mainMenuCombine() {
 	appendAction(KeyAction::Combine);
@@ -164,7 +160,6 @@ void mainMenuCombine() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Select two or more score files to combine"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void mainMenuQuit() {
 	appendAction(KeyAction::Quit);
@@ -176,7 +171,6 @@ void mainMenuQuit() {
 	ASSERT_FALSE(catcher.contains("Select file to load items from"));
 	ASSERT_FALSE(catcher.contains("Select file name to load voting round from"));
 	ASSERT_FALSE(catcher.contains("Select two or more score files to combine"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void newVotingRoundSelectItemsPromptPrintedEachTime() {
 	appendAction(KeyAction::NewRound);
@@ -191,7 +185,6 @@ void newVotingRoundSelectItemsPromptPrintedEachTime() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select file to load items from"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 }
 void newVotingRoundSelectItemsEmptyFileName() {
 	appendAction(KeyAction::NewRound);
@@ -204,7 +197,6 @@ void newVotingRoundSelectItemsEmptyFileName() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void newVotingRoundSelectItemsCancel() {
 	appendAction(KeyAction::NewRound);
@@ -213,7 +205,6 @@ void newVotingRoundSelectItemsCancel() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 }
 void newVotingRoundSelectItemsNonExistingFile() {
 	appendAction(KeyAction::NewRound);
@@ -226,7 +217,6 @@ void newVotingRoundSelectItemsNonExistingFile() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("File 'non_existing_file.txt' does not exist"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void newVotingRoundSelectItemsTooFewItems() {
 	createItemsFile(1);
@@ -241,7 +231,6 @@ void newVotingRoundSelectItemsTooFewItems() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Too few items in '" + std::string{ kTestItemsFile } + "'. At least two expected."));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void newVotingRoundSelectItemsSuccessful() {
@@ -257,7 +246,6 @@ void newVotingRoundSelectItemsSuccessful() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Select voting format"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void newVotingRoundSelectFormatLegendPrinted() {
@@ -278,7 +266,6 @@ void newVotingRoundSelectFormatLegendPrinted() {
 	ASSERT_TRUE(catcher.contains("[I]nsertion rank-based voting"));
 	ASSERT_TRUE(catcher.contains("[H]elp"));
 	ASSERT_TRUE(catcher.contains("[C]ancel"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void newVotingRoundSelectFormatEstimatedVotesPrinted() {
@@ -297,7 +284,6 @@ void newVotingRoundSelectFormatEstimatedVotesPrinted() {
 	ASSERT_TRUE(catcher.contains("45"));  // Full
 	ASSERT_TRUE(catcher.contains("15"));  // Reduced
 	ASSERT_TRUE(catcher.contains("33"));  // Ranked
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void newVotingRoundSelectFormatLegendNotReprinted() {
@@ -317,7 +303,6 @@ void newVotingRoundSelectFormatLegendNotReprinted() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select voting format"), 1);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void newVotingRoundSelectFormatCancel() {
@@ -332,7 +317,6 @@ void newVotingRoundSelectFormatCancel() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void newVotingRoundSelectFormatPrintHelp() {
@@ -350,7 +334,6 @@ void newVotingRoundSelectFormatPrintHelp() {
 
 	ASSERT_TRUE(catcher.contains("Score-based voting will"));
 	ASSERT_TRUE(catcher.contains("Rank-based voting will"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void newVotingRoundSelectFormatSuccessful() {
@@ -368,7 +351,6 @@ void newVotingRoundSelectFormatSuccessful() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Voting round"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void loadVotingRoundPromptPrintedEachTime() {
@@ -384,7 +366,6 @@ void loadVotingRoundPromptPrintedEachTime() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to load voting round from"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 }
 void loadVotingRoundEmptyFileName() {
 	appendAction(KeyAction::LoadRound);
@@ -397,7 +378,6 @@ void loadVotingRoundEmptyFileName() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void loadVotingRoundCancel() {
 	appendAction(KeyAction::LoadRound);
@@ -406,7 +386,6 @@ void loadVotingRoundCancel() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 }
 void loadVotingRoundNonExistingFile() {
 	cleanUpFiles();
@@ -420,7 +399,6 @@ void loadVotingRoundNonExistingFile() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("File '" + std::string{ kTestVotesFile } + "' does not exist"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void loadVotingRoundEmptyFile() {
 	std::ofstream votes_file(kTestVotesFile);
@@ -437,7 +415,6 @@ void loadVotingRoundEmptyFile() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No lines found in '" + std::string{ kTestVotesFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void loadVotingRoundInvalidFile() {
@@ -456,7 +433,6 @@ void loadVotingRoundInvalidFile() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Failed to create voting round from '" + std::string{ kTestVotesFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void loadVotingRoundSuccessful() {
@@ -473,7 +449,6 @@ void loadVotingRoundSuccessful() {
 
 	ASSERT_TRUE(catcher.contains("Select file name to load voting round from"));
 	ASSERT_TRUE(catcher.contains("Voting round loaded from '" + std::string{ kTestVotesFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundPromptPrintedEachTime() {
@@ -496,7 +471,6 @@ void saveVotingRoundPromptPrintedEachTime() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save voting round to"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundEmptyFileName() {
@@ -517,7 +491,6 @@ void saveVotingRoundEmptyFileName() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundCancel() {
@@ -534,7 +507,6 @@ void saveVotingRoundCancel() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundSuccessful() {
@@ -553,7 +525,6 @@ void saveVotingRoundSuccessful() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Voting round saved to '" + std::string{ kTestVotesFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundScoresNoVotes() {
@@ -572,7 +543,6 @@ void saveVotingRoundScoresNoVotes() {
 	catcher.stop();
 
 	ASSERT_FALSE(catcher.contains("Select file name to save scores to"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundScoresPromptPrintedEachTime() {
@@ -596,7 +566,6 @@ void saveVotingRoundScoresPromptPrintedEachTime() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save scores to"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundScoresEmptyFileName() {
@@ -618,7 +587,6 @@ void saveVotingRoundScoresEmptyFileName() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundScoresCancel() {
@@ -636,7 +604,6 @@ void saveVotingRoundScoresCancel() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundScoresSuccessful() {
@@ -657,7 +624,6 @@ void saveVotingRoundScoresSuccessful() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Scores saved to '" + std::string{ kTestScoresFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundRankingNoVotes() {
@@ -676,7 +642,6 @@ void saveVotingRoundRankingNoVotes() {
 	catcher.stop();
 
 	ASSERT_FALSE(catcher.contains("Select file name to save ranking to"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundRankingPromptPrintedEachTime() {
@@ -700,7 +665,6 @@ void saveVotingRoundRankingPromptPrintedEachTime() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save ranking to"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundRankingEmptyFileName() {
@@ -722,7 +686,6 @@ void saveVotingRoundRankingEmptyFileName() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundRankingCancel() {
@@ -740,7 +703,6 @@ void saveVotingRoundRankingCancel() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundRankingSuccessful() {
@@ -761,7 +723,6 @@ void saveVotingRoundRankingSuccessful() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Ranking saved to '" + std::string{ kTestRankingFile } + "'"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void saveVotingRoundRankingSortedMarked() {
@@ -779,7 +740,6 @@ void saveVotingRoundRankingSortedMarked() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 
 	auto const ranking_lines = loadFile(kTestRankingFile);
 	auto has_sorted_marker = false;
@@ -814,7 +774,6 @@ void votingLegendPrinted() {
 	ASSERT_TRUE(catcher.contains("[P]rint current score"));
 	ASSERT_TRUE(catcher.contains("[S]ave votes"));
 	ASSERT_TRUE(catcher.contains("[Q]uit to main menu"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingLegendNotReprinted() {
@@ -833,7 +792,6 @@ void votingLegendNotReprinted() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Voting round"), 1);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingMatchupPrintedEachTime() {
@@ -857,7 +815,6 @@ void votingMatchupPrintedEachTime() {
 	ASSERT_EQ(catcher.occurrences("A:"), 11);
 	ASSERT_EQ(catcher.occurrences("B:"), 11);
 	ASSERT_EQ(catcher.occurrences("Your choice"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingCompletedPrinted() {
@@ -876,7 +833,6 @@ void votingCompletedPrinted() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Voting round completed"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingOptionA() {
@@ -895,7 +851,6 @@ void votingOptionA() {
 	catcher.stop();
 
 	ASSERT_FALSE(catcher.contains("Can't vote. Voting round is completed."));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingOptionB() {
@@ -914,7 +869,6 @@ void votingOptionB() {
 	catcher.stop();
 
 	ASSERT_FALSE(catcher.contains("Can't vote. Voting round is completed."));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingCompletedVoteOptionA() {
@@ -934,7 +888,6 @@ void votingCompletedVoteOptionA() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Can't vote. Voting round is completed."));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingCompletedVoteOptionB() {
@@ -954,7 +907,6 @@ void votingCompletedVoteOptionB() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Can't vote. Voting round is completed."));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingUndoScoreVote() {
@@ -974,7 +926,6 @@ void votingUndoScoreVote() {
 	catcher.stop();
 
 	ASSERT_FALSE(catcher.contains("No votes to undo"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingUndoRankVote() {
@@ -994,7 +945,6 @@ void votingUndoRankVote() {
 	catcher.stop();
 
 	ASSERT_FALSE(catcher.contains("No votes to undo"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingUndoWithNoVotes() {
@@ -1013,7 +963,6 @@ void votingUndoWithNoVotes() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No votes to undo"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingPrintScore() {
@@ -1034,7 +983,6 @@ void votingPrintScore() {
 	ASSERT_TRUE(catcher.contains("Item"));
 	ASSERT_TRUE(catcher.contains("Wins"));
 	ASSERT_TRUE(catcher.contains("Losses"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingPrintRank() {
@@ -1053,7 +1001,6 @@ void votingPrintRank() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("<-- sorted until here"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingQuitWhenSaved() {
@@ -1073,7 +1020,6 @@ void votingQuitWhenSaved() {
 
 	ASSERT_FALSE(catcher.contains("You have unsaved progress"));
 	ASSERT_TRUE(std::filesystem::exists(kTestVotesFile));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingQuitWhenUnsavedLegendPrinted() {
@@ -1095,7 +1041,6 @@ void votingQuitWhenUnsavedLegendPrinted() {
 	ASSERT_TRUE(catcher.contains("[Y]es"));
 	ASSERT_TRUE(catcher.contains("[N]o (lose progress)"));
 	ASSERT_TRUE(catcher.contains("[C]ancel"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingQuitWhenUnsavedLegendNotReprinted() {
@@ -1114,7 +1059,6 @@ void votingQuitWhenUnsavedLegendNotReprinted() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("You have unsaved progress"), 1);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingQuitWhenUnsavedThenSave() {
@@ -1135,7 +1079,6 @@ void votingQuitWhenUnsavedThenSave() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Select file name to save voting round to"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingQuitWhenUnsavedThenDontSave() {
@@ -1153,7 +1096,6 @@ void votingQuitWhenUnsavedThenDontSave() {
 	catcher.stop();
 
 	ASSERT_FALSE(catcher.contains("Select file name to save voting round to"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingQuitWhenUnsavedThenCancel() {
@@ -1173,7 +1115,6 @@ void votingQuitWhenUnsavedThenCancel() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("You have unsaved progress"), 2);
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void votingInvalidKey() {
@@ -1192,7 +1133,6 @@ void votingInvalidKey() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Invalid key"));
-	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
 void combinePromptPrintedEachTime() {
@@ -1208,7 +1148,6 @@ void combinePromptPrintedEachTime() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select two or more score files to combine"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 }
 void combineEmptyFileNames() {
 	appendAction(KeyAction::Combine);
@@ -1221,7 +1160,6 @@ void combineEmptyFileNames() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No file names selected"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void combineCancel() {
 	appendAction(KeyAction::Combine);
@@ -1230,7 +1168,6 @@ void combineCancel() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 }
 void combineTooFewFiles() {
 	appendAction(KeyAction::Combine);
@@ -1243,7 +1180,6 @@ void combineTooFewFiles() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("Too few files. No scores combined"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void combineNonExistingFiles() {
 	appendAction(KeyAction::Combine);
@@ -1258,7 +1194,6 @@ void combineNonExistingFiles() {
 	ASSERT_TRUE(catcher.contains("File 'file1' doesn't exist"));
 	ASSERT_TRUE(catcher.contains("File 'file2' doesn't exist"));
 	ASSERT_TRUE(catcher.contains("No scores combined"));
-	ASSERT_TRUE(allActionsCompleted());
 }
 void combineInvalidFiles() {
 	auto file_names = createScoresFiles(1);
@@ -1280,7 +1215,6 @@ void combineInvalidFiles() {
 	ASSERT_TRUE(catcher.contains("File '" + invalid_file_name + "' is invalid"));
 	ASSERT_TRUE(catcher.contains("No scores combined"));
 	ASSERT_FALSE(std::filesystem::exists(kTestCombinedScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names + std::vector<std::string>{ invalid_file_name });
 }
@@ -1299,7 +1233,6 @@ void combineSuccessful() {
 	ASSERT_TRUE(catcher.contains("Reading " + file_names[0]));
 	ASSERT_TRUE(catcher.contains("Reading " + file_names[1]));
 	ASSERT_TRUE(catcher.contains("Scores were combined"));
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1319,7 +1252,6 @@ void combineViewScoresLegendPrinted() {
 	ASSERT_TRUE(catcher.contains("[P]rint combined scores"));
 	ASSERT_TRUE(catcher.contains("[S]ave combined scores"));
 	ASSERT_TRUE(catcher.contains("[Q]uit to main menu"));
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1336,7 +1268,6 @@ void combineViewScoresLegendNotReprinted() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Scores combined"), 1);
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1353,7 +1284,6 @@ void combineViewScoresDoesNotAutomaticallySave() {
 	catcher.stop();
 
 	ASSERT_FALSE(std::filesystem::exists(kTestCombinedScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1373,7 +1303,6 @@ void combineViewScoresPrint() {
 	ASSERT_TRUE(catcher.contains("Item"));
 	ASSERT_TRUE(catcher.contains("Wins"));
 	ASSERT_TRUE(catcher.contains("Losses"));
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1396,7 +1325,6 @@ void combineSaveScoresPromptPrintedEachTime() {
 	catcher.stop();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save combined scores to"), 11);
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1416,7 +1344,6 @@ void combineSaveScoresEmptyFileName() {
 	catcher.stop();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1432,7 +1359,6 @@ void combineSaveScoresCancel() {
 
 	programLoop();
 
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
@@ -1451,17 +1377,13 @@ void combineSaveScoresSuccessful() {
 
 	ASSERT_TRUE(catcher.contains("Saved combined scores to '" + std::string{ kTestCombinedScoresFile } + "'"));
 	ASSERT_TRUE(std::filesystem::exists(kTestCombinedScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
 
 	cleanUpFiles(file_names);
 }
 
 } // namespace
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	cleanUpFiles();
-
+auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(mainMenuLegendPrinted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(mainMenuLegendNotReprinted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(mainMenuNewVotingRound);
@@ -1538,4 +1460,14 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(combineSaveScoresCancel);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combineSaveScoresSuccessful);
 	return 1;
+}
+
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	cleanUpFiles();
+	if (run_tests(argv) != 0) {
+		return 1;
+	}
+	ASSERT_TRUE(allActionsCompleted());
+	return 0;
 }

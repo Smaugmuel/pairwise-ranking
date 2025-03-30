@@ -441,8 +441,6 @@ list(APPEND test_cases
 	newVotingRoundSelectFormatCancel
 	newVotingRoundSelectFormatPrintHelp
 	newVotingRoundSelectFormatSuccessful
-	quitWhenUnsaved
-	quitWhenUnsavedThenCancel
 	loadVotingRoundPromptPrintedEachTime
 	loadVotingRoundEmptyFileName
 	loadVotingRoundCancel
@@ -465,13 +463,26 @@ list(APPEND test_cases
 	saveVotingRoundRankingCancel
 	saveVotingRoundRankingSuccessful
 	saveVotingRoundRankingSortedMarked
-	vote
-	voteWhenVotingRoundCompleted
-	undoWithNoVotes
-	undoScoreVote
-	undoRankVote
-	printScore
-	printRank
+	votingLegendPrinted
+	votingLegendNotReprinted
+	votingMatchupPrintedEachTime
+	votingCompletedPrinted
+	votingOptionA
+	votingOptionB
+	votingCompletedVoteOptionA
+	votingCompletedVoteOptionB
+	votingUndoScoreVote
+	votingUndoRankVote
+	votingUndoWithNoVotes
+	votingPrintScore
+	votingPrintRank
+	votingQuitWhenSaved
+	votingQuitWhenUnsavedLegendPrinted
+	votingQuitWhenUnsavedLegendNotReprinted
+	votingQuitWhenUnsavedThenSave
+	votingQuitWhenUnsavedThenDontSave
+	votingQuitWhenUnsavedThenCancel
+	votingInvalidKey
 	combineEmptyFileNames
 	combine
 	combineThenPrintScores

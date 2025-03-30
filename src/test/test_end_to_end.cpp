@@ -92,6 +92,13 @@ void cleanUpFiles(std::vector<std::string> extra_files = {}) {
 	}
 }
 
+auto runProgramLoopAndCatchOutput() -> OutputCatcher {
+	OutputCatcher output;
+	programLoop();
+	output.stop();
+	return output;
+}
+
 // NOTE: How to trigger these failing?
 //void saveVotingRoundFails() {
 //}
@@ -105,9 +112,7 @@ void cleanUpFiles(std::vector<std::string> extra_files = {}) {
 void mainMenuLegendPrinted() {
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Pairwise ranking"));
 	ASSERT_TRUE(catcher.contains("[N]ew voting round"));
@@ -122,9 +127,7 @@ void mainMenuLegendNotReprinted() {
 	}
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Pairwise ranking"), 1);
 }
@@ -133,9 +136,7 @@ void mainMenuNewVotingRound() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Select file to load items from"));
 }
@@ -144,9 +145,7 @@ void mainMenuLoadVotingRound() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Select file name to load voting round from"));
 }
@@ -155,18 +154,14 @@ void mainMenuCombine() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Select two or more score files to combine"));
 }
 void mainMenuQuit() {
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("Select file to load items from"));
 	ASSERT_FALSE(catcher.contains("Select file name to load voting round from"));
@@ -180,9 +175,7 @@ void newVotingRoundSelectItemsPromptPrintedEachTime() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select file to load items from"), 11);
 }
@@ -192,9 +185,7 @@ void newVotingRoundSelectItemsEmptyFileName() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
 }
@@ -204,7 +195,6 @@ void newVotingRoundSelectItemsCancel() {
 	appendAction(KeyAction::Quit);
 
 	programLoop();
-
 }
 void newVotingRoundSelectItemsNonExistingFile() {
 	appendAction(KeyAction::NewRound);
@@ -212,9 +202,7 @@ void newVotingRoundSelectItemsNonExistingFile() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("File 'non_existing_file.txt' does not exist"));
 }
@@ -226,9 +214,7 @@ void newVotingRoundSelectItemsTooFewItems() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Too few items in '" + std::string{ kTestItemsFile } + "'. At least two expected."));
 	cleanUpFiles();
@@ -241,9 +227,7 @@ void newVotingRoundSelectItemsSuccessful() {
 	appendAction(KeyAction::Cancel);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Select voting format"));
 	cleanUpFiles();
@@ -256,9 +240,7 @@ void newVotingRoundSelectFormatLegendPrinted() {
 	appendAction(KeyAction::Cancel);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Select voting format"));
 	ASSERT_TRUE(catcher.contains("[F]ull score-based voting"));
@@ -276,9 +258,7 @@ void newVotingRoundSelectFormatEstimatedVotesPrinted() {
 	appendAction(KeyAction::Cancel);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Estimated votes"));
 	ASSERT_TRUE(catcher.contains("45"));  // Full
@@ -298,9 +278,7 @@ void newVotingRoundSelectFormatLegendNotReprinted() {
 	appendAction(KeyAction::Cancel);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select voting format"), 1);
 	cleanUpFiles();
@@ -313,9 +291,7 @@ void newVotingRoundSelectFormatCancel() {
 	appendAction(KeyAction::Cancel);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	cleanUpFiles();
 }
@@ -328,9 +304,7 @@ void newVotingRoundSelectFormatPrintHelp() {
 	appendAction(KeyAction::Cancel);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Score-based voting will"));
 	ASSERT_TRUE(catcher.contains("Rank-based voting will"));
@@ -346,9 +320,7 @@ void newVotingRoundSelectFormatSuccessful() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Voting round"));
 	cleanUpFiles();
@@ -361,9 +333,7 @@ void loadVotingRoundPromptPrintedEachTime() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to load voting round from"), 11);
 }
@@ -373,9 +343,7 @@ void loadVotingRoundEmptyFileName() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
 }
@@ -385,7 +353,6 @@ void loadVotingRoundCancel() {
 	appendAction(KeyAction::Quit);
 
 	programLoop();
-
 }
 void loadVotingRoundNonExistingFile() {
 	cleanUpFiles();
@@ -394,9 +361,7 @@ void loadVotingRoundNonExistingFile() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("File '" + std::string{ kTestVotesFile } + "' does not exist"));
 }
@@ -410,9 +375,7 @@ void loadVotingRoundEmptyFile() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No lines found in '" + std::string{ kTestVotesFile } + "'"));
 	cleanUpFiles();
@@ -428,9 +391,7 @@ void loadVotingRoundInvalidFile() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Failed to create voting round from '" + std::string{ kTestVotesFile } + "'"));
 	cleanUpFiles();
@@ -443,9 +404,7 @@ void loadVotingRoundSuccessful() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Select file name to load voting round from"));
 	ASSERT_TRUE(catcher.contains("Voting round loaded from '" + std::string{ kTestVotesFile } + "'"));
@@ -466,9 +425,7 @@ void saveVotingRoundPromptPrintedEachTime() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save voting round to"), 11);
 	cleanUpFiles();
@@ -486,9 +443,7 @@ void saveVotingRoundEmptyFileName() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
 	cleanUpFiles();
@@ -520,9 +475,7 @@ void saveVotingRoundSuccessful() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Voting round saved to '" + std::string{ kTestVotesFile } + "'"));
 	cleanUpFiles();
@@ -538,9 +491,7 @@ void saveVotingRoundScoresNoVotes() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("Select file name to save scores to"));
 	cleanUpFiles();
@@ -561,9 +512,7 @@ void saveVotingRoundScoresPromptPrintedEachTime() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save scores to"), 11);
 	cleanUpFiles();
@@ -582,9 +531,7 @@ void saveVotingRoundScoresEmptyFileName() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
 	cleanUpFiles();
@@ -619,9 +566,7 @@ void saveVotingRoundScoresSuccessful() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Scores saved to '" + std::string{ kTestScoresFile } + "'"));
 	cleanUpFiles();
@@ -637,9 +582,7 @@ void saveVotingRoundRankingNoVotes() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("Select file name to save ranking to"));
 	cleanUpFiles();
@@ -660,9 +603,7 @@ void saveVotingRoundRankingPromptPrintedEachTime() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save ranking to"), 11);
 	cleanUpFiles();
@@ -681,9 +622,7 @@ void saveVotingRoundRankingEmptyFileName() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
 	cleanUpFiles();
@@ -718,9 +657,7 @@ void saveVotingRoundRankingSuccessful() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Ranking saved to '" + std::string{ kTestRankingFile } + "'"));
 	cleanUpFiles();
@@ -739,7 +676,6 @@ void saveVotingRoundRankingSortedMarked() {
 	appendAction(KeyAction::Quit);
 
 	programLoop();
-
 
 	auto const ranking_lines = loadFile(kTestRankingFile);
 	auto has_sorted_marker = false;
@@ -763,9 +699,7 @@ void votingLegendPrinted() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Voting round"));
 	ASSERT_TRUE(catcher.contains("Vote option [A]"));
@@ -787,9 +721,7 @@ void votingLegendNotReprinted() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Voting round"), 1);
 	cleanUpFiles();
@@ -808,9 +740,7 @@ void votingMatchupPrintedEachTime() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("A:"), 11);
 	ASSERT_EQ(catcher.occurrences("B:"), 11);
@@ -828,9 +758,7 @@ void votingCompletedPrinted() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Voting round completed"));
 	cleanUpFiles();
@@ -846,9 +774,7 @@ void votingOptionA() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("Can't vote. Voting round is completed."));
 	cleanUpFiles();
@@ -864,9 +790,7 @@ void votingOptionB() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("Can't vote. Voting round is completed."));
 	cleanUpFiles();
@@ -883,9 +807,7 @@ void votingCompletedVoteOptionA() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Can't vote. Voting round is completed."));
 	cleanUpFiles();
@@ -902,9 +824,7 @@ void votingCompletedVoteOptionB() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Can't vote. Voting round is completed."));
 	cleanUpFiles();
@@ -921,9 +841,7 @@ void votingUndoScoreVote() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("No votes to undo"));
 	cleanUpFiles();
@@ -940,9 +858,7 @@ void votingUndoRankVote() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("No votes to undo"));
 	cleanUpFiles();
@@ -958,9 +874,7 @@ void votingUndoWithNoVotes() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No votes to undo"));
 	cleanUpFiles();
@@ -976,9 +890,7 @@ void votingPrintScore() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Item"));
 	ASSERT_TRUE(catcher.contains("Wins"));
@@ -996,9 +908,7 @@ void votingPrintRank() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("<-- sorted until here"));
 	cleanUpFiles();
@@ -1014,9 +924,7 @@ void votingQuitWhenSaved() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("You have unsaved progress"));
 	ASSERT_TRUE(std::filesystem::exists(kTestVotesFile));
@@ -1032,9 +940,7 @@ void votingQuitWhenUnsavedLegendPrinted() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("You have unsaved progress"));
 	ASSERT_TRUE(catcher.contains("Save before quitting?"));
@@ -1054,9 +960,7 @@ void votingQuitWhenUnsavedLegendNotReprinted() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("You have unsaved progress"), 1);
 	cleanUpFiles();
@@ -1074,9 +978,7 @@ void votingQuitWhenUnsavedThenSave() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Select file name to save voting round to"));
 	cleanUpFiles();
@@ -1091,9 +993,7 @@ void votingQuitWhenUnsavedThenDontSave() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(catcher.contains("Select file name to save voting round to"));
 	cleanUpFiles();
@@ -1110,9 +1010,7 @@ void votingQuitWhenUnsavedThenCancel() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("You have unsaved progress"), 2);
 	cleanUpFiles();
@@ -1128,9 +1026,7 @@ void votingInvalidKey() {
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Invalid key"));
 	cleanUpFiles();
@@ -1143,9 +1039,7 @@ void combinePromptPrintedEachTime() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select two or more score files to combine"), 11);
 }
@@ -1155,9 +1049,7 @@ void combineEmptyFileNames() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No file names selected"));
 }
@@ -1167,7 +1059,6 @@ void combineCancel() {
 	appendAction(KeyAction::Quit);
 
 	programLoop();
-
 }
 void combineTooFewFiles() {
 	appendAction(KeyAction::Combine);
@@ -1175,9 +1066,7 @@ void combineTooFewFiles() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Too few files. No scores combined"));
 }
@@ -1187,9 +1076,7 @@ void combineNonExistingFiles() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("File 'file1' doesn't exist"));
 	ASSERT_TRUE(catcher.contains("File 'file2' doesn't exist"));
@@ -1208,9 +1095,7 @@ void combineInvalidFiles() {
 	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("File '" + invalid_file_name + "' is invalid"));
 	ASSERT_TRUE(catcher.contains("No scores combined"));
@@ -1226,9 +1111,7 @@ void combineSuccessful() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Reading " + file_names[0]));
 	ASSERT_TRUE(catcher.contains("Reading " + file_names[1]));
@@ -1244,9 +1127,7 @@ void combineViewScoresLegendPrinted() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Scores combined"));
 	ASSERT_TRUE(catcher.contains("[P]rint combined scores"));
@@ -1263,9 +1144,7 @@ void combineViewScoresLegendNotReprinted() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Scores combined"), 1);
 
@@ -1279,9 +1158,7 @@ void combineViewScoresDoesNotAutomaticallySave() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_FALSE(std::filesystem::exists(kTestCombinedScoresFile));
 
@@ -1296,9 +1173,7 @@ void combineViewScoresPrint() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Item"));
 	ASSERT_TRUE(catcher.contains("Wins"));
@@ -1320,9 +1195,7 @@ void combineSaveScoresPromptPrintedEachTime() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_EQ(catcher.occurrences("Select file name to save combined scores to"), 11);
 
@@ -1339,9 +1212,7 @@ void combineSaveScoresEmptyFileName() {
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("No file name selected"));
 
@@ -1359,7 +1230,6 @@ void combineSaveScoresCancel() {
 
 	programLoop();
 
-
 	cleanUpFiles(file_names);
 }
 void combineSaveScoresSuccessful() {
@@ -1371,9 +1241,7 @@ void combineSaveScoresSuccessful() {
 	appendLine(kTestCombinedScoresFile);
 	appendAction(KeyAction::Quit);
 
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
+	auto const catcher = runProgramLoopAndCatchOutput();
 
 	ASSERT_TRUE(catcher.contains("Saved combined scores to '" + std::string{ kTestCombinedScoresFile } + "'"));
 	ASSERT_TRUE(std::filesystem::exists(kTestCombinedScoresFile));

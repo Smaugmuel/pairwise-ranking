@@ -77,6 +77,14 @@ void cleanUpFiles() {
 	std::filesystem::remove(kTestCombinedScoresFile);
 }
 
+// NOTE: How to trigger this failing?
+//void saveVotingRoundFails() {
+//}
+//void saveVotingRoundScoresFails() {
+//}
+//void saveVotingRoundRankingFails() {
+//}
+
 void mainMenuLegendPrinted() {
 	appendAction(KeyAction::Quit);
 
@@ -451,7 +459,6 @@ void loadVotingRoundSuccessful() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-
 void saveVotingRoundPromptPrintedEachTime() {
 	createItemsFile(2);
 
@@ -513,9 +520,6 @@ void saveVotingRoundCancel() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-// NOTE: How to trigger this failing?
-//void saveVotingRoundFails() {
-//}
 void saveVotingRoundSuccessful() {
 	createItemsFile(2);
 
@@ -618,9 +622,6 @@ void saveVotingRoundScoresCancel() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-// NOTE: How to trigger this failing?
-//void saveVotingRoundScoresFails() {
-//}
 void saveVotingRoundScoresSuccessful() {
 	createItemsFile(2);
 
@@ -725,9 +726,6 @@ void saveVotingRoundRankingCancel() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-// NOTE: How to trigger this failing?
-//void saveVotingRoundRankingFails() {
-//}
 void saveVotingRoundRankingSuccessful() {
 	createItemsFile(2);
 
@@ -778,8 +776,290 @@ void saveVotingRoundRankingSortedMarked() {
 
 	cleanUpFiles();
 }
+void votingLegendPrinted() {
+	createItemsFile(2);
 
-void quitWhenUnsaved() {
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Voting round"));
+	ASSERT_TRUE(catcher.contains("Vote option [A]"));
+	ASSERT_TRUE(catcher.contains("Vote option [B]"));
+	ASSERT_TRUE(catcher.contains("[U]ndo vote"));
+	ASSERT_TRUE(catcher.contains("[P]rint current score"));
+	ASSERT_TRUE(catcher.contains("[S]ave votes"));
+	ASSERT_TRUE(catcher.contains("[Q]uit to main menu"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingLegendNotReprinted() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::FullRound); // Invalid option during voting
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("Voting round"), 1);
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingMatchupPrintedEachTime() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	// Repeat an invalid key
+	for (uint32_t i = 0; i < 10; i++) {
+		appendAction(KeyAction::FullRound);
+	}
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("A:"), 11);
+	ASSERT_EQ(catcher.occurrences("B:"), 11);
+	ASSERT_EQ(catcher.occurrences("Your choice"), 11);
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingCompletedPrinted() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Voting round completed"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingOptionA() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("Can't vote. Voting round is completed."));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingOptionB() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteB);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("Can't vote. Voting round is completed."));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingCompletedVoteOptionA() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Can't vote. Voting round is completed."));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingCompletedVoteOptionB() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::VoteB);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Can't vote. Voting round is completed."));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingUndoScoreVote() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Undo);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("No votes to undo"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingUndoRankVote() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::VoteA);
+	appendAction(KeyAction::Undo);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("No votes to undo"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingUndoWithNoVotes() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Undo);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("No votes to undo"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingPrintScore() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Print);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Item"));
+	ASSERT_TRUE(catcher.contains("Wins"));
+	ASSERT_TRUE(catcher.contains("Losses"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingPrintRank() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::RankedRound);
+	appendAction(KeyAction::Print);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("<-- sorted until here"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingQuitWhenSaved() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Save);
+	appendLine(kTestVotesFile);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("You have unsaved progress"));
+	ASSERT_TRUE(std::filesystem::exists(kTestVotesFile));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingQuitWhenUnsavedLegendPrinted() {
 	createItemsFile(2);
 
 	appendAction(KeyAction::NewRound);
@@ -801,7 +1081,65 @@ void quitWhenUnsaved() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-void quitWhenUnsavedThenCancel() {
+void votingQuitWhenUnsavedLegendNotReprinted() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::FullRound); // Invalid input
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_EQ(catcher.occurrences("You have unsaved progress"), 1);
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingQuitWhenUnsavedThenSave() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::Yes);
+	appendLine(std::string{ static_cast<char>(KeyAction::Cancel) });
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_TRUE(catcher.contains("Select file name to save voting round to"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingQuitWhenUnsavedThenDontSave() {
+	createItemsFile(2);
+
+	appendAction(KeyAction::NewRound);
+	appendLine(kTestItemsFile);
+	appendAction(KeyAction::FullRound);
+	appendAction(KeyAction::Quit);
+	appendAction(KeyAction::No);
+	appendAction(KeyAction::Quit);
+
+	OutputCatcher catcher;
+	programLoop();
+	catcher.stop();
+
+	ASSERT_FALSE(catcher.contains("Select file name to save voting round to"));
+	ASSERT_TRUE(allActionsCompleted());
+	cleanUpFiles();
+}
+void votingQuitWhenUnsavedThenCancel() {
 	createItemsFile(2);
 
 	appendAction(KeyAction::NewRound);
@@ -821,88 +1159,13 @@ void quitWhenUnsavedThenCancel() {
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
-void saveVotingRound() {
+void votingInvalidKey() {
 	createItemsFile(2);
 
 	appendAction(KeyAction::NewRound);
 	appendLine(kTestItemsFile);
 	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::Save);
-	appendLine(kTestVotesFile);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Select file name to save voting round to"));
-	ASSERT_TRUE(catcher.contains("Voting round saved to '" + std::string{ kTestVotesFile } + "'"));
-	ASSERT_FALSE(catcher.contains("Select file name to save scores"));
-	ASSERT_TRUE(std::filesystem::exists(kTestVotesFile));
-	ASSERT_FALSE(std::filesystem::exists(kTestScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void saveScores() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
 	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::VoteA);
-	appendAction(KeyAction::Save);
-	appendLine(kTestVotesFile);
-	appendLine(kTestScoresFile);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Select file name to save scores"));
-	ASSERT_TRUE(catcher.contains("Scores saved to '" + std::string{ kTestScoresFile } + "'"));
-	ASSERT_TRUE(std::filesystem::exists(kTestScoresFile));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void saveRanking() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::RankedRound);
-	appendAction(KeyAction::VoteA);
-	appendAction(KeyAction::Save);
-	appendLine(kTestVotesFile);
-	appendLine(kTestRankingFile);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Select file name to save ranking"));
-	ASSERT_TRUE(catcher.contains("Ranking saved to '" + std::string{ kTestRankingFile } + "'"));
-	ASSERT_TRUE(std::filesystem::exists(kTestRankingFile));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void vote() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::VoteA);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::VoteB);
 	appendAction(KeyAction::Quit);
 	appendAction(KeyAction::No);
 	appendAction(KeyAction::Quit);
@@ -911,129 +1174,7 @@ void vote() {
 	programLoop();
 	catcher.stop();
 
-	ASSERT_FALSE(catcher.contains("Can't vote. Voting round is completed."));
-	ASSERT_TRUE(catcher.contains("Voting round completed"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void voteWhenVotingRoundCompleted() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::VoteA);
-	appendAction(KeyAction::VoteA);
-	appendAction(KeyAction::VoteB);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_EQ(catcher.occurrences("Can't vote. Voting round is completed."), 2);
-	ASSERT_EQ(catcher.occurrences("Voting round completed"), 3);
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void undoWithNoVotes() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::Undo);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("No votes to undo"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void undoScoreVote() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::VoteA);
-	appendAction(KeyAction::Undo);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_FALSE(catcher.contains("No votes to undo"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void undoRankVote() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::RankedRound);
-	appendAction(KeyAction::VoteA);
-	appendAction(KeyAction::Undo);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_FALSE(catcher.contains("No votes to undo"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void printScore() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::FullRound);
-	appendAction(KeyAction::Print);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("Item"));
-	ASSERT_TRUE(catcher.contains("Wins"));
-	ASSERT_TRUE(catcher.contains("Losses"));
-	ASSERT_TRUE(allActionsCompleted());
-	cleanUpFiles();
-}
-void printRank() {
-	createItemsFile(2);
-
-	appendAction(KeyAction::NewRound);
-	appendLine(kTestItemsFile);
-	appendAction(KeyAction::RankedRound);
-	appendAction(KeyAction::Print);
-	appendAction(KeyAction::Quit);
-	appendAction(KeyAction::No);
-	appendAction(KeyAction::Quit);
-
-	OutputCatcher catcher;
-	programLoop();
-	catcher.stop();
-
-	ASSERT_TRUE(catcher.contains("<-- sorted until here"));
+	ASSERT_TRUE(catcher.contains("Invalid key"));
 	ASSERT_TRUE(allActionsCompleted());
 	cleanUpFiles();
 }
@@ -1241,8 +1382,6 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(newVotingRoundSelectFormatCancel);
 	RUN_TEST_IF_ARGUMENT_EQUALS(newVotingRoundSelectFormatPrintHelp);
 	RUN_TEST_IF_ARGUMENT_EQUALS(newVotingRoundSelectFormatSuccessful);
-	RUN_TEST_IF_ARGUMENT_EQUALS(quitWhenUnsaved);
-	RUN_TEST_IF_ARGUMENT_EQUALS(quitWhenUnsavedThenCancel);
 	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundPromptPrintedEachTime);
 	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundEmptyFileName);
 	RUN_TEST_IF_ARGUMENT_EQUALS(loadVotingRoundCancel);
@@ -1265,13 +1404,26 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingCancel);
 	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingSuccessful);
 	RUN_TEST_IF_ARGUMENT_EQUALS(saveVotingRoundRankingSortedMarked);
-	RUN_TEST_IF_ARGUMENT_EQUALS(vote);
-	RUN_TEST_IF_ARGUMENT_EQUALS(voteWhenVotingRoundCompleted);
-	RUN_TEST_IF_ARGUMENT_EQUALS(undoWithNoVotes);
-	RUN_TEST_IF_ARGUMENT_EQUALS(undoScoreVote);
-	RUN_TEST_IF_ARGUMENT_EQUALS(undoRankVote);
-	RUN_TEST_IF_ARGUMENT_EQUALS(printScore);
-	RUN_TEST_IF_ARGUMENT_EQUALS(printRank);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingLegendPrinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingLegendNotReprinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingMatchupPrintedEachTime);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingCompletedPrinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingOptionA);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingOptionB);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingCompletedVoteOptionA);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingCompletedVoteOptionB);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingUndoScoreVote);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingUndoRankVote);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingUndoWithNoVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingPrintScore);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingPrintRank);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenSaved);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenUnsavedLegendPrinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenUnsavedLegendNotReprinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenUnsavedThenSave);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenUnsavedThenDontSave);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingQuitWhenUnsavedThenCancel);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingInvalidKey);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combineEmptyFileNames);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combine);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combineThenPrintScores);

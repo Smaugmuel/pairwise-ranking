@@ -460,54 +460,43 @@ void programLoop() {
 	Items items{};
 
 	while (program_running) {
+		auto const state_on_entry = state;
 		switch (state) {
 		case ProgramState::MainMenu:
 			mainMenuState(state, show_menu);
-			show_menu = (state != ProgramState::MainMenu);
 			break;
 		case ProgramState::SelectItemsFile:
 			selectItemsFileState(state, items);
-			show_menu = (state != ProgramState::SelectItemsFile);
 			break;
 		case ProgramState::SelectFormatAndCreateVotingRound:
 			selectFormatAndCreateVotingRoundState(state, show_menu, items, voting_round);
-			show_menu = (state != ProgramState::SelectFormatAndCreateVotingRound);
 			break;
 		case ProgramState::LoadVotingRound:
 			loadVotingRoundState(state, voting_round);
-			show_menu = (state != ProgramState::LoadVotingRound);
 			break;
 		case ProgramState::SaveVotingRound:
 			saveVotingRoundState(state, voting_round.value());
-			show_menu = (state != ProgramState::SaveVotingRound);
 			break;
 		case ProgramState::SaveScores:
 			saveScoresState(state, voting_round.value());
-			show_menu = (state != ProgramState::SaveScores);
 			break;
 		case ProgramState::SaveRanking:
 			saveRankingState(state, voting_round.value());
-			show_menu = (state != ProgramState::SaveRanking);
 			break;
 		case ProgramState::CheckUnsavedVotingRound:
 			checkUnsavedVotingRoundState(state, show_menu, voting_round.value());
-			show_menu = (state != ProgramState::CheckUnsavedVotingRound);
 			break;
 		case ProgramState::Voting:
 			votingState(state, show_menu, voting_round.value());
-			show_menu = (state != ProgramState::Voting);
 			break;
 		case ProgramState::CombineScores:
 			combineScoresState(state, combined_scores);
-			show_menu = (state != ProgramState::CombineScores);
 			break;
 		case ProgramState::ViewCombinedScores:
 			viewCombinedScoresState(state, show_menu, combined_scores.value());
-			show_menu = (state != ProgramState::ViewCombinedScores);
 			break;
 		case ProgramState::SaveCombinedScores:
 			saveCombinedScoresState(state, show_menu, combined_scores.value());
-			show_menu = (state != ProgramState::SaveCombinedScores);
 			break;
 		case ProgramState::Quit:
 			program_running = false;
@@ -515,5 +504,6 @@ void programLoop() {
 		default:
 			break;
 		}
+		show_menu = (state != state_on_entry);
 	}
 }

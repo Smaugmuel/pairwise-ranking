@@ -483,13 +483,20 @@ list(APPEND test_cases
 	votingQuitWhenUnsavedThenDontSave
 	votingQuitWhenUnsavedThenCancel
 	votingInvalidKey
+	combinePromptPrintedEachTime
 	combineEmptyFileNames
-	combine
-	combineThenPrintScores
-	combineThenSaveScores
-	combineThenSaveScoresCancel
 	combineCancel
-	combineWithTooFewFiles
-	combineWithNonExistingFiles
+	combineTooFewFiles
+	combineNonExistingFiles
+	combineInvalidFiles
+	combineSuccessful
+	combineViewScoresLegendPrinted
+	combineViewScoresLegendNotReprinted
+	combineViewScoresDoesNotAutomaticallySave
+	combineViewScoresPrint
+	combineSaveScoresPromptPrintedEachTime
+	combineSaveScoresEmptyFileName
+	combineSaveScoresCancel
+	combineSaveScoresSuccessful
 )
 addTestSuite(test_end_to_end "${test_dependencies}" "${test_cases}")

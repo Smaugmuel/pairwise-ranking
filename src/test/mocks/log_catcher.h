@@ -2,9 +2,9 @@
 #include <sstream>
 #include <string>
 
-class OutputCatcher final {
+class LogCatcher final {
 public:
-	OutputCatcher() : original_buffer{ std::cout.rdbuf(stream.rdbuf()) } {
+	LogCatcher() : original_buffer{ std::cout.rdbuf(stream.rdbuf()) } {
 	}
 	void stop() {
 		std::cout.rdbuf(original_buffer);

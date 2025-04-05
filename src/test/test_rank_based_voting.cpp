@@ -329,6 +329,8 @@ auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(numberOfSortedItemsIncrementsWhenRightOptionChanges);
 	RUN_TEST_IF_ARGUMENT_EQUALS(presentedOptionsDependOnVoting);
 	RUN_TEST_IF_ARGUMENT_EQUALS(itemsAreSortedCorrectlyForNumberOfSortedItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(currentRankingListPresentsNumberOfSortedItems);
+	RUN_TEST_IF_ARGUMENT_EQUALS(convertingRankedVotingRoundToText);
 	RUN_TEST_IF_ARGUMENT_EQUALS(rankItemsBySortingWhenInitiallyRanked);
 	RUN_TEST_IF_ARGUMENT_EQUALS(rankItemsBySortingWhenInitiallyUnranked);
 	RUN_TEST_IF_ARGUMENT_EQUALS(voteCounterAndApproximateTotalVotesIsPresented);

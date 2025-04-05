@@ -428,6 +428,7 @@ auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(sameMatchupMultipleTimes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(chosenVoteIsNotZeroOrOne);
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndReducedVotingAndFourVotes);
+	RUN_TEST_IF_ARGUMENT_EQUALS(sevenItemsAndReducedVotingAndFourVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndOneVote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndZeroVotes);
 	return 1;

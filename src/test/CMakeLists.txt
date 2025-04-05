@@ -22,9 +22,12 @@ list(APPEND test_dependencies
 	${PROJECT_SOURCE_DIR}/src/score.cpp
 )
 list(APPEND test_cases
+	zeroItemsAndVotes
 	zeroVotes
 	oneVoteForA
 	oneVoteForB
+	allVotesForA
+	allVotesForB
 	votingForItem2AndOptionAIfNotPresent
 	votingForItem3AndOptionAIfNotPresent
 	votingForItem2AndOptionBIfNotPresent
@@ -276,6 +279,7 @@ list(APPEND test_cases
 	sameMatchupMultipleTimes
 	chosenVoteIsNotZeroOrOne
 	fourItemsAndReducedVotingAndFourVotes
+	sevenItemsAndReducedVotingAndFourVotes
 	fourItemsAndFullVotingAndOneVote
 	fourItemsAndFullVotingAndZeroVotes
 )
@@ -320,6 +324,8 @@ list(APPEND test_cases
 	numberOfSortedItemsIncrementsWhenRightOptionChanges
 	presentedOptionsDependOnVoting
 	itemsAreSortedCorrectlyForNumberOfSortedItems
+	currentRankingListPresentsNumberOfSortedItems
+	convertingRankedVotingRoundToText
 	rankItemsBySortingWhenInitiallyRanked
 	rankItemsBySortingWhenInitiallyUnranked
 	voteCounterAndApproximateTotalVotesIsPresented

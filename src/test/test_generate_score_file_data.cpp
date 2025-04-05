@@ -26,11 +26,18 @@ void multipleScores() {
 
 } // namespace
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
+auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(noScores);
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneScore);
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneScoreWithSpacesInItemName);
 	RUN_TEST_IF_ARGUMENT_EQUALS(multipleScores);
 	return 1;
+}
+
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	if (run_tests(argv) != 0) {
+		return 1;
+	}
+	return 0;
 }

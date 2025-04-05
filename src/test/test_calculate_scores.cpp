@@ -270,8 +270,7 @@ void tooFewVotesToScoreAllItems() {
 
 } // namespace
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
+auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(zeroVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneVoteForA);
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneVoteForB);
@@ -287,4 +286,12 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForOptionBButNotFullRound);
 	RUN_TEST_IF_ARGUMENT_EQUALS(tooFewVotesToScoreAllItems);
 	return 1;
+}
+
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	if (run_tests(argv) != 0) {
+		return 1;
+	}
+	return 0;
 }

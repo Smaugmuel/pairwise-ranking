@@ -100,7 +100,6 @@ void nonNumbers() {
 
 auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(stringIsEmpty);
-	RUN_TEST_IF_ARGUMENT_EQUALS(stringIsEmpty);
 	RUN_TEST_IF_ARGUMENT_EQUALS(stringIsValid);
 	RUN_TEST_IF_ARGUMENT_EQUALS(itemIsAnInteger);
 	RUN_TEST_IF_ARGUMENT_EQUALS(itemHasMultipleWords);

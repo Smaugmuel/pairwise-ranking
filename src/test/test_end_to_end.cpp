@@ -105,13 +105,13 @@ auto runProgramLoopAndCatchLogs() -> LogCatcher {
 }
 
 // NOTE: How to trigger these failing?
-//void saveVotingRoundFails() {
+//void saveVotingRoundFails( ) {
 //}
-//void saveVotingRoundScoresFails() {
+//void saveVotingRoundScoresFails( ) {
 //}
-//void saveVotingRoundRankingFails() {
+//void saveVotingRoundRankingFails( ) {
 //}
-//void combineSaveScoresFails() {
+//void combineSaveScoresFails( ) {
 //}
 
 void mainMenuLegendPrinted() {

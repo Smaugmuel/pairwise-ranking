@@ -65,8 +65,8 @@ void allVotesForB() {
 	// ASSUMPTION: In each matchup, the earlier item will be option A (left)
 	ASSERT_EQ(findScoreForItem(scores, "item1"), Score{ "item1", 0, 3 });
 	ASSERT_EQ(findScoreForItem(scores, "item2"), Score{ "item2", 1, 2 });
-	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 3, 1 });
-	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 4, 0 });
+	ASSERT_EQ(findScoreForItem(scores, "item3"), Score{ "item3", 2, 1 });
+	ASSERT_EQ(findScoreForItem(scores, "item4"), Score{ "item4", 3, 0 });
 }
 void votingForItem2AndOptionAIfNotPresent() {
 	uint64_t const kNumberOfItems{ 4 };
@@ -271,9 +271,12 @@ void tooFewVotesToScoreAllItems() {
 } // namespace
 
 auto run_tests(char* argv[]) -> int {
+	RUN_TEST_IF_ARGUMENT_EQUALS(zeroItemsAndVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(zeroVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneVoteForA);
 	RUN_TEST_IF_ARGUMENT_EQUALS(oneVoteForB);
+	RUN_TEST_IF_ARGUMENT_EQUALS(allVotesForA);
+	RUN_TEST_IF_ARGUMENT_EQUALS(allVotesForB);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem2AndOptionAIfNotPresent);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem3AndOptionAIfNotPresent);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForItem2AndOptionBIfNotPresent);

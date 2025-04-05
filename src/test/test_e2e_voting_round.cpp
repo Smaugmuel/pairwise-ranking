@@ -131,9 +131,16 @@ void scoresAreTheSameDespiteDifferentItemOrderAndSeed() {
 
 } // namespace
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
+auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundIsTheSameAfterLoading);
 	RUN_TEST_IF_ARGUMENT_EQUALS(scoresAreTheSameDespiteDifferentItemOrderAndSeed);
 	return 1;
+}
+
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	if (run_tests(argv) != 0) {
+		return 1;
+	}
+	return 0;
 }

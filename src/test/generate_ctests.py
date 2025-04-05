@@ -63,11 +63,11 @@ for test_suite in test_suites:
 for test_suite in test_suites:
 	with open(test_suite + ".cpp", 'r') as test_suite_file:
 		test_suite_file_content = test_suite_file.readlines()
-	assert_line = findLineInList(test_suite_file_content, "ASSERT_EQ(argc, 2)")
-	return_line = findNextReturnInTestSuite(test_suite_file_content, assert_line)
+	run_tests_line = findLineInList(test_suite_file_content, "auto run_tests(char* argv[])")
+	return_line = findNextReturnInTestSuite(test_suite_file_content, run_tests_line)
 
 	# Note: Conversion to index kept for clarity
-	run_test_start_index = (assert_line - 1) + 1
+	run_test_start_index = (run_tests_line - 1) + 1
 	run_test_end_index   = (return_line - 1) - 1
 
 	del test_suite_file_content[run_test_start_index:run_test_end_index+1]

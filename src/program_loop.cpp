@@ -315,7 +315,18 @@ void votingState(ProgramState& state, bool show_menu, VotingRound& voting_round)
 		print(voting_line.value() + " Your choice: ", false);
 	}
 	else {
-		print("Voting round completed");
+		print(
+			"--------------------------\n"
+			"| Voting round completed |\n"
+			"|------------------------|\n"
+			"|    Vote option [A]     |\n"
+			"|    Vote option [B]     |\n"
+			"|      [U]ndo vote       |\n"
+			"| [P]rint current score  |\n"
+			"|      [S]ave votes      |\n"
+			"|  [Q]uit to main menu   |\n"
+			"--------------------------"
+		);
 	}
 
 	auto const ch = getKey();

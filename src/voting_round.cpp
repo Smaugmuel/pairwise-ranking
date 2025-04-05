@@ -596,12 +596,12 @@ auto VotingRound::currentMatchup() const -> std::optional<Matchup> {
 }
 auto VotingRound::currentVotingLine() const -> std::optional<std::string> {
 	if (!hasRemainingVotes()) {
-		printError("Voting finished. No active votes to print");
+		print("Voting finished. No active votes to print");
 		return std::nullopt;
 	}
 	auto const matchup = currentMatchup();
 	if (!matchup.has_value()) {
-		printError("No matchup");
+		print("No matchup");
 		return std::nullopt;
 	}
 

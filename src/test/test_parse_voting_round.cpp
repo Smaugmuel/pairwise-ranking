@@ -405,8 +405,7 @@ void fourItemsAndFullVotingAndZeroVotes() {
 
 } // namespace
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
+auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(noLinesToParse);
 	RUN_TEST_IF_ARGUMENT_EQUALS(noItemsBeforeEmptyLine);
 	RUN_TEST_IF_ARGUMENT_EQUALS(fewerThanTwoItems);
@@ -431,6 +430,13 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndReducedVotingAndFourVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndOneVote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(fourItemsAndFullVotingAndZeroVotes);
-
 	return 1;
+}
+
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	if (run_tests(argv) != 0) {
+		return 1;
+	}
+	return 0;
 }

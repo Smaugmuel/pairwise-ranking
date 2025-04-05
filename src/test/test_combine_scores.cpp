@@ -173,8 +173,7 @@ void endToEnd_combineFromOneEmptyFile() {
 
 } // namespace
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
+auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(combiningNoScoreSet);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combiningOneScoreSetWithZeroScores);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combiningOneScoreSetWithOneScore);
@@ -189,4 +188,12 @@ int main(int argc, char* argv[]) {
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromAllEmptyFiles);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromOneEmptyFile);
 	return 1;
+}
+
+int main(int argc, char* argv[]) {
+	ASSERT_EQ(argc, 2);
+	if (run_tests(argv) != 0) {
+		return 1;
+	}
+	return 0;
 }

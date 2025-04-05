@@ -27,13 +27,18 @@ void saveWhenSomeScores() {
 
 } // namespace
 
+auto run_tests(char* argv[]) -> int {
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenNoScores);
+	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenSomeScores);
+	return 1;
+}
+
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
 	std::filesystem::remove(kTestFileName);
-
-	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenNoScores);
-	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenSomeScores);
-
+	if (run_tests(argv) != 0) {
+		return 1;
+	}
 	std::filesystem::remove(kTestFileName);
-	return 1;
+	return 0;
 }

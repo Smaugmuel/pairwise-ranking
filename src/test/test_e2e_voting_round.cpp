@@ -129,17 +129,16 @@ void scoresAreTheSameDespiteDifferentItemOrderAndSeed() {
 	ASSERT_EQ(findScore(scores_1, item_to_vote_for), findScore(scores_2, item_to_vote_for));
 }
 
-} // namespace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundIsTheSameAfterLoading);
 	RUN_TEST_IF_ARGUMENT_EQUALS(scoresAreTheSameDespiteDifferentItemOrderAndSeed);
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	if (run_tests(argv[1])) {
+} // namespace
+
+auto test_e2e_voting_round(std::string const& test_case) -> int {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	return 0;

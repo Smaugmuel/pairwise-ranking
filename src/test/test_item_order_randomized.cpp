@@ -102,8 +102,6 @@ void scoresAreCalculatedWithCorrectItems() {
 	}
 }
 
-} // namespace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(itemOrderIsShuffledWhenShufflingNewVotingRound);
 	RUN_TEST_IF_ARGUMENT_EQUALS(originalItemOrderIsRetainedWhenShufflingNewVotingRound);
@@ -114,9 +112,10 @@ auto run_tests(std::string const& test) -> bool {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	if (run_tests(argv[1])) {
+} // namespace
+
+auto test_item_order_randomized(std::string const& test_case) -> int {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	return 0;

@@ -2,25 +2,67 @@ cmake_minimum_required(VERSION 3.15)
 
 enable_testing()
 
-function(addTestSuite suite_name dependencies cases)
-	add_executable(${suite_name}
-		${suite_name}.cpp
+function(addTestExe suites dependencies)
+	foreach (suite ${suites})
+		list(APPEND suites_cpp ${suite}.cpp)
+	endforeach()
+	add_executable(test
 		testing.cpp
+		test.cpp
+		${suites_cpp}
 		${dependencies}
 	)
-	target_include_directories(${suite_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+	target_include_directories(test PRIVATE ${PROJECT_SOURCE_DIR}/src)
+endfunction()
+
+function(addTestSuite suite_name cases)
 	foreach (test_case ${cases})
-		add_test(NAME "${suite_name}/${test_case}" COMMAND ${suite_name} ${test_case})
+		add_test(NAME "${suite_name}/${test_case}" COMMAND test ${suite_name} ${test_case})
 	endforeach()
-	unset(test_dependencies PARENT_SCOPE)
 	unset(test_cases PARENT_SCOPE)
 endfunction()
 
-
 list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
+    ${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions.cpp
+    ${PROJECT_SOURCE_DIR}/src/helpers.cpp
+    ${PROJECT_SOURCE_DIR}/src/menus.cpp
+    ${PROJECT_SOURCE_DIR}/src/print.cpp
+    ${PROJECT_SOURCE_DIR}/src/program_loop.cpp
+    ${PROJECT_SOURCE_DIR}/src/score.cpp
+    ${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
+    ${PROJECT_SOURCE_DIR}/src/test/mocks/mock_keyboard_input.cpp
+    ${PROJECT_SOURCE_DIR}/src/vote.cpp
+    ${PROJECT_SOURCE_DIR}/src/voting_format.cpp
+    ${PROJECT_SOURCE_DIR}/src/voting_round.cpp
 )
+list(APPEND test_suites
+	test_calculate_scores
+	test_combine_scores
+	test_create_score_table
+	test_current_voting_line
+	test_e2e_voting_round
+	test_end_to_end
+	test_generate_new_voting_round
+	test_generate_score_file_data
+	test_generate_voting_round_file_data
+	test_get_active_menu_string
+	test_item_order_randomized
+	test_load_and_save_file
+	test_parse_scores
+	test_parse_voting_round
+	test_prune_votes
+	test_rank_based_voting
+	test_save_scores
+	test_save_votes
+	test_shuffle_voting_order
+	test_undo
+	test_vote
+	test_voting_format
+)
+
+addTestExe("${test_suites}" "${test_dependencies}")
+
 list(APPEND test_cases
 	zeroItemsAndVotes
 	zeroVotes
@@ -40,15 +82,8 @@ list(APPEND test_cases
 	votingForOptionBButNotFullRound
 	tooFewVotesToScoreAllItems
 )
-addTestSuite(test_calculate_scores "${test_dependencies}" "${test_cases}")
+addTestSuite(test_calculate_scores "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-)
 list(APPEND test_cases
 	combiningNoScoreSet
 	combiningOneScoreSetWithZeroScores
@@ -64,15 +99,8 @@ list(APPEND test_cases
 	endToEnd_combineFromAllEmptyFiles
 	endToEnd_combineFromOneEmptyFile
 )
-addTestSuite(test_combine_scores "${test_dependencies}" "${test_cases}")
+addTestSuite(test_combine_scores "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-)
 list(APPEND test_cases
 	noScores
 	alreadySorted
@@ -84,15 +112,8 @@ list(APPEND test_cases
 	shortItemNameAndWinsAndLosses
 	longItemNameAndWinsAndLosses
 )
-addTestSuite(test_create_score_table "${test_dependencies}" "${test_cases}")
+addTestSuite(test_create_score_table "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	counterLengthEqualsTotalLength
 	counterLengthIsLessThanTotalLength
@@ -101,33 +122,14 @@ list(APPEND test_cases
 	votingIsCompleted
 	incompleteVotingIncreasesCounterAndChangesItem
 )
-addTestSuite(test_current_voting_line "${test_dependencies}" "${test_cases}")
+addTestSuite(test_current_voting_line "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/vote.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	votingRoundIsTheSameAfterLoading
 	scoresAreTheSameDespiteDifferentItemOrderAndSeed
 )
-addTestSuite(test_e2e_voting_round "${test_dependencies}" "${test_cases}")
+addTestSuite(test_e2e_voting_round "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/vote.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	generateWithTooFewItems
 	generateWithOnlyEmptyItems
@@ -139,63 +141,32 @@ list(APPEND test_cases
 	generateWithReducedVotingGivesCorrectAmountOfScheduledVotes
 	generateWithFullVotingGivesCorrectScheduledVotes
 )
-addTestSuite(test_generate_new_voting_round "${test_dependencies}" "${test_cases}")
+addTestSuite(test_generate_new_voting_round "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-)
 list(APPEND test_cases
 	noScores
 	oneScore
 	oneScoreWithSpacesInItemName
 	multipleScores
 )
-addTestSuite(test_generate_score_file_data "${test_dependencies}" "${test_cases}")
+addTestSuite(test_generate_score_file_data "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	emptyVotingRound
 	votingRoundWithFullVoting
 	votingRoundWithReducedVoting
 	votingRoundWithOneVote
 )
-addTestSuite(test_generate_voting_round_file_data "${test_dependencies}" "${test_cases}")
+addTestSuite(test_generate_voting_round_file_data "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/menus.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	showIntro
 	noVotingRoundCreated
 	votingRoundStarted
 	votingRoundCompleted
 )
-addTestSuite(test_get_active_menu_string "${test_dependencies}" "${test_cases}")
+addTestSuite(test_get_active_menu_string "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	itemOrderIsShuffledWhenShufflingNewVotingRound
 	originalItemOrderIsRetainedWhenShufflingNewVotingRound
@@ -204,13 +175,8 @@ list(APPEND test_cases
 	convertingVotingRoundToTextUsesOriginalItemOrder
 	scoresAreCalculatedWithCorrectItems
 )
-addTestSuite(test_item_order_randomized "${test_dependencies}" "${test_cases}")
+addTestSuite(test_item_order_randomized "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-)
 list(APPEND test_cases
 	savingAndLoadingLines
 	savingAndLoadingLinesWithEmptyLines
@@ -220,15 +186,8 @@ list(APPEND test_cases
 	savingToExistingFile
 	loadingNonExistingFile
 )
-addTestSuite(test_load_and_save_file "${test_dependencies}" "${test_cases}")
+addTestSuite(test_load_and_save_file "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-)
 list(APPEND test_cases
 	stringIsEmpty
 	stringIsValid
@@ -246,16 +205,8 @@ list(APPEND test_cases
 	validNumbers
 	nonNumbers
 )
-addTestSuite(test_parse_scores "${test_dependencies}" "${test_cases}")
+addTestSuite(test_parse_scores "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/vote.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	noLinesToParse
 	noItemsBeforeEmptyLine
@@ -283,33 +234,16 @@ list(APPEND test_cases
 	fourItemsAndFullVotingAndOneVote
 	fourItemsAndFullVotingAndZeroVotes
 )
-addTestSuite(test_parse_voting_round "${test_dependencies}" "${test_cases}")
+addTestSuite(test_parse_voting_round "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/vote.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	pruningDuringVotingRoundCreationWithTooFewItems
 	pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems
 	parseVotingRoundWithPruning
 	pruningRemovesCorrectScheduledVotes
 )
-addTestSuite(test_prune_votes "${test_dependencies}" "${test_cases}")
+addTestSuite(test_prune_votes "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/menus.cpp
-	${PROJECT_SOURCE_DIR}/src/vote.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	newRoundFormatStringPresentsAvailableVotingFormatsAndNumberOfVotes
 	createNewRankedVotingRound
@@ -330,68 +264,31 @@ list(APPEND test_cases
 	rankItemsBySortingWhenInitiallyUnranked
 	voteCounterAndApproximateTotalVotesIsPresented
 )
-addTestSuite(test_rank_based_voting "${test_dependencies}" "${test_cases}")
+addTestSuite(test_rank_based_voting "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-)
 list(APPEND test_cases
 	saveWhenNoScores
 	saveWhenSomeScores
 )
-addTestSuite(test_save_scores "${test_dependencies}" "${test_cases}")
+addTestSuite(test_save_scores "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	saveWhenSomeVotesRemain
 	saveWhenNoVotesRemain
 )
-addTestSuite(test_save_votes "${test_dependencies}" "${test_cases}")
+addTestSuite(test_save_votes "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/vote.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	shufflingWithSeedIsDeterministic
 )
-addTestSuite(test_shuffle_voting_order "${test_dependencies}" "${test_cases}")
+addTestSuite(test_shuffle_voting_order "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	undoWhenVotesExist
 	undoWhenNoVotesExist
 )
-addTestSuite(test_undo "${test_dependencies}" "${test_cases}")
+addTestSuite(test_undo "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/vote.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	firstVoteForA
 	firstVoteForB
@@ -399,12 +296,8 @@ list(APPEND test_cases
 	votingForBForEachScheduledVote
 	votingAfterRoundCompleted
 )
-addTestSuite(test_vote "${test_dependencies}" "${test_cases}")
+addTestSuite(test_vote "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-)
 list(APPEND test_cases
 	charToFormatWithValidOptions
 	charToFormatWithInvalidOptions
@@ -412,22 +305,8 @@ list(APPEND test_cases
 	stringToFormatWithInalidOptions
 	formatToString
 )
-addTestSuite(test_voting_format "${test_dependencies}" "${test_cases}")
+addTestSuite(test_voting_format "${test_cases}")
 
-
-list(APPEND test_dependencies
-	${PROJECT_SOURCE_DIR}/src/test/mocks/mock_keyboard_input.cpp
-	${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
-	${PROJECT_SOURCE_DIR}/src/functions.cpp
-	${PROJECT_SOURCE_DIR}/src/helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/menus.cpp
-	${PROJECT_SOURCE_DIR}/src/print.cpp
-	${PROJECT_SOURCE_DIR}/src/program_loop.cpp
-	${PROJECT_SOURCE_DIR}/src/score.cpp
-	${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-	${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
 list(APPEND test_cases
 	mainMenuLegendPrinted
 	mainMenuLegendNotReprinted
@@ -505,4 +384,4 @@ list(APPEND test_cases
 	combineSaveScoresCancel
 	combineSaveScoresSuccessful
 )
-addTestSuite(test_end_to_end "${test_dependencies}" "${test_cases}")
+addTestSuite(test_end_to_end "${test_cases}")

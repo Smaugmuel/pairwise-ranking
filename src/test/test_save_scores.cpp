@@ -25,18 +25,17 @@ void saveWhenSomeScores() {
 	std::filesystem::remove(kTestFileName);
 }
 
-} // namespace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenNoScores);
 	RUN_TEST_IF_ARGUMENT_EQUALS(saveWhenSomeScores);
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
+} // namespace
+
+auto test_save_scores(std::string const& test_case) -> int {
 	std::filesystem::remove(kTestFileName);
-	if (run_tests(argv[1])) {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	std::filesystem::remove(kTestFileName);

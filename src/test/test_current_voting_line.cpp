@@ -59,8 +59,6 @@ void incompleteVotingIncreasesCounterAndChangesItem() {
 		std::string{ "(3/3) A: \'item2\'. B: \'item3\'." });
 }
 
-} // namespace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(counterLengthEqualsTotalLength);
 	RUN_TEST_IF_ARGUMENT_EQUALS(counterLengthIsLessThanTotalLength);
@@ -71,9 +69,10 @@ auto run_tests(std::string const& test) -> bool {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	if (run_tests(argv[1])) {
+} // namespace
+
+auto test_current_voting_line(std::string const& test_case) -> int {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	return 0;

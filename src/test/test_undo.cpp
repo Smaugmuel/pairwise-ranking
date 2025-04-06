@@ -17,17 +17,16 @@ void undoWhenNoVotesExist() {
 	ASSERT_FALSE(voting_round.value().undoVote());
 }
 
-} // namespace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(undoWhenVotesExist);
 	RUN_TEST_IF_ARGUMENT_EQUALS(undoWhenNoVotesExist);
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	if (run_tests(argv[1])) {
+} // namespace
+
+auto test_undo(std::string const& test_case) -> int {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	return 0;

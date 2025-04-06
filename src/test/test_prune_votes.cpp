@@ -208,8 +208,6 @@ void pruningRemovesCorrectScheduledVotes() {
 		Vote{7, 12, Option::A} });
 }
 
-} // namsepace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(pruningDuringVotingRoundCreationWithTooFewItems);
 	RUN_TEST_IF_ARGUMENT_EQUALS(pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems);
@@ -218,9 +216,10 @@ auto run_tests(std::string const& test) -> bool {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	if (run_tests(argv[1])) {
+} // namsepace
+
+auto test_prune_votes(std::string const& test_case) -> int {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	return 0;

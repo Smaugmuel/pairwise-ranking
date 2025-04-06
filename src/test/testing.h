@@ -6,7 +6,7 @@
 #include <vector>
 
 /* -------------- Test definitions -------------- */
-#define RUN_TEST_IF_ARGUMENT_EQUALS(test_name) if (std::string{ argv[1] } == #test_name) { test_name(); return 0; }
+#define RUN_TEST_IF_ARGUMENT_EQUALS(test_name) if (test == #test_name) { test_name(); return false; }
 
 namespace detail
 {

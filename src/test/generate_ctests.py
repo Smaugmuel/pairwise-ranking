@@ -35,7 +35,7 @@ def findNextReturnInTestSuite(list_to_search, line_number):
 	for num, line in enumerate(list_to_search, 1):
 		if num < line_number:
 			continue
-		if "return 1" in line:
+		if "return true" in line:
 			return num
 	print("No return found")
 	return -1
@@ -63,7 +63,7 @@ for test_suite in test_suites:
 for test_suite in test_suites:
 	with open(test_suite + ".cpp", 'r') as test_suite_file:
 		test_suite_file_content = test_suite_file.readlines()
-	run_tests_line = findLineInList(test_suite_file_content, "auto run_tests(char* argv[])")
+	run_tests_line = findLineInList(test_suite_file_content, "auto run_tests(std::string const& test)")
 	return_line = findNextReturnInTestSuite(test_suite_file_content, run_tests_line)
 
 	# Note: Conversion to index kept for clarity

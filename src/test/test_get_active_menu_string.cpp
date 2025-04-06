@@ -26,17 +26,17 @@ void votingRoundCompleted() {
 
 } // namespace
 
-auto run_tests(char* argv[]) -> int {
+auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(showIntro);
 	RUN_TEST_IF_ARGUMENT_EQUALS(noVotingRoundCreated);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundStarted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingRoundCompleted);
-	return 1;
+	return true;
 }
 
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
-	if (run_tests(argv) != 0) {
+	if (run_tests(argv[1])) {
 		return 1;
 	}
 	return 0;

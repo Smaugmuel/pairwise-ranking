@@ -313,8 +313,6 @@ void voteCounterAndApproximateTotalVotesIsPresented() {
 	ASSERT_EQ(get_counter_string_then_vote_A(), std::string{ "( 19/~33)" });
 }
 
-} // namespace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(newRoundFormatStringPresentsAvailableVotingFormatsAndNumberOfVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(createNewRankedVotingRound);
@@ -337,9 +335,10 @@ auto run_tests(std::string const& test) -> bool {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	if (run_tests(argv[1])) {
+} // namespace
+
+auto test_rank_based_voting(std::string const& test_case) -> int {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	return 0;

@@ -96,7 +96,6 @@ void nonNumbers() {
 	ASSERT_EQ(Scores{}, parseScores({ "0 @ item1" }));
 	// Could exhaust more, but it's likely unnecessary
 }
-} // namespace
 
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(stringIsEmpty);
@@ -117,9 +116,10 @@ auto run_tests(std::string const& test) -> bool {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
-	if (run_tests(argv[1])) {
+} // namespace
+
+auto test_parse_scores(std::string const& test_case) -> int {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	return 0;

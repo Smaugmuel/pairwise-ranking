@@ -1254,8 +1254,6 @@ void combineSaveScoresSuccessful() {
 	cleanUpFiles(file_names);
 }
 
-} // namespace
-
 auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(mainMenuLegendPrinted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(mainMenuLegendNotReprinted);
@@ -1335,10 +1333,11 @@ auto run_tests(std::string const& test) -> bool {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
-	ASSERT_EQ(argc, 2);
+} // namespace
+
+auto test_end_to_end(std::string const& test_case) -> int {
 	cleanUpFiles();
-	if (run_tests(argv[1])) {
+	if (run_tests(test_case)) {
 		return 1;
 	}
 	ASSERT_TRUE(allActionsCompleted());

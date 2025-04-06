@@ -36,18 +36,18 @@ void formatToString() {
 
 } // namespace
 
-auto run_tests(char* argv[]) -> int {
+auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(charToFormatWithValidOptions);
 	RUN_TEST_IF_ARGUMENT_EQUALS(charToFormatWithInvalidOptions);
 	RUN_TEST_IF_ARGUMENT_EQUALS(stringToFormatWithValidOptions);
 	RUN_TEST_IF_ARGUMENT_EQUALS(stringToFormatWithInalidOptions);
 	RUN_TEST_IF_ARGUMENT_EQUALS(formatToString);
-	return 1;
+	return true;
 }
 
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
-	if (run_tests(argv) != 0) {
+	if (run_tests(argv[1])) {
 		return 1;
 	}
 	return 0;

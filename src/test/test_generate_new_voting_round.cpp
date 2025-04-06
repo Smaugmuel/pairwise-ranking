@@ -375,7 +375,7 @@ void generateWithFullVotingGivesCorrectScheduledVotes() {
 
 } // namespace
 
-auto run_tests(char* argv[]) -> int {
+auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithTooFewItems);
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithOnlyEmptyItems);
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithSomeEmptyItems);
@@ -385,12 +385,12 @@ auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithFullVotingGivesCorrectAmountOfScheduledVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithReducedVotingGivesCorrectAmountOfScheduledVotes);
 	RUN_TEST_IF_ARGUMENT_EQUALS(generateWithFullVotingGivesCorrectScheduledVotes);
-	return 1;
+	return true;
 }
 
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
-	if (run_tests(argv) != 0) {
+	if (run_tests(argv[1])) {
 		return 1;
 	}
 	return 0;

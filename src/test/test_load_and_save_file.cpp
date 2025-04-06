@@ -78,7 +78,7 @@ void loadingNonExistingFile() {
 
 } // namespace
 
-auto run_tests(char* argv[]) -> int {
+auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(savingAndLoadingLines);
 	RUN_TEST_IF_ARGUMENT_EQUALS(savingAndLoadingLinesWithEmptyLines);
 	RUN_TEST_IF_ARGUMENT_EQUALS(savingAndLoadingOnlyEmptyLines);
@@ -86,13 +86,13 @@ auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(loadingNoLines);
 	RUN_TEST_IF_ARGUMENT_EQUALS(savingToExistingFile);
 	RUN_TEST_IF_ARGUMENT_EQUALS(loadingNonExistingFile);
-	return 1;
+	return true;
 }
 
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
 	std::filesystem::remove(kTestFileName);
-	if (run_tests(argv) != 0) {
+	if (run_tests(argv[1])) {
 		return 1;
 	}
 	std::filesystem::remove(kTestFileName);

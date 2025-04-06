@@ -173,7 +173,7 @@ void endToEnd_combineFromOneEmptyFile() {
 
 } // namespace
 
-auto run_tests(char* argv[]) -> int {
+auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(combiningNoScoreSet);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combiningOneScoreSetWithZeroScores);
 	RUN_TEST_IF_ARGUMENT_EQUALS(combiningOneScoreSetWithOneScore);
@@ -187,12 +187,12 @@ auto run_tests(char* argv[]) -> int {
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromInvalidFileName);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromAllEmptyFiles);
 	RUN_TEST_IF_ARGUMENT_EQUALS(endToEnd_combineFromOneEmptyFile);
-	return 1;
+	return true;
 }
 
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
-	if (run_tests(argv) != 0) {
+	if (run_tests(argv[1])) {
 		return 1;
 	}
 	return 0;

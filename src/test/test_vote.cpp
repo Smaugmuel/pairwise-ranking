@@ -60,18 +60,18 @@ void votingAfterRoundCompleted() {
 
 } // namespace
 
-auto run_tests(char* argv[]) -> int {
+auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(firstVoteForA);
 	RUN_TEST_IF_ARGUMENT_EQUALS(firstVoteForB);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForAForEachScheduledVote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingForBForEachScheduledVote);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingAfterRoundCompleted);
-	return 1;
+	return true;
 }
 
 int main(int argc, char* argv[]) {
 	ASSERT_EQ(argc, 2);
-	if (run_tests(argv) != 0) {
+	if (run_tests(argv[1])) {
 		return 1;
 	}
 	return 0;

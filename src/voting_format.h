@@ -10,6 +10,6 @@ enum class VotingFormat : uint32_t {
 	Reduced,
 };
 
-auto characterToVotingFormat(char const c) -> VotingFormat;
-auto stringToVotingFormat(std::string const& s) -> VotingFormat;
-auto votingFormatToString(VotingFormat f) -> std::string;
+auto characterToVotingFormat(char const c) noexcept -> VotingFormat;
+auto stringToVotingFormat(std::string const& s) noexcept -> VotingFormat;
+auto votingFormatToString(VotingFormat f) noexcept -> std::string;

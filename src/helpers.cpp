@@ -7,10 +7,10 @@
 #include "constants.h"
 #include "print.h"
 
-auto sumOfFirstIntegers(size_t n) -> size_t {
+auto sumOfFirstIntegers(size_t n) noexcept -> size_t {
 	return (n * (n + 1)) / 2;
 }
-auto pruningAmount(uint32_t const number_of_items) -> uint32_t {
+auto pruningAmount(uint32_t const number_of_items) noexcept -> uint32_t {
 	if (number_of_items < kMinimumItemsForPruning) {
 		return 0;
 	}
@@ -43,7 +43,7 @@ auto parseNumber(std::string const& str) -> std::optional<uint32_t> {
 	}
 	return static_cast<uint32_t>(std::stoul(str));
 }
-auto numberOfDigits(size_t n) -> size_t {
+auto numberOfDigits(size_t n) noexcept -> size_t {
 	if (n == 0) {
 		return 1;
 	}

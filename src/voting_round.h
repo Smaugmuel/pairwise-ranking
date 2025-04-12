@@ -37,8 +37,8 @@ class VotingRound final {
 
 		auto shuffle(Seed const seed) -> bool;
 		auto currentIndexPair(uint32_t const counter) const -> IndexPair;
-		auto indexPairs() const -> IndexPairs const&;
-		auto numberOfScheduledVotes() const -> uint32_t;
+		auto indexPairs() const noexcept -> IndexPairs const&;
+		auto numberOfScheduledVotes() const noexcept -> uint32_t;
 	private:
 		IndexPairs index_pairs_{};
 	};
@@ -48,8 +48,8 @@ class VotingRound final {
 
 		void vote(Items& items, Option option);
 		auto undoVote(Items& items, Votes const& votes) -> bool;
-		auto currentIndexPair() const -> IndexPair;
-		auto numberOfSortedItems() const -> uint32_t;
+		auto currentIndexPair() const noexcept -> IndexPair;
+		auto numberOfSortedItems() const noexcept -> uint32_t;
 	private:
 		uint32_t number_of_sorted_items_{ 1 };
 		uint32_t start_index_{ 0 };
@@ -67,12 +67,12 @@ public:
 	auto save(std::string const& file_name) -> bool;
 
 	// Internal members access
-	auto items() const -> Items const&;
-	auto originalItemOrder() const -> Items const&;
-	auto format() const -> VotingFormat;
-	auto seed() const -> Seed;
-	auto votes() const -> Votes const&;
-	auto isSaved() const -> bool;
+	auto items() const noexcept -> Items const&;
+	auto originalItemOrder() const noexcept -> Items const&;
+	auto format() const noexcept -> VotingFormat;
+	auto seed() const noexcept -> Seed;
+	auto votes() const noexcept -> Votes const&;
+	auto isSaved() const noexcept -> bool;
 
 	// TODO: This is an implementation detail currently, only applicable for
 	// VotingFormat::Ranking. Find a better way to deal with this.
@@ -93,10 +93,10 @@ private:
 	auto voteImpl(Option option) -> bool;
 	auto undoVoteImpl() -> bool;
 	auto createFormatImpl() -> bool;
-	auto currentIndexPairImpl() const -> IndexPair;
-	auto hasRemainingVotesImpl() const -> bool;
-	auto numberOfSortedItemsImpl() const -> uint32_t;
-	auto numberOfScheduledVotesImpl() const -> uint32_t;
+	auto currentIndexPairImpl() const noexcept -> IndexPair;
+	auto hasRemainingVotesImpl() const noexcept -> bool;
+	auto numberOfSortedItemsImpl() const noexcept -> uint32_t;
+	auto numberOfScheduledVotesImpl() const noexcept -> uint32_t;
 
 	std::optional<ScoreBased> score_based_{};
 	std::optional<RankBased> rank_based_{};

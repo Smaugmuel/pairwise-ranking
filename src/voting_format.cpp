@@ -1,6 +1,6 @@
 #include "voting_format.h"
 
-auto characterToVotingFormat(char const c) -> VotingFormat {
+auto characterToVotingFormat(char const c) noexcept -> VotingFormat {
 	switch (c) {
 	case 'f':
 		return VotingFormat::Full;
@@ -12,7 +12,7 @@ auto characterToVotingFormat(char const c) -> VotingFormat {
 		return VotingFormat::Invalid;
 	}
 }
-auto stringToVotingFormat(std::string const& s) -> VotingFormat {
+auto stringToVotingFormat(std::string const& s) noexcept -> VotingFormat {
 	if (s == "reduced") {
 		return VotingFormat::Reduced;
 	}
@@ -24,7 +24,7 @@ auto stringToVotingFormat(std::string const& s) -> VotingFormat {
 	}
 	return VotingFormat::Invalid;
 }
-auto votingFormatToString(VotingFormat f) -> std::string {
+auto votingFormatToString(VotingFormat f) noexcept -> std::string {
 	switch (f) {
 	case VotingFormat::Full:
 		return "full";

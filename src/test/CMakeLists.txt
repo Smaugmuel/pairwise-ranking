@@ -20,48 +20,9 @@ function(addTestSuite suite_name cases)
 		add_test(NAME "${suite_name}/${test_case}" COMMAND test ${suite_name} ${test_case})
 	endforeach()
 	unset(test_cases PARENT_SCOPE)
+	list(APPEND test_suites "${suite_name}")
+	set(test_suites ${test_suites} PARENT_SCOPE)
 endfunction()
-
-list(APPEND test_dependencies
-    ${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
-    ${PROJECT_SOURCE_DIR}/src/functions.cpp
-    ${PROJECT_SOURCE_DIR}/src/helpers.cpp
-    ${PROJECT_SOURCE_DIR}/src/menus.cpp
-    ${PROJECT_SOURCE_DIR}/src/print.cpp
-    ${PROJECT_SOURCE_DIR}/src/program_loop.cpp
-    ${PROJECT_SOURCE_DIR}/src/score.cpp
-    ${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
-    ${PROJECT_SOURCE_DIR}/src/test/mocks/mock_keyboard_input.cpp
-    ${PROJECT_SOURCE_DIR}/src/vote.cpp
-    ${PROJECT_SOURCE_DIR}/src/voting_format.cpp
-    ${PROJECT_SOURCE_DIR}/src/voting_round.cpp
-)
-list(APPEND test_suites
-	test_calculate_scores
-	test_combine_scores
-	test_create_score_table
-	test_current_voting_line
-	test_e2e_voting_round
-	test_end_to_end
-	test_generate_new_voting_round
-	test_generate_score_file_data
-	test_generate_voting_round_file_data
-	test_get_active_menu_string
-	test_item_order_randomized
-	test_load_and_save_file
-	test_parse_scores
-	test_parse_voting_round
-	test_prune_votes
-	test_rank_based_voting
-	test_save_scores
-	test_save_votes
-	test_shuffle_voting_order
-	test_undo
-	test_vote
-	test_voting_format
-)
-
-addTestExe("${test_suites}" "${test_dependencies}")
 
 list(APPEND test_cases
 	zeroItemsAndVotes
@@ -385,3 +346,20 @@ list(APPEND test_cases
 	combineSaveScoresSuccessful
 )
 addTestSuite(test_end_to_end "${test_cases}")
+
+list(APPEND test_dependencies
+    ${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions.cpp
+    ${PROJECT_SOURCE_DIR}/src/helpers.cpp
+    ${PROJECT_SOURCE_DIR}/src/menus.cpp
+    ${PROJECT_SOURCE_DIR}/src/print.cpp
+    ${PROJECT_SOURCE_DIR}/src/program_loop.cpp
+    ${PROJECT_SOURCE_DIR}/src/score.cpp
+    ${PROJECT_SOURCE_DIR}/src/score_helpers.cpp
+    ${PROJECT_SOURCE_DIR}/src/test/mocks/mock_keyboard_input.cpp
+    ${PROJECT_SOURCE_DIR}/src/vote.cpp
+    ${PROJECT_SOURCE_DIR}/src/voting_format.cpp
+    ${PROJECT_SOURCE_DIR}/src/voting_round.cpp
+)
+
+addTestExe("${test_suites}" "${test_dependencies}")

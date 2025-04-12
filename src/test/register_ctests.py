@@ -9,7 +9,6 @@ def findLineIndexOfMatch(list_to_search, element) -> int:
 	for num, line in enumerate(list_to_search, 1):
 		if element in line:
 			return num - 1
-	print("No match found for '" + element + "'")
 	return -1
 
 def findLineIndexOfNextClosingParenthesis(list_to_search, starting_index):
@@ -20,7 +19,6 @@ def findLineIndexOfNextClosingParenthesis(list_to_search, starting_index):
 			break
 		if ")" in line:
 			return num - 1
-	print("No match found for ')'")
 	return -1
 
 def findLineIndexOfNextReturn(list_to_search, starting_index):
@@ -29,12 +27,56 @@ def findLineIndexOfNextReturn(list_to_search, starting_index):
 			continue
 		if "return true" in line:
 			return num - 1
-	print("No match found for 'return'")
 	return -1
+
+def addTestSuiteInCMakeIfNotPresent(data, test_suite):
+	if findLineIndexOfMatch(data, test_suite) != -1:
+		return
+
+	print(f"Creating CMake test suite for {test_suite}")
+
+	test_suites_end_index = findLineIndexOfMatch(data, "function(addTestExe")
+	data[test_suites_end_index:test_suites_end_index] = [
+		f"addTestSuite({test_suite}" + "\n",
+		")" + "\n",
+		"\n",
+	]
+
+def addRunTestsIfNotPresent(data, test_suite):
+	if findLineIndexOfMatch(data, "auto run_tests") != -1:
+		return
+
+	print(f"Creating run_tests for {test_suite}")
+
+	namespace_end_index = findLineIndexOfMatch(data, "} // namespace")
+	data[namespace_end_index:namespace_end_index] = [
+		"auto run_tests(std::string const& test) -> bool {" + "\n",
+		"\t" + "return true;" + "\n",
+		"}" + "\n",
+		"\n",
+	]
+
+def addTestSuiteEntryPointIfNotPresent(data, test_suite):
+	if findLineIndexOfMatch(data, f"auto {test_suite}") != -1:
+		return
+
+	print(f"Creating test suite entry point for {test_suite}")
+
+	data += [
+		"\n",
+		f"auto {test_suite}(std::string const& test_case) -> int {{" + "\n",
+		"\t" + "if (run_tests(test_case)) {" + "\n",
+		"\t\t" + "return 1;" + "\n",
+		"\t" + "}" + "\n",
+		"\t" + "return 0;" + "\n",
+		"}" + "\n",
+	]
 
 def updateCMakeLists(test_suite):
 	with open("CMakeLists.txt", 'r') as file:
 		cmake_file_data = file.readlines()
+
+	addTestSuiteInCMakeIfNotPresent(cmake_file_data, test_suite)
 
 	# Find range of existing CTest cases
 	tests_start_index = findLineIndexOfMatch(cmake_file_data, test_suite) + 1
@@ -53,6 +95,9 @@ def updateCMakeLists(test_suite):
 def updateTestSuiteFile(test_suite):
 	with open(test_suite + ".cpp", 'r') as file:
 		test_suite_data = file.readlines()
+
+	addRunTestsIfNotPresent(test_suite_data, test_suite)
+	addTestSuiteEntryPointIfNotPresent(test_suite_data, test_suite)
 
 	# Find range of existing test macros
 	tests_start_index = findLineIndexOfMatch(test_suite_data, "auto run_tests(std::string const& test)") + 1

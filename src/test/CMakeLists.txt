@@ -6,7 +6,8 @@ function(addTestSuite suite_name #[[ARGN]])
 	foreach (test_case ${ARGN})
 		add_test(NAME "${suite_name}/${test_case}" COMMAND test ${suite_name} ${test_case})
 	endforeach()
-	set(test_suites "${test_suites};${suite_name}" PARENT_SCOPE)
+	list(APPEND test_suites ${suite_name})
+	set(test_suites "${test_suites}" PARENT_SCOPE)
 endfunction()
 
 addTestSuite(test_calculate_scores
@@ -311,13 +312,11 @@ addTestSuite(test_end_to_end
 )
 
 function(addTestExe test_suites #[[ARGN]])
-	foreach (test_suite ${test_suites})
-		list(APPEND test_suites_cpp ${test_suite}.cpp)
-	endforeach()
+	list(TRANSFORM test_suites APPEND ".cpp")
 	add_executable(test
 		testing.cpp
 		test.cpp
-		${test_suites_cpp}
+		${test_suites}
 		${ARGN} # Dependencies
 	)
 	target_include_directories(test PRIVATE ${PROJECT_SOURCE_DIR}/src)

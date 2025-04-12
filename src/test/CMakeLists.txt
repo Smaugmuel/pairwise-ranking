@@ -277,7 +277,7 @@ addTestSuite(test_end_to_end
 	votingLegendPrinted
 	votingLegendNotReprinted
 	votingMatchupPrintedEachTime
-	votingCompletedPrinted
+	votingCompletedLegendPrinted
 	votingOptionA
 	votingOptionB
 	votingCompletedVoteOptionA

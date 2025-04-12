@@ -12,7 +12,7 @@
 namespace
 {
 
-auto sortIndexPair(IndexPair const& index_pair) -> IndexPair {
+auto getSortedIndexPair(IndexPair const& index_pair) noexcept -> IndexPair {
 	if (index_pair.first < index_pair.second) {
 		return index_pair;
 	}
@@ -21,7 +21,7 @@ auto sortIndexPair(IndexPair const& index_pair) -> IndexPair {
 auto itemsAreUnique(Items const& items) -> bool {
 	return items.size() == std::unordered_set<Item>{ items.begin(), items.end() }.size();
 }
-auto votingIndicesAreSmallerThanNumberOfItems(Votes const& votes, uint32_t const number_of_items) -> bool {
+auto votingIndicesAreSmallerThanNumberOfItems(Votes const& votes, uint32_t const number_of_items) noexcept -> bool {
 	for (auto const& vote : votes) {
 		if (vote.a_idx >= number_of_items || vote.b_idx >= number_of_items) {
 			return false;
@@ -32,11 +32,11 @@ auto votingIndicesAreSmallerThanNumberOfItems(Votes const& votes, uint32_t const
 auto hasDuplicateMatchups(Votes const& votes) -> bool {
 	std::unordered_set<IndexPair, IndexPairHash> index_pair_set{};
 	for (auto const& vote : votes) {
-		index_pair_set.insert(sortIndexPair({ vote.a_idx, vote.b_idx }));
+		index_pair_set.insert(getSortedIndexPair({ vote.a_idx, vote.b_idx }));
 	}
 	return index_pair_set.size() != votes.size();
 }
-auto generateSeed() -> Seed {
+auto generateSeed() noexcept -> Seed {
 	return static_cast<Seed>(std::chrono::system_clock::now().time_since_epoch().count());
 }
 auto generateIndexPairs(uint32_t const number_of_items) -> IndexPairs {
@@ -74,11 +74,11 @@ auto hasInvalidScheduledVotes(IndexPairs const& index_pairs, uint32_t number_of_
 auto hasDuplicateScheduledVotes(IndexPairs const& index_pairs) -> bool {
 	std::unordered_set<IndexPair, IndexPairHash> index_pair_set{};
 	for (auto const& index_pair : index_pairs) {
-		index_pair_set.insert(sortIndexPair(index_pair));
+		index_pair_set.insert(getSortedIndexPair(index_pair));
 	}
 	return index_pair_set.size() != index_pairs.size();
 }
-auto expectedIndexPairs(Items const& items, bool reduced_voting) -> uint32_t {
+auto expectedIndexPairs(Items const& items, bool reduced_voting) noexcept -> uint32_t {
 	if (items.size() < 2) {
 		return 0;
 	}
@@ -88,7 +88,7 @@ auto expectedIndexPairs(Items const& items, bool reduced_voting) -> uint32_t {
 	}
 	return static_cast<uint32_t>(number_of_pairs);
 }
-auto hasVotesWithInvalidIndices(Votes const& votes, uint32_t number_of_items) -> bool {
+auto hasVotesWithInvalidIndices(Votes const& votes, uint32_t number_of_items) noexcept -> bool {
 	for (auto const& vote : votes) {
 		if (vote.a_idx >= vote.b_idx || vote.b_idx >= number_of_items) {
 			return true;
@@ -96,7 +96,7 @@ auto hasVotesWithInvalidIndices(Votes const& votes, uint32_t number_of_items) ->
 	}
 	return false;
 }
-auto hasVotesWithInvalidVoteOption(Votes const& votes) -> bool {
+auto hasVotesWithInvalidVoteOption(Votes const& votes) noexcept -> bool {
 	for (auto const& vote : votes) {
 		if (vote.winner != Option::A && vote.winner != Option::B) {
 			return true;
@@ -111,14 +111,14 @@ auto hasDuplicateVotes(Votes const& votes) -> bool {
 	}
 	return index_pair_set.size() != votes.size();
 }
-auto generateIndexPairWithOffset(uint32_t const i, uint32_t const offset, uint32_t const number_of_items) -> IndexPair {
+auto generateIndexPairWithOffset(uint32_t const i, uint32_t const offset, uint32_t const number_of_items) noexcept -> IndexPair {
 	return std::make_pair(i, (i + offset) % number_of_items);
 }
 void removeNSpacedPairs(IndexPairs& index_pairs, uint32_t const offset, uint32_t const number_of_items) {
 	for (uint32_t i = 0; i < number_of_items; i++) {
 		// Since pairs are generated with the first element always being smaller than the second,
 		// the order must be ensured here.
-		auto const pair = sortIndexPair(generateIndexPairWithOffset(i, offset, number_of_items));
+		auto const pair = getSortedIndexPair(generateIndexPairWithOffset(i, offset, number_of_items));
 		index_pairs.erase(std::remove(index_pairs.begin(), index_pairs.end(), pair), index_pairs.end());
 	}
 }
@@ -159,12 +159,12 @@ auto parseVote(std::string const& str) -> Vote {
 		option_b.value(),
 		static_cast<Option>(winner.value()) };
 }
-auto findMaxLength(Items const& items) -> size_t {
+auto findMaxLength(Items const& items) noexcept -> size_t {
 	if (items.empty()) {
 		return 0;
 	}
 	return std::max_element(items.begin(), items.end(),
-		[](Item const& a, Item const& b) {
+		[](Item const& a, Item const& b) noexcept {
 			return a.size() < b.size();
 		}
 	)->size();
@@ -211,10 +211,10 @@ auto VotingRound::ScoreBased::shuffle(Seed const seed) -> bool {
 auto VotingRound::ScoreBased::currentIndexPair(uint32_t const counter) const -> IndexPair {
 	return index_pairs_[counter];
 }
-auto VotingRound::ScoreBased::indexPairs() const -> IndexPairs const& {
+auto VotingRound::ScoreBased::indexPairs() const noexcept -> IndexPairs const& {
 	return index_pairs_;
 }
-auto VotingRound::ScoreBased::numberOfScheduledVotes() const -> uint32_t {
+auto VotingRound::ScoreBased::numberOfScheduledVotes() const noexcept -> uint32_t {
 	return static_cast<uint32_t>(index_pairs_.size());
 }
 
@@ -336,11 +336,11 @@ auto VotingRound::RankBased::undoVote(Items& items, Votes const& votes) -> bool 
 	}
 	return true;
 }
-auto VotingRound::RankBased::currentIndexPair() const -> IndexPair {
+auto VotingRound::RankBased::currentIndexPair() const noexcept -> IndexPair {
 	uint32_t const mid_index = (start_index_ + end_index_) / 2;
 	return { mid_index, number_of_sorted_items_ };
 }
-auto VotingRound::RankBased::numberOfSortedItems() const->uint32_t {
+auto VotingRound::RankBased::numberOfSortedItems() const noexcept -> uint32_t {
 	return number_of_sorted_items_;
 }
 
@@ -511,22 +511,22 @@ auto VotingRound::save(std::string const& file_name) -> bool {
 	is_saved_ = true;
 	return true;
 }
-auto VotingRound::items() const->Items const& {
+auto VotingRound::items() const noexcept -> Items const& {
 	return items_;
 }
-auto VotingRound::originalItemOrder() const -> Items const& {
+auto VotingRound::originalItemOrder() const noexcept -> Items const& {
 	return original_items_order_;
 }
-auto VotingRound::format() const->VotingFormat {
+auto VotingRound::format() const noexcept -> VotingFormat {
 	return voting_format_;
 }
-auto VotingRound::seed() const->Seed {
+auto VotingRound::seed() const noexcept -> Seed {
 	return seed_;
 }
-auto VotingRound::votes() const->Votes const& {
+auto VotingRound::votes() const noexcept -> Votes const& {
 	return votes_;
 }
-auto VotingRound::isSaved() const -> bool {
+auto VotingRound::isSaved() const noexcept -> bool {
 	return is_saved_;
 }
 // TODO: Deprecated in favor of VotingRound::create().
@@ -704,12 +704,21 @@ auto VotingRound::createFormatImpl() -> bool {
 		return false;
 	}
 }
-auto VotingRound::currentIndexPairImpl() const -> IndexPair {
+auto VotingRound::currentIndexPairImpl() const noexcept -> IndexPair {
 	switch (voting_format_) {
 	case VotingFormat::Full:
 	case VotingFormat::Reduced:
+		if (!score_based_.has_value()) {
+			return {};
+		}
+		if (score_based_.value().indexPairs().size() < votes_.size() + 1) {
+			return {};
+		}
 		return score_based_.value().indexPairs()[votes_.size()];
 	case VotingFormat::Ranked:
+		if (!rank_based_.has_value()) {
+			return {};
+		}
 		return rank_based_.value().currentIndexPair();
 	case VotingFormat::Invalid:
 	default:
@@ -731,7 +740,7 @@ auto VotingRound::shuffleImpl() -> bool {
 		return false;
 	}
 }
-auto VotingRound::hasRemainingVotesImpl() const -> bool {
+auto VotingRound::hasRemainingVotesImpl() const noexcept -> bool {
 	switch (voting_format_) {
 	case VotingFormat::Full:
 	case VotingFormat::Reduced:
@@ -749,7 +758,7 @@ auto VotingRound::hasRemainingVotesImpl() const -> bool {
 		return false;
 	}
 }
-auto VotingRound::numberOfSortedItemsImpl() const -> uint32_t {
+auto VotingRound::numberOfSortedItemsImpl() const noexcept -> uint32_t {
 	switch (voting_format_) {
 	case VotingFormat::Ranked:
 		if (!rank_based_.has_value()) {
@@ -763,7 +772,7 @@ auto VotingRound::numberOfSortedItemsImpl() const -> uint32_t {
 		return 0;
 	}
 }
-auto VotingRound::numberOfScheduledVotesImpl() const -> uint32_t {
+auto VotingRound::numberOfScheduledVotesImpl() const noexcept -> uint32_t {
 	switch (voting_format_) {
 	case VotingFormat::Full:
 	case VotingFormat::Reduced:

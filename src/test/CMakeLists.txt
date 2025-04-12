@@ -2,29 +2,14 @@ cmake_minimum_required(VERSION 3.15)
 
 enable_testing()
 
-function(addTestExe suites dependencies)
-	foreach (suite ${suites})
-		list(APPEND suites_cpp ${suite}.cpp)
-	endforeach()
-	add_executable(test
-		testing.cpp
-		test.cpp
-		${suites_cpp}
-		${dependencies}
-	)
-	target_include_directories(test PRIVATE ${PROJECT_SOURCE_DIR}/src)
-endfunction()
-
-function(addTestSuite suite_name cases)
-	foreach (test_case ${cases})
+function(addTestSuite suite_name #[[ARGN]])
+	foreach (test_case ${ARGN})
 		add_test(NAME "${suite_name}/${test_case}" COMMAND test ${suite_name} ${test_case})
 	endforeach()
-	unset(test_cases PARENT_SCOPE)
-	list(APPEND test_suites "${suite_name}")
-	set(test_suites ${test_suites} PARENT_SCOPE)
+	set(test_suites "${test_suites};${suite_name}" PARENT_SCOPE)
 endfunction()
 
-list(APPEND test_cases
+addTestSuite(test_calculate_scores
 	zeroItemsAndVotes
 	zeroVotes
 	oneVoteForA
@@ -43,9 +28,8 @@ list(APPEND test_cases
 	votingForOptionBButNotFullRound
 	tooFewVotesToScoreAllItems
 )
-addTestSuite(test_calculate_scores "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_combine_scores
 	combiningNoScoreSet
 	combiningOneScoreSetWithZeroScores
 	combiningOneScoreSetWithOneScore
@@ -60,9 +44,8 @@ list(APPEND test_cases
 	endToEnd_combineFromAllEmptyFiles
 	endToEnd_combineFromOneEmptyFile
 )
-addTestSuite(test_combine_scores "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_create_score_table
 	noScores
 	alreadySorted
 	reversedOrder
@@ -73,9 +56,8 @@ list(APPEND test_cases
 	shortItemNameAndWinsAndLosses
 	longItemNameAndWinsAndLosses
 )
-addTestSuite(test_create_score_table "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_current_voting_line
 	counterLengthEqualsTotalLength
 	counterLengthIsLessThanTotalLength
 	itemIsShorterThanLongestItem
@@ -83,15 +65,13 @@ list(APPEND test_cases
 	votingIsCompleted
 	incompleteVotingIncreasesCounterAndChangesItem
 )
-addTestSuite(test_current_voting_line "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_e2e_voting_round
 	votingRoundIsTheSameAfterLoading
 	scoresAreTheSameDespiteDifferentItemOrderAndSeed
 )
-addTestSuite(test_e2e_voting_round "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_generate_new_voting_round
 	generateWithTooFewItems
 	generateWithOnlyEmptyItems
 	generateWithSomeEmptyItems
@@ -102,33 +82,29 @@ list(APPEND test_cases
 	generateWithReducedVotingGivesCorrectAmountOfScheduledVotes
 	generateWithFullVotingGivesCorrectScheduledVotes
 )
-addTestSuite(test_generate_new_voting_round "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_generate_score_file_data
 	noScores
 	oneScore
 	oneScoreWithSpacesInItemName
 	multipleScores
 )
-addTestSuite(test_generate_score_file_data "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_generate_voting_round_file_data
 	emptyVotingRound
 	votingRoundWithFullVoting
 	votingRoundWithReducedVoting
 	votingRoundWithOneVote
 )
-addTestSuite(test_generate_voting_round_file_data "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_get_active_menu_string
 	showIntro
 	noVotingRoundCreated
 	votingRoundStarted
 	votingRoundCompleted
 )
-addTestSuite(test_get_active_menu_string "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_item_order_randomized
 	itemOrderIsShuffledWhenShufflingNewVotingRound
 	originalItemOrderIsRetainedWhenShufflingNewVotingRound
 	itemOrderIsShuffledWhenShufflingParsedVotingRound
@@ -136,9 +112,8 @@ list(APPEND test_cases
 	convertingVotingRoundToTextUsesOriginalItemOrder
 	scoresAreCalculatedWithCorrectItems
 )
-addTestSuite(test_item_order_randomized "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_load_and_save_file
 	savingAndLoadingLines
 	savingAndLoadingLinesWithEmptyLines
 	savingAndLoadingOnlyEmptyLines
@@ -147,9 +122,8 @@ list(APPEND test_cases
 	savingToExistingFile
 	loadingNonExistingFile
 )
-addTestSuite(test_load_and_save_file "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_parse_scores
 	stringIsEmpty
 	stringIsValid
 	itemIsAnInteger
@@ -166,9 +140,8 @@ list(APPEND test_cases
 	validNumbers
 	nonNumbers
 )
-addTestSuite(test_parse_scores "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_parse_voting_round
 	noLinesToParse
 	noItemsBeforeEmptyLine
 	fewerThanTwoItems
@@ -195,17 +168,15 @@ list(APPEND test_cases
 	fourItemsAndFullVotingAndOneVote
 	fourItemsAndFullVotingAndZeroVotes
 )
-addTestSuite(test_parse_voting_round "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_prune_votes
 	pruningDuringVotingRoundCreationWithTooFewItems
 	pruningAmountDuringVotingRoundCreationDependsOnNumberOfItems
 	parseVotingRoundWithPruning
 	pruningRemovesCorrectScheduledVotes
 )
-addTestSuite(test_prune_votes "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_rank_based_voting
 	newRoundFormatStringPresentsAvailableVotingFormatsAndNumberOfVotes
 	createNewRankedVotingRound
 	parseRankedVotingRoundWithNoVotes
@@ -225,50 +196,43 @@ list(APPEND test_cases
 	rankItemsBySortingWhenInitiallyUnranked
 	voteCounterAndApproximateTotalVotesIsPresented
 )
-addTestSuite(test_rank_based_voting "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_save_scores
 	saveWhenNoScores
 	saveWhenSomeScores
 )
-addTestSuite(test_save_scores "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_save_votes
 	saveWhenSomeVotesRemain
 	saveWhenNoVotesRemain
 )
-addTestSuite(test_save_votes "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_shuffle_voting_order
 	shufflingWithSeedIsDeterministic
 )
-addTestSuite(test_shuffle_voting_order "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_undo
 	undoWhenVotesExist
 	undoWhenNoVotesExist
 )
-addTestSuite(test_undo "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_vote
 	firstVoteForA
 	firstVoteForB
 	votingForAForEachScheduledVote
 	votingForBForEachScheduledVote
 	votingAfterRoundCompleted
 )
-addTestSuite(test_vote "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_voting_format
 	charToFormatWithValidOptions
 	charToFormatWithInvalidOptions
 	stringToFormatWithValidOptions
 	stringToFormatWithInalidOptions
 	formatToString
 )
-addTestSuite(test_voting_format "${test_cases}")
 
-list(APPEND test_cases
+addTestSuite(test_end_to_end
 	mainMenuLegendPrinted
 	mainMenuLegendNotReprinted
 	mainMenuNewVotingRound
@@ -345,9 +309,21 @@ list(APPEND test_cases
 	combineSaveScoresCancel
 	combineSaveScoresSuccessful
 )
-addTestSuite(test_end_to_end "${test_cases}")
 
-list(APPEND test_dependencies
+function(addTestExe test_suites #[[ARGN]])
+	foreach (test_suite ${test_suites})
+		list(APPEND test_suites_cpp ${test_suite}.cpp)
+	endforeach()
+	add_executable(test
+		testing.cpp
+		test.cpp
+		${test_suites_cpp}
+		${ARGN} # Dependencies
+	)
+	target_include_directories(test PRIVATE ${PROJECT_SOURCE_DIR}/src)
+endfunction()
+
+addTestExe("${test_suites}"
     ${PROJECT_SOURCE_DIR}/src/calculate_scores.cpp
     ${PROJECT_SOURCE_DIR}/src/functions.cpp
     ${PROJECT_SOURCE_DIR}/src/helpers.cpp
@@ -361,5 +337,3 @@ list(APPEND test_dependencies
     ${PROJECT_SOURCE_DIR}/src/voting_format.cpp
     ${PROJECT_SOURCE_DIR}/src/voting_round.cpp
 )
-
-addTestExe("${test_suites}" "${test_dependencies}")

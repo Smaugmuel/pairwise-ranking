@@ -752,7 +752,7 @@ void votingMatchupPrintedEachTime() {
 	ASSERT_EQ(logs.occurrences("Your choice"), 11);
 	cleanUpFiles();
 }
-void votingCompletedPrinted() {
+void votingCompletedLegendPrinted() {
 	createItemsFile(2);
 
 	appendAction(KeyAction::NewRound);
@@ -765,7 +765,8 @@ void votingCompletedPrinted() {
 
 	auto const logs = runProgramLoopAndCatchLogs();
 
-	ASSERT_TRUE(logs.contains("Voting round completed"));
+	ASSERT_TRUE(logs.contains("| Voting round completed |"));
+	ASSERT_TRUE(logs.occurrences("Vote option [A]") >= 2);
 	cleanUpFiles();
 }
 void votingOptionA() {
@@ -1298,7 +1299,7 @@ auto run_tests(std::string const& test) -> bool {
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingLegendPrinted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingLegendNotReprinted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingMatchupPrintedEachTime);
-	RUN_TEST_IF_ARGUMENT_EQUALS(votingCompletedPrinted);
+	RUN_TEST_IF_ARGUMENT_EQUALS(votingCompletedLegendPrinted);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingOptionA);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingOptionB);
 	RUN_TEST_IF_ARGUMENT_EQUALS(votingCompletedVoteOptionA);

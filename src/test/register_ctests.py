@@ -29,6 +29,12 @@ def findLineIndexOfNextReturn(list_to_search, starting_index):
 			return num - 1
 	return -1
 
+def findLineIndexOfLastTestSuiteExternDeclaration(list_to_search):
+	for num, line in reversed([x for x in enumerate(list_to_search, 1)]):
+		if "extern auto test_" in line:
+			return num - 1
+	return -1
+
 def addTestSuiteInCMakeIfNotPresent(data, test_suite):
 	if findLineIndexOfMatch(data, test_suite) != -1:
 		return
@@ -113,11 +119,50 @@ def updateTestSuiteFile(test_suite):
 	with open(test_suite + ".cpp", "w") as file:
 		file.write("".join(test_suite_data))
 
+def updateTestSuiteEntryPoints(suites):
+	with open("test.cpp", "r") as file:
+		entrypoint_data = file.readlines()
+
+	#### Add test suite extern declaration ####
+
+	namespace_index = findLineIndexOfMatch(entrypoint_data, "namespace")
+	extern_start_index = findLineIndexOfMatch(entrypoint_data, "extern auto test")
+
+	# Delete existing extern declarations
+	if extern_start_index != -1:
+		del entrypoint_data[extern_start_index:namespace_index]
+	
+	extern_start_index = namespace_index
+
+	entrypoint_data[extern_start_index:extern_start_index] = [
+		f"extern auto {suite}(std::string const&) -> int;" + '\n' for suite in suites
+	] + [
+		'\n'
+	]
+
+	#### Add test suite run_test invokations ####
+
+	run_test_start_index = findLineIndexOfMatch(entrypoint_data, "run_test") + 1
+	run_test_end_index = findLineIndexOfMatch(entrypoint_data, "return 1;") - 1
+
+	del entrypoint_data[run_test_start_index:run_test_end_index+1]
+	entrypoint_data[run_test_start_index:run_test_start_index] = [
+		'\t' + f"if (suite == \"{suite}\") {{" + '\n'
+		"\t\t" + f"return {suite}(test);" + '\n'
+		'\t' + "}" + '\n'
+		for suite in suites
+	]
+
+	with open("test.cpp", "w") as file:
+		file.write("".join(entrypoint_data))
+
+
 os.chdir(os.path.dirname(__file__))
 
 # Find all test suites
 test_suites = [ name[:-4] for name in glob.glob("test_*.cpp")]
 
+updateTestSuiteEntryPoints(test_suites)
 for test_suite in test_suites:
 	updateCMakeLists(test_suite)
 	updateTestSuiteFile(test_suite)

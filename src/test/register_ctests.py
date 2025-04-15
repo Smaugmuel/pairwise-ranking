@@ -125,16 +125,15 @@ def updateTestSuiteEntryPoints(suites):
 
 	#### Add test suite extern declaration ####
 
-	namespace_index = findLineIndexOfMatch(entrypoint_data, "namespace")
 	extern_start_index = findLineIndexOfMatch(entrypoint_data, "extern auto test")
 
 	# Delete existing extern declarations
 	if extern_start_index != -1:
+		namespace_index = findLineIndexOfMatch(entrypoint_data, "namespace")
 		del entrypoint_data[extern_start_index:namespace_index]
 	
-	extern_start_index = namespace_index
-
-	entrypoint_data[extern_start_index:extern_start_index] = [
+	namespace_index = findLineIndexOfMatch(entrypoint_data, "namespace")
+	entrypoint_data[namespace_index:namespace_index] = [
 		f"extern auto {suite}(std::string const&) -> int;" + '\n' for suite in suites
 	] + [
 		'\n'
@@ -146,6 +145,7 @@ def updateTestSuiteEntryPoints(suites):
 	run_test_end_index = findLineIndexOfMatch(entrypoint_data, "return 1;") - 1
 
 	del entrypoint_data[run_test_start_index:run_test_end_index+1]
+
 	entrypoint_data[run_test_start_index:run_test_start_index] = [
 		'\t' + f"if (suite == \"{suite}\") {{" + '\n'
 		"\t\t" + f"return {suite}(test);" + '\n'
